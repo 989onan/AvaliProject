@@ -1,6 +1,8 @@
 package com.lunkoashtail.avaliproject.item.custom;
 
 import com.lunkoashtail.avaliproject.entity.custom.AvaliProjectileEntity;
+import com.lunkoashtail.avaliproject.event.PistolProjectileEvent;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ItemStack;
@@ -18,11 +20,12 @@ public class AvaliProjectileItemItem extends Item {
         super(new Item.Properties().stacksTo(64).rarity(Rarity.COMMON));
     }
 
+
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player entity, InteractionHand hand) {
-        InteractionResultHolder<ItemStack> ar = InteractionResultHolder.fail(entity.getItemInHand(hand));
+    public InteractionResult use(Level world, Player entity, InteractionHand hand) {
+        InteractionResult ar = InteractionResult.FAIL;
         if (entity.getAbilities().instabuild || findAmmo(entity) != ItemStack.EMPTY) {
-            ar = InteractionResultHolder.fail(entity.getItemInHand(hand));
+            ar = InteractionResult.FAIL;
             entity.startUsingItem(hand);
         }
         return ar;

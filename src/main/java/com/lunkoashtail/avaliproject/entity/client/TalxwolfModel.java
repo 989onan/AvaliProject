@@ -1,14 +1,17 @@
 package com.lunkoashtail.avaliproject.entity.client;
 
+import com.lunkoashtail.avaliproject.entity.custom.TalxweaselEntity;
 import com.lunkoashtail.avaliproject.entity.custom.TalxwolfEntity;
-import software.bernie.geckolib.model.data.EntityModelData;
+import software.bernie.geckolib.animatable.processing.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.animation.AnimationState;
 
 import net.minecraft.util.Mth;
 import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
+
+import static com.lunkoashtail.avaliproject.entity.client.AvaliProjectDataTickets.texture;
 
 public class TalxwolfModel extends GeoModel<TalxwolfEntity> {
     @Override
@@ -17,22 +20,21 @@ public class TalxwolfModel extends GeoModel<TalxwolfEntity> {
     }
 
     @Override
-    public ResourceLocation getModelResource(TalxwolfEntity entity) {
+    public ResourceLocation getModelResource(GeoRenderState entity) {
         return ResourceLocation.parse("avaliproject:geo/talxwolf.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(TalxwolfEntity entity) {
-        return ResourceLocation.parse("avaliproject:textures/entity/talxwolf/" + entity.getTexture() + ".png");
+    public ResourceLocation getTextureResource(GeoRenderState entity) {
+        return ResourceLocation.parse("avaliproject:textures/entity/talxwolf/" + entity.getGeckolibData(texture) + ".png");
     }
 
     @Override
-    public void setCustomAnimations(TalxwolfEntity animatable, long instanceId, AnimationState animationState) {
+    public void setCustomAnimations(AnimationState<TalxwolfEntity> animatable) {
         GeoBone head = getAnimationProcessor().getBone("head");
         if (head != null) {
-            EntityModelData entityData = (EntityModelData) animationState.getData(DataTickets.ENTITY_MODEL_DATA);
-            head.setRotX(entityData.headPitch() * Mth.DEG_TO_RAD);
-            head.setRotY(entityData.netHeadYaw() * Mth.DEG_TO_RAD);
+            head.setRotX(animatable.renderState().getGeckolibData(DataTickets.ENTITY_PITCH)  * Mth.DEG_TO_RAD);
+            head.setRotY(animatable.renderState().getGeckolibData(DataTickets.ENTITY_YAW)  * Mth.DEG_TO_RAD);
         }
 
     }

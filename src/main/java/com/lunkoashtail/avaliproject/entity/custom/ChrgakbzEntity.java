@@ -1,12 +1,13 @@
 package com.lunkoashtail.avaliproject.entity.custom;
 
 import com.lunkoashtail.avaliproject.entity.ModEntities;
+import net.minecraft.world.entity.*;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.GeoEntity;
 
@@ -29,13 +30,6 @@ import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.SpawnPlacementTypes;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.util.Mth;
@@ -129,29 +123,22 @@ public class ChrgakbzEntity extends Animal implements GeoEntity {
 
     protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHitIn) {
         super.dropCustomDeathLoot(serverLevel, source, recentlyHitIn);
-        this.spawnAtLocation(new ItemStack(Items.TURTLE_SCUTE));
+        this.spawnAtLocation(serverLevel,  new ItemStack(Items.TURTLE_SCUTE));
     }
 
     @Override
     public SoundEvent getAmbientSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.turtle.ambient_land"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.turtle.ambient_land")).get().value();
     }
 
     @Override
     public SoundEvent getHurtSound(DamageSource ds) {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.turtle.hurt"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.turtle.hurt")).get().value();
     }
 
     @Override
     public SoundEvent getDeathSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.turtle.death"));
-    }
-
-    @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (source.is(DamageTypes.DROWN))
-            return false;
-        return super.hurt(source, amount);
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.turtle.death")).get().value();
     }
 
     @Override
@@ -164,13 +151,16 @@ public class ChrgakbzEntity extends Animal implements GeoEntity {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("Texture"))
-            this.setTexture(compound.getString("Texture"));
+            this.setTexture(compound.getString("Texture").get());
     }
 
     @Override
     public void baseTick() {
         super.baseTick();
         this.refreshDimensions();
+        if (this.level() instanceof ServerLevel) {
+            this.setAirSupply(300);
+        }
     }
 
     @Override
@@ -180,8 +170,8 @@ public class ChrgakbzEntity extends Animal implements GeoEntity {
 
     @Override
     public AgeableMob getBreedOffspring(ServerLevel serverWorld, AgeableMob ageable) {
-        ChrgakbzEntity retval = ModEntities.CHRGAKBZ.get().create(serverWorld);
-        retval.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(retval.blockPosition()), MobSpawnType.BREEDING, null);
+        ChrgakbzEntity retval = ModEntities.CHRGAKBZ.get().create(serverWorld, EntitySpawnReason.BREEDING);
+        retval.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(retval.blockPosition()), EntitySpawnReason.BREEDING, null);
         return retval;
     }
 
@@ -228,9 +218,9 @@ public class ChrgakbzEntity extends Animal implements GeoEntity {
         return builder;
     }
 
-    private PlayState movementPredicate(AnimationState event) {
+    private PlayState movementPredicate(AnimationTest<ChrgakbzEntity> event) {
         if (this.animationprocedure.equals("empty")) {
-            if (this.isInWaterOrBubble()) {
+            if (this.isInWater()) {
                 return event.setAndContinue(RawAnimation.begin().thenLoop("Swim"));
             }
             return event.setAndContinue(RawAnimation.begin().thenLoop("Idle"));
@@ -240,14 +230,14 @@ public class ChrgakbzEntity extends Animal implements GeoEntity {
 
     String prevAnim = "empty";
 
-    private PlayState procedurePredicate(AnimationState event) {
-        if (!animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
+    private PlayState procedurePredicate(AnimationTest<ChrgakbzEntity> event) {
+        if (!animationprocedure.equals("empty") && event.controller().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
             if (!this.animationprocedure.equals(prevAnim))
-                event.getController().forceAnimationReset();
-            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
-            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                event.controller().forceAnimationReset();
+            event.controller().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.controller().getAnimationState() == AnimationController.State.STOPPED) {
                 this.animationprocedure = "empty";
-                event.getController().forceAnimationReset();
+                event.controller().forceAnimationReset();
             }
         } else if (animationprocedure.equals("empty")) {
             prevAnim = "empty";
@@ -262,7 +252,7 @@ public class ChrgakbzEntity extends Animal implements GeoEntity {
         ++this.deathTime;
         if (this.deathTime == 20) {
             this.remove(ChrgakbzEntity.RemovalReason.KILLED);
-            this.dropExperience(this);
+            this.dropExperience(this.getServer().getLevel(this.level().dimension()), this);
         }
     }
 
@@ -276,8 +266,8 @@ public class ChrgakbzEntity extends Animal implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        data.add(new AnimationController<>(this, "movement", 4, this::movementPredicate));
-        data.add(new AnimationController<>(this, "procedure", 4, this::procedurePredicate));
+        data.add(new AnimationController<>("movement", 4, this::movementPredicate));
+        data.add(new AnimationController<>("procedure", 4, this::procedurePredicate));
     }
 
     @Override

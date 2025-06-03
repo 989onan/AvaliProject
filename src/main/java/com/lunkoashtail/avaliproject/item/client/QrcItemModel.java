@@ -4,6 +4,7 @@ import com.lunkoashtail.avaliproject.item.custom.QrcItem;
 import software.bernie.geckolib.model.GeoModel;
 
 import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 public class QrcItemModel extends GeoModel<QrcItem> {
     @Override
@@ -12,12 +13,12 @@ public class QrcItemModel extends GeoModel<QrcItem> {
     }
 
     @Override
-    public ResourceLocation getModelResource(QrcItem animatable) {
+    public ResourceLocation getModelResource(GeoRenderState animatable) {
         return ResourceLocation.parse("avaliproject:geo/qrc.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(QrcItem animatable) {
+    public ResourceLocation getTextureResource(GeoRenderState animatable) {
         return ResourceLocation.parse("avaliproject:textures/item/qrc.png");
     }
 }

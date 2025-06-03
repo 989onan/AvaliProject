@@ -2,25 +2,27 @@ package com.lunkoashtail.avaliproject.item.custom;
 
 import com.lunkoashtail.avaliproject.event.CustomProjectileEvent;
 import com.lunkoashtail.avaliproject.item.client.NovaItemRenderer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemUseAnimation;
+import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimatableManager;
+
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.GeoItem;
 
 import net.minecraft.world.level.Level;
-import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 
 import java.util.function.Consumer;
 
@@ -43,7 +45,7 @@ public class NovaItem extends Item implements GeoItem {
             private NovaItemRenderer renderer;
 
             @Override
-            public BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
+            public @Nullable GeoItemRenderer<NovaItem> getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new NovaItemRenderer();
                 return this.renderer;
@@ -51,9 +53,9 @@ public class NovaItem extends Item implements GeoItem {
         });
     }
 
-    private PlayState idlePredicate(AnimationState event) {
+    private PlayState idlePredicate(AnimationTest<NovaItem> event) {
         if (this.animationprocedure.equals("empty")) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("Idle"));
+            event.controller().setAnimation(RawAnimation.begin().thenLoop("Idle"));
             return PlayState.CONTINUE;
         }
         return PlayState.STOP;
@@ -61,14 +63,14 @@ public class NovaItem extends Item implements GeoItem {
 
     String prevAnim = "empty";
 
-    private PlayState procedurePredicate(AnimationState event) {
-        if (!this.animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
+    private PlayState procedurePredicate(AnimationTest<NovaItem> event) {
+        if (!this.animationprocedure.equals("empty") && event.controller().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
             if (!this.animationprocedure.equals(prevAnim))
-                event.getController().forceAnimationReset();
-            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
-            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                event.controller().forceAnimationReset();
+            event.controller().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.controller().getAnimationState() == AnimationController.State.STOPPED) {
                 this.animationprocedure = "empty";
-                event.getController().forceAnimationReset();
+                event.controller().forceAnimationReset();
             }
         } else if (this.animationprocedure.equals("empty")) {
             prevAnim = "empty";
@@ -80,9 +82,9 @@ public class NovaItem extends Item implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        AnimationController procedureController = new AnimationController(this, "procedureController", 0, this::procedurePredicate);
+        AnimationController procedureController = new AnimationController<>("procedureController", 0, this::procedurePredicate);
         data.add(procedureController);
-        AnimationController idleController = new AnimationController(this, "idleController", 0, this::idlePredicate);
+        AnimationController idleController = new AnimationController<>("idleController", 0, this::idlePredicate);
         data.add(idleController);
     }
 
@@ -92,14 +94,14 @@ public class NovaItem extends Item implements GeoItem {
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack itemstack) {
-        return UseAnim.BOW;
+    public ItemUseAnimation getUseAnimation(ItemStack itemstack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player entity, InteractionHand hand) {
-        InteractionResultHolder<ItemStack> ar = super.use(world, entity, hand);
-        CustomProjectileEvent.execute(world, entity.getX(), entity.getY(), entity.getZ(), entity, ar.getObject());
+    public InteractionResult use(Level world, Player entity, InteractionHand hand) {
+        InteractionResult ar = super.use(world, entity, hand);
+        CustomProjectileEvent.execute(world, entity.getX(), entity.getY(), entity.getZ(), entity, entity.getItemInHand(hand));
         return ar;
     }
 }

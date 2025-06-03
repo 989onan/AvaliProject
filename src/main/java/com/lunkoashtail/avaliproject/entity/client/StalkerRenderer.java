@@ -1,6 +1,8 @@
 package com.lunkoashtail.avaliproject.entity.client;
 
+import com.lunkoashtail.avaliproject.entity.custom.SporeEntity;
 import com.lunkoashtail.avaliproject.entity.custom.StalkerEntity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 
@@ -11,23 +13,32 @@ import net.minecraft.client.renderer.MultiBufferSource;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
-public class StalkerRenderer extends GeoEntityRenderer<StalkerEntity> {
+import static com.lunkoashtail.avaliproject.entity.client.AvaliProjectDataTickets.texture;
+
+public class StalkerRenderer<R extends EntityRenderState & GeoRenderState>  extends GeoEntityRenderer<StalkerEntity, R> {
     public StalkerRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new StalkerModel());
         this.shadowRadius = 0.5f;
     }
 
     @Override
-    public RenderType getRenderType(StalkerEntity animatable, ResourceLocation texture, MultiBufferSource bufferSource, float partialTick) {
+    public RenderType getRenderType(R animatable, ResourceLocation texture) {
         return RenderType.entityTranslucent(getTextureLocation(animatable));
     }
 
     @Override
-    public void preRender(PoseStack poseStack, StalkerEntity entity, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int color) {
+    public void addRenderData(StalkerEntity animatable, Void relatedObject, R renderState) {
+        renderState.addGeckolibData(texture,animatable.getTexture());
+
+    }
+
+    @Override
+    public void preRender(R entity, PoseStack poseStack, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, int packedLight, int packedOverlay, int color) {
         float scale = 1f;
         this.scaleHeight = scale;
         this.scaleWidth = scale;
-        super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, color);
+        super.preRender( entity,poseStack, model, bufferSource, buffer, isReRender, packedLight, packedOverlay, color);
     }
 }

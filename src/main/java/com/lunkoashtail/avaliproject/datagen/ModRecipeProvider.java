@@ -3,25 +3,33 @@ package com.lunkoashtail.avaliproject.datagen;
 import com.lunkoashtail.avaliproject.AvaliProject;
 import com.lunkoashtail.avaliproject.block.ModBlocks;
 import com.lunkoashtail.avaliproject.item.ModItems;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.common.conditions.IConditionBuilder;
+import net.neoforged.neoforge.common.conditions.;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
-    public ModRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries);
+public class ModRecipeProvider extends RecipeProvider {
+    public ModRecipeProvider(HolderLookup.Provider output, RecipeOutput registries) {
+        super( output, registries);
+        
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput recipeOutput) {
+    protected void buildRecipes() {
         List<ItemLike> LUME_SMELTABLES = List.of(
                 ModBlocks.LUME_ORE, ModBlocks.LUME_DEEPSLATE_ORE);
         List<ItemLike> TITANIUM_SMELTABLES = List.of(
@@ -45,21 +53,21 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         List<ItemLike> AGATE_SMELTABLES = List.of(
                 ModBlocks.AGATE_ORE, ModBlocks.AGATE_DEEPSLATE_ORE);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.LUME.get())
+        ShapedRecipeBuilder.shaped(ModItems.LUME.getDelegate(), RecipeCategory.MISC, ModItems.LUME.)
                 .pattern("BBB")
                 .pattern("BBB")
                 .pattern("BBB")
                 .define('B', ModItems.LUME_BIT.get())
                 .unlockedBy("avaliproject:has_lume_bit", has(ModItems.LUME_BIT))
-                .save(recipeOutput, "avaliproject:lume_from_lume_bits");
+                .save(this.output, "avaliproject:lume_from_lume_bits");
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModBlocks.LUME_BLOCK.get())
+        ShapedRecipeBuilder.shaped(ModBlocks.LUME_BLOCK.unwrapLookup(), ModBlocks.LUME_BLOCK.get(), ModBlocks.LUME_BLOCK)
                 .pattern("BBB")
                 .pattern("BBB")
                 .pattern("BBB")
                 .define('B', ModItems.LUME.get())
                 .unlockedBy("avaliproject:has_lume", has(ModItems.LUME))
-                .save(recipeOutput, "avaliproject:lume_block_from_lume");
+                .save(this.output, "avaliproject:lume_block_from_lume");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.AVALI_SWORD.get())
                 .pattern(" A ")
@@ -69,7 +77,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.AEROMER.get())
                 .unlockedBy("has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("has_aeromer", has(ModItems.AEROMER))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.AVALI_PICKAXE.get())
                 .pattern("ACC")
@@ -81,7 +89,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("has_woven_graphene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.AVALI_HOE.get())
                 .pattern(" AC")
@@ -93,7 +101,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("has_woven_graphene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.AVALI_AXE.get())
                 .pattern(" CA")
@@ -105,7 +113,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("has_woven_graphene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AEROMER.get())
                 .pattern("BAB")
@@ -115,7 +123,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.WOVEN_GRAPHENE.get())
                 .unlockedBy("has_aero_crystal", has(ModItems.AERO_CRYSTAL))
                 .unlockedBy("has_woven_graphene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AEROGEL.get(), 3)
                 .pattern("BBB")
@@ -123,7 +131,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("BBB")
                 .define('B', ModItems.AERO_CRYSTAL.get())
                 .unlockedBy("avaliproject:has_aero_crystal", has(ModItems.AERO_CRYSTAL))
-                .save(recipeOutput, "avaliproject:aerogel_from_aero_crystal");
+                .save(this.output, "avaliproject:aerogel_from_aero_crystal");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WOVEN_GRAPHENE.get(), 4)
                 .pattern("BAB")
@@ -133,7 +141,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.COAL)
                 .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
                 .unlockedBy("has_coal", has(Items.COAL))
-                .save(recipeOutput, "avaliproject:woven_grapene");
+                .save(this.output, "avaliproject:woven_grapene");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.AVALI_BBQ.get(), 3)
                 .pattern("BA ")
@@ -143,7 +151,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.NAKATI_BARK.get())
                 .unlockedBy("has_cooked_chicken", has(Items.COOKED_CHICKEN))
                 .unlockedBy("has_nakati_bark", has(ModItems.NAKATI_BARK))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.AVALON_TACO.get())
                 .pattern("ABA")
@@ -152,7 +160,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.SPICY_JERKY.get())
                 .unlockedBy("has_piru_flour", has(ModItems.PIRU_FLOUR))
                 .unlockedBy("has_spicy_jerky", has(ModItems.SPICY_JERKY))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PROTOSTEEL_INGOT.get())
                 .pattern(" A ")
@@ -162,7 +170,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.DURASTEEL_INGOT.get())
                 .unlockedBy("has_nanite_injector", has(ModItems.NANITE_INJECTOR))
                 .unlockedBy("has_durasteel_ingot", has(ModItems.DURASTEEL_INGOT))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.PIRUZA.get())
                 .pattern("BAB")
@@ -176,7 +184,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_kiri_fruit", has(ModItems.KIRI_FRUIT))
                 .unlockedBy("has_spicy_jerky", has(ModItems.SPICY_JERKY))
                 .unlockedBy("has_piru_flour", has(ModItems.PIRU_FLOUR))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.KIRI_CIDER.get())
                 .pattern(" A ")
@@ -188,7 +196,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_avali_bottle", has(ModItems.AVALI_BOTTLE))
                 .unlockedBy("has_nakati_bark", has(ModItems.NAKATI_BARK))
                 .unlockedBy("has_kiri_fruit", has(ModItems.KIRI_FRUIT))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.KIRI_JAM.get())
                 .pattern("BAB")
@@ -198,7 +206,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.GLASS_PANE)
                 .unlockedBy("has_bowl", has(Items.GLASS_PANE))
                 .unlockedBy("has_kiri_fruit", has(ModItems.KIRI_FRUIT))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.KIRI_CURRY.get())
                 .pattern("AD ")
@@ -211,7 +219,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_spicy_jerky", has(ModItems.SPICY_JERKY))
                 .unlockedBy("has_kiri_fruit", has(ModItems.KIRI_FRUIT))
                 .unlockedBy("has_bowl", has(Items.BOWL))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.KIRIKIRI_PIE.get())
                 .pattern("DAD")
@@ -227,7 +235,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_sugar", has(Items.SUGAR))
                 .unlockedBy("has_kiri_fruit", has(ModItems.KIRI_FRUIT))
                 .unlockedBy("has_piru_flour", has(ModItems.PIRU_FLOUR))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.GROOU_JUICE.get())
                 .pattern(" A ")
@@ -237,14 +245,14 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.AVALI_BOTTLE.get())
                 .unlockedBy("has_avali_bottle", has(ModItems.AVALI_BOTTLE))
                 .unlockedBy("has_groou", has(ModItems.GROOU))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AVALI_BOTTLE.get())
                 .pattern("C C")
                 .pattern(" C ")
                 .define('C', ModItems.AEROGEL.get())
                 .unlockedBy("has_aerogel", has(ModItems.AEROGEL))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.PIRU_NOODLE.get())
                 .pattern("CBC")
@@ -254,14 +262,14 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.KIRI_FRUIT.get())
                 .unlockedBy("has_piru_flour", has(ModItems.PIRU_FLOUR))
                 .unlockedBy("has_kiri_fruit", has(ModItems.KIRI_FRUIT))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WOVEN_FABRIC.get())
                 .pattern("BB ")
                 .pattern("BB ")
                 .define('B', ModItems.FIBER.get())
                 .unlockedBy("has_fiber", has(ModItems.FIBER))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.FOOD, ModItems.AVALI_MUFFIN.get(), 2)
                 .pattern("OOO")
@@ -275,7 +283,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_sugar", has(Items.SUGAR))
                 .unlockedBy("has_piru_flour", has(ModItems.PIRU_FLOUR))
                 .unlockedBy("has_kiri_jam", has(ModItems.KIRI_JAM))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.NANITE_INJECTOR.get(), 2)
                 .pattern(" A ")
@@ -285,48 +293,48 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('A', ModItems.DURASTEEL_INGOT.get())
                 .unlockedBy("has_diamond", has(Items.DIAMOND))
                 .unlockedBy("has_durasteel_ingot", has(ModItems.DURASTEEL_INGOT))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.PIRU_FLOUR.get(), 2)
                 .requires(ModItems.PIRU_FROND)
                 .unlockedBy("avaliproject:has_piru_frond", has(ModItems.PIRU_FROND))
-                .save(recipeOutput, "avaliproject:piru_flour_from_piru_frond");
+                .save(this.output, "avaliproject:piru_flour_from_piru_frond");
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.LUME_BIT.get(), 9)
                 .requires(ModItems.LUME)
                 .unlockedBy("avaliproject:has_lume", has(ModItems.LUME))
-                .save(recipeOutput, "avaliproject:lume_bits_from_lume");
+                .save(this.output, "avaliproject:lume_bits_from_lume");
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.LUME.get(), 9)
                 .requires(ModBlocks.LUME_BLOCK)
                 .unlockedBy("avaliproject:has_lume_from_lume_block", has(ModBlocks.LUME_BLOCK))
-                .save(recipeOutput, "avaliproject:lume_from_lume_block");
+                .save(this.output, "avaliproject:lume_from_lume_block");
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.SUGAR, 3)
                 .requires(ModItems.GROOU)
                 .unlockedBy("has_groou", has(ModItems.GROOU))
-                .save(recipeOutput, "avaliproject:sugar_from_groou");
+                .save(this.output, "avaliproject:sugar_from_groou");
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.GROOU, 1)
                 .requires(ModBlocks.GROOU_NODULE)
                 .unlockedBy("has_groou_nodule", has(ModBlocks.GROOU_NODULE))
-                .save(recipeOutput, "avaliproject:groou_from_groou_nodule");
+                .save(this.output, "avaliproject:groou_from_groou_nodule");
         ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.PIRU_COLONY, 1)
                 .requires(ModBlocks.PIRU_NODULE)
                 .unlockedBy("has_groou_nodule", has(ModBlocks.PIRU_NODULE))
-                .save(recipeOutput, "avaliproject:piru_colony_from_piru_nodule");
+                .save(this.output, "avaliproject:piru_colony_from_piru_nodule");
         ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.NAKATI_OVOID, 1)
                 .requires(ModBlocks.NAKATI_NODULE)
                 .unlockedBy("has_groou_nodule", has(ModBlocks.NAKATI_NODULE))
-                .save(recipeOutput, "avaliproject:nakati_ovoid_from_nakati_nodule");
+                .save(this.output, "avaliproject:nakati_ovoid_from_nakati_nodule");
         ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.KIRI_FRUIT, 1)
                 .requires(ModBlocks.KIRI_NODULE)
                 .unlockedBy("has_kiri_nodule", has(ModBlocks.KIRI_NODULE))
-                .save(recipeOutput, "avaliproject:kiri_fruit_from_kiri_nodule");
+                .save(this.output, "avaliproject:kiri_fruit_from_kiri_nodule");
     ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.SERGAL_CHEESE, 4)
                 .requires(Items.MILK_BUCKET)
                 .unlockedBy("has_milk_bucket", has(Items.MILK_BUCKET))
-                .save(recipeOutput, "avaliproject:sergal_cheese_from_milk_bucket");
+                .save(this.output, "avaliproject:sergal_cheese_from_milk_bucket");
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PROTOGEN_RAM.get(), 4)
                 .pattern("AAA")
                 .pattern("CBC")
@@ -336,7 +344,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_gold_nugget", has(Items.GOLD_NUGGET))
                 .unlockedBy("has_iron_nugget", has(Items.IRON_NUGGET))
                 .unlockedBy("has_durasteel_ingot", has(ModItems.DURASTEEL_INGOT))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PROTOGEN_AXE.get())
                 .pattern(" BB")
@@ -348,7 +356,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_durasteel_ingot", has(ModItems.DURASTEEL_INGOT))
                 .unlockedBy("has_protosteel_ingot", has(ModItems.PROTOSTEEL_INGOT))
                 .unlockedBy("has_nanite_injector", has(ModItems.NANITE_INJECTOR))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PROTOGEN_SWORD.get())
                 .pattern(" C ")
                 .pattern("ACA")
@@ -359,7 +367,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_durasteel_ingot", has(ModItems.DURASTEEL_INGOT))
                 .unlockedBy("has_protosteel_ingot", has(ModItems.PROTOSTEEL_INGOT))
                 .unlockedBy("has_nanite_injector", has(ModItems.NANITE_INJECTOR))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.AVALI_SPEAR.get())
                 .pattern("  A")
                 .pattern("DC ")
@@ -370,29 +378,29 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("has_refined_aegisalt", has(ModItems.REFINED_AEGISALT))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModBlocks.NOVULITE_BLOCK.get())
                 .pattern("BBB")
                 .pattern("BBB")
                 .pattern("BBB")
                 .define('B', ModItems.NOVULITE.get())
                 .unlockedBy("avaliproject:has_novulite", has(ModItems.NOVULITE))
-                .save(recipeOutput, "avaliproject:novulite_block_from_novulite");
+                .save(this.output, "avaliproject:novulite_block_from_novulite");
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.NOVULITE.get(), 9)
                 .requires(ModBlocks.NOVULITE_BLOCK)
                 .unlockedBy("avaliproject:has_novulite_block", has(ModBlocks.NOVULITE_BLOCK))
-                .save(recipeOutput, "avaliproject:novulite_from_novulite_block");
+                .save(this.output, "avaliproject:novulite_from_novulite_block");
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModBlocks.AGATE_BLOCK.get())
                 .pattern("BBB")
                 .pattern("BBB")
                 .pattern("BBB")
                 .define('B', ModItems.AGATE.get())
                 .unlockedBy("avaliproject:has_agate", has(ModItems.AGATE))
-                .save(recipeOutput, "avaliproject:agate_block_from_agate");
+                .save(this.output, "avaliproject:agate_block_from_agate");
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.AGATE.get(), 9)
                 .requires(ModBlocks.AGATE_BLOCK)
                 .unlockedBy("avaliproject:has_agate_block", has(ModBlocks.AGATE_BLOCK))
-                .save(recipeOutput, "avaliproject:agate_from_agate_block");
+                .save(this.output, "avaliproject:agate_from_agate_block");
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AVALI_DANCE_MUSIC_DISC.get())
                 .pattern("CAC")
                 .pattern("ADA")
@@ -403,7 +411,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
                 .unlockedBy("has_flint", has(Items.FLINT))
                 .unlockedBy("has_amethyst_crystal", has(Items.AMETHYST_SHARD))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MERP_MUSIC_DISC.get())
                 .pattern("CAC")
                 .pattern("ADA")
@@ -414,7 +422,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_agate", has(ModItems.AGATE))
                 .unlockedBy("has_flint", has(Items.FLINT))
                 .unlockedBy("has_amethyst_crystal", has(Items.AMETHYST_SHARD))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.CYBERNETIC_HEART_MUSIC_DISC.get())
                 .pattern("CAC")
                 .pattern("ADA")
@@ -425,7 +433,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_novulite", has(ModItems.NOVULITE))
                 .unlockedBy("has_flint", has(Items.FLINT))
                 .unlockedBy("has_amethyst_crystal", has(Items.AMETHYST_SHARD))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.SOFT_TAPESTRY.get())
                 .pattern("BAB")
                 .pattern("ABA")
@@ -434,7 +442,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.YELLOW_WOOL)
                 .unlockedBy("has_orange_wool", has(Items.ORANGE_WOOL))
                 .unlockedBy("has_yellow_wool", has(Items.YELLOW_WOOL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_FABRIC_BLOCK.get())
                 .pattern("BBA")
                 .pattern("BAB")
@@ -443,7 +451,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.ALT_AVALI_FABRIC_BLOCK.get())
                 .pattern("BBB")
                 .pattern("ABA")
@@ -452,7 +460,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.PROTOGEN_SUPPORT_BLOCK.get())
                 .pattern("BAB")
                 .pattern("BAB")
@@ -461,7 +469,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.BLACK_CONCRETE)
                 .unlockedBy("has_gray_concrete", has(Items.GRAY_CONCRETE))
                 .unlockedBy("has_black_concrete", has(Items.BLACK_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.ALT_PROTOGEN_SUPPORT_BLOCK.get())
                 .pattern("AAA")
                 .pattern("BBB")
@@ -470,7 +478,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.BLACK_CONCRETE)
                 .unlockedBy("has_gray_concrete", has(Items.GRAY_CONCRETE))
                 .unlockedBy("has_black_concrete", has(Items.BLACK_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.DETAILED_PROTOGEN_BLOCK.get())
                 .pattern("BAB")
                 .pattern("BAB")
@@ -479,7 +487,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.BLACK_CONCRETE)
                 .unlockedBy("has_black_concrete", has(Items.BLACK_CONCRETE))
                 .unlockedBy("has_light_blue_concrete", has(Items.LIGHT_BLUE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.ALT_DETAILED_PROTOGEN_BLOCK.get())
                 .pattern("AAA")
                 .pattern("BBB")
@@ -488,7 +496,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.LIGHT_BLUE_CONCRETE)
                 .unlockedBy("has_black_concrete", has(Items.BLACK_CONCRETE))
                 .unlockedBy("has_light_blue_concrete", has(Items.LIGHT_BLUE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_PATTERN_BLOCK_1.get())
                 .pattern("AAB")
                 .pattern("BAA")
@@ -497,7 +505,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_PATTERN_BLOCK_2.get())
                 .pattern("ABA")
                 .pattern("AAB")
@@ -506,7 +514,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_PATTERN_BLOCK_3.get())
                 .pattern("ABA")
                 .pattern("ABA")
@@ -515,7 +523,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_PATTERN_BLOCK_4.get())
                 .pattern("BAB")
                 .pattern("ABA")
@@ -524,7 +532,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_WALL_PATTERN_BLOCK_1.get())
                 .pattern("AAA")
                 .pattern("BAB")
@@ -533,7 +541,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_WALL_PATTERN_BLOCK_2.get())
                 .pattern("AAA")
                 .pattern("BBA")
@@ -542,7 +550,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_WALL_PATTERN_BLOCK_3.get())
                 .pattern("AAA")
                 .pattern("BBB")
@@ -551,7 +559,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_WALL_PATTERN_BLOCK_4.get())
                 .pattern("BAA")
                 .pattern("ABB")
@@ -560,7 +568,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.WHITE_CONCRETE)
                 .unlockedBy("has_orange_concrete", has(Items.ORANGE_CONCRETE))
                 .unlockedBy("has_white_concrete", has(Items.WHITE_CONCRETE))
-                .save(recipeOutput);
+                .save(this.output);
 
 
 
@@ -572,7 +580,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('A', Items.BLUE_WOOL)
                 .unlockedBy("has_white_wool", has(Items.WHITE_WOOL))
                 .unlockedBy("has_blue_wool", has(Items.BLUE_WOOL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_NIGHTLY_FABRIC_2.get())
                 .pattern("BAA")
                 .pattern("ABB")
@@ -581,7 +589,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.BLUE_WOOL)
                 .unlockedBy("has_white_wool", has(Items.WHITE_WOOL))
                 .unlockedBy("has_blue_wool", has(Items.BLUE_WOOL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_NIGHTLY_FABRIC_3.get())
                 .pattern("ABB")
                 .pattern("BAA")
@@ -590,7 +598,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.BLUE_WOOL)
                 .unlockedBy("has_white_wool", has(Items.WHITE_WOOL))
                 .unlockedBy("has_blue_wool", has(Items.BLUE_WOOL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_NIGHTLY_FABRIC_4.get())
                 .pattern("BAB")
                 .pattern("BAA")
@@ -599,7 +607,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.BLUE_WOOL)
                 .unlockedBy("has_white_wool", has(Items.WHITE_WOOL))
                 .unlockedBy("has_blue_wool", has(Items.BLUE_WOOL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_NIGHTLY_FABRIC_5.get())
                 .pattern("BAA")
                 .pattern("ABA")
@@ -608,7 +616,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.BLUE_WOOL)
                 .unlockedBy("has_white_wool", has(Items.WHITE_WOOL))
                 .unlockedBy("has_blue_wool", has(Items.BLUE_WOOL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_NIGHTLY_FABRIC_6.get())
                 .pattern("ABB")
                 .pattern("AAB")
@@ -617,7 +625,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.BLUE_WOOL)
                 .unlockedBy("has_white_wool", has(Items.WHITE_WOOL))
                 .unlockedBy("has_blue_wool", has(Items.BLUE_WOOL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_CARVING_1.get())
                 .pattern("AAA")
                 .pattern("BAA")
@@ -626,7 +634,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.DARK_OAK_PLANKS)
                 .unlockedBy("has_acacia_planks", has(Items.ACACIA_PLANKS))
                 .unlockedBy("has_dark_oak_planks", has(Items.DARK_OAK_PLANKS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_CARVING_2.get())
                 .pattern("AAA")
                 .pattern("AAA")
@@ -635,7 +643,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.DARK_OAK_PLANKS)
                 .unlockedBy("has_acacia_planks", has(Items.ACACIA_PLANKS))
                 .unlockedBy("has_dark_oak_planks", has(Items.DARK_OAK_PLANKS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_CARVING_3.get())
                 .pattern("AAA")
                 .pattern("AAA")
@@ -644,7 +652,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.DARK_OAK_PLANKS)
                 .unlockedBy("has_acacia_planks", has(Items.ACACIA_PLANKS))
                 .unlockedBy("has_dark_oak_planks", has(Items.DARK_OAK_PLANKS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_CARVING_4.get())
                 .pattern("AAA")
                 .pattern("AAB")
@@ -653,7 +661,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.DARK_OAK_PLANKS)
                 .unlockedBy("has_acacia_planks", has(Items.ACACIA_PLANKS))
                 .unlockedBy("has_dark_oak_planks", has(Items.DARK_OAK_PLANKS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModBlocks.AVALI_CARVING_5.get())
                 .pattern("AAA")
                 .pattern("AAA")
@@ -662,7 +670,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.DARK_OAK_PLANKS)
                 .unlockedBy("has_acacia_planks", has(Items.ACACIA_PLANKS))
                 .unlockedBy("has_dark_oak_planks", has(Items.DARK_OAK_PLANKS))
-                .save(recipeOutput);
+                .save(this.output);
 
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MLSERIES_HILT.get())
@@ -673,7 +681,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.WOVEN_GRAPHENE.get())
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MLSERIES_MUZZLE.get())
                 .pattern(" AA")
                 .pattern("BAA")
@@ -682,7 +690,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.AEROGEL.get())
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MLSERIES_MAIN.get())
                 .pattern("AA ")
                 .pattern("ACB")
@@ -695,7 +703,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("avaliproject:has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.FIRELANCE_SCOPE.get())
                 .pattern("ABA")
                 .pattern("BDB")
@@ -708,7 +716,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
                 .unlockedBy("has_spyglass", has(Items.SPYGLASS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.FIRELANCE_MUZZLE.get())
                 .pattern("AAA")
                 .pattern("ABB")
@@ -717,7 +725,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.WOVEN_GRAPHENE.get())
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.FIRELANCE_HILT.get())
                 .pattern("BB ")
                 .pattern("A A")
@@ -726,7 +734,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.WOVEN_GRAPHENE.get())
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.FIRELANCE_MAIN.get())
                 .pattern("BB ")
                 .pattern("DCB")
@@ -737,7 +745,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.MLSERIES.get())
                 .pattern("   ")
@@ -748,7 +756,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_mlseries_muzzle", has(ModItems.MLSERIES_MUZZLE))
                 .unlockedBy("avaliproject:has_mlseries_main", has(ModItems.MLSERIES_MAIN))
                 .unlockedBy("avaliproject:has_mlseries_hilt", has(ModItems.MLSERIES_HILT))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FIRELANCE.get())
                 .pattern(" D ")
                 .pattern("ABC")
@@ -760,7 +768,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_firelance_main", has(ModItems.FIRELANCE_MAIN))
                 .unlockedBy("avaliproject:has_firelance_muzzle", has(ModItems.FIRELANCE_MUZZLE))
                 .unlockedBy("avaliproject:has_firelance_scope", has(ModItems.FIRELANCE_SCOPE))
-                .save(recipeOutput);
+                .save(this.output);
 
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.QRC_MUZZLE.get())
@@ -772,7 +780,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("has_iron_bars", has(Items.IRON_BARS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.QRC_MAIN.get())
                 .pattern("AAA")
                 .pattern("ACA")
@@ -783,7 +791,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.QRC_HILT.get())
                 .pattern("AAA")
                 .pattern("BBA")
@@ -792,7 +800,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.WOVEN_GRAPHENE.get())
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.NOVA_MUZZLE.get())
                 .pattern("BAB")
                 .pattern("ABC")
@@ -802,7 +810,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("has_iron_bars", has(Items.IRON_BARS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.NOVA_HILT.get())
                 .pattern("ABA")
                 .pattern("AAA")
@@ -811,7 +819,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModItems.WOVEN_GRAPHENE.get())
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.NOVA_MAIN.get())
                 .pattern("ABA")
                 .pattern("AC ")
@@ -822,7 +830,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("avaliproject:has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.NOVA_SCOPE.get())
                 .pattern(" BD")
                 .pattern("BBB")
@@ -830,7 +838,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('D', ModItems.AEROGEL.get())
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
-                .save(recipeOutput);
+                .save(this.output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.QRC.get())
                 .pattern("ABC")
@@ -840,7 +848,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_qrc_muzzle", has(ModItems.QRC_MUZZLE))
                 .unlockedBy("avaliproject:has_qrc_main", has(ModItems.QRC_MAIN))
                 .unlockedBy("avaliproject:has_qrc_hilt", has(ModItems.QRC_HILT))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.NOVA.get())
                 .pattern(" D ")
                 .pattern("ABC")
@@ -852,14 +860,14 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_nova_main", has(ModItems.NOVA_MAIN))
                 .unlockedBy("avaliproject:has_nova_muzzle", has(ModItems.NOVA_MUZZLE))
                 .unlockedBy("avaliproject:has_nova_scope", has(ModItems.NOVA_SCOPE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.AVALI_DRONE.get())
                 .pattern("BAB")
                 .define('A', ModItems.AVALI_DRONE_CORE.get())
                 .define('B', ModItems.AVALI_DRONE_ROTORS.get())
                 .unlockedBy("avaliproject:has_avali_drone_core", has(ModItems.AVALI_DRONE_CORE))
                 .unlockedBy("avaliproject:has_avali_drone_rotors", has(ModItems.AVALI_DRONE_ROTORS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.STORM.get())
                 .pattern("BC ")
                 .pattern("A  ")
@@ -869,7 +877,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_storm_hilt", has(ModItems.STORM_HILT))
                 .unlockedBy("avaliproject:has_storm_core", has(ModItems.STORM_CORE))
                 .unlockedBy("avaliproject:has_storm_muzzle", has(ModItems.STORM_MUZZLE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.BLIZZARD.get())
                 .pattern("BC ")
                 .pattern("A  ")
@@ -879,7 +887,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_blizzard_hilt", has(ModItems.BLIZZARD_HILT))
                 .unlockedBy("avaliproject:has_blizzard_core", has(ModItems.BLIZZARD_CORE))
                 .unlockedBy("avaliproject:has_blizzard_muzzle", has(ModItems.BLIZZARD_MUZZLE))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AVALI_DRONE_ROTORS.get())
                 .pattern("ACA")
                 .pattern("CBC")
@@ -890,7 +898,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_woven_grapene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AVALI_DRONE_CORE.get())
                 .pattern(" B ")
                 .pattern("BAB")
@@ -901,7 +909,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
                 .unlockedBy("avaliproject:has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
                 .unlockedBy("has_iron_bars", has(Items.IRON_BARS))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AVALI_DATA_CHIT.get())
                 .pattern("AA ")
                 .pattern("AA ")
@@ -910,7 +918,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('A', ModItems.LUME.get())
                 .unlockedBy("avaliproject:has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
                 .unlockedBy("avaliproject:has_lume", has(ModItems.LUME))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STORM_HILT.get())
                 .pattern("A  ")
                 .pattern("AC ")
@@ -921,7 +929,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("avaliproject:has_woven_graphene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STORM_MUZZLE.get())
                 .pattern("ABA")
                 .pattern("AAA")
@@ -932,7 +940,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("avaliproject:has_woven_graphene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STORM_CORE.get())
                 .pattern("BAC")
                 .pattern("ABA")
@@ -943,7 +951,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("avaliproject:has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.BLIZZARD_CORE.get())
                 .pattern("BAB")
                 .pattern("ABA")
@@ -954,7 +962,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("avaliproject:has_sync_crystal", has(ModItems.SYNC_CRYSTAL))
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.BLIZZARD_MUZZLE.get())
                 .pattern("ABA")
                 .pattern("BBC")
@@ -964,7 +972,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_iron_bars", has(Items.IRON_BARS))
                 .unlockedBy("avaliproject:has_woven_graphene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
-                .save(recipeOutput);
+                .save(this.output);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.BLIZZARD_HILT.get())
                 .pattern("A B")
                 .pattern(" C ")
@@ -975,31 +983,31 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("avaliproject:has_aerogel", has(ModItems.AEROGEL))
                 .unlockedBy("avaliproject:has_woven_graphene", has(ModItems.WOVEN_GRAPHENE))
                 .unlockedBy("avaliproject:has_aeromer", has(ModItems.AEROMER))
-                .save(recipeOutput);
+                .save(this.output);
 
 
-        oreSmelting(recipeOutput, ARCAITES_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.ARCAITES_CRYSTAL.get(), 0.25f, 200, "arcaites_crystal");
-        oreBlasting(recipeOutput, ARCAITES_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.ARCAITES_CRYSTAL.get(), 0.25f, 100, "arcaites_crystal");
-        oreSmelting(recipeOutput, VILOUS_CERAMIC_SMELTABLES, RecipeCategory.MISC, ModItems.VILOUS_CERAMIC_INGOT.get(), 0.25f, 200, "vilous_ceramic");
-        oreBlasting(recipeOutput, VILOUS_CERAMIC_SMELTABLES, RecipeCategory.MISC, ModItems.VILOUS_CERAMIC_INGOT.get(), 0.25f, 100, "vilous_ceramic");
-        oreSmelting(recipeOutput, DURASTEEL_SMELTABLES, RecipeCategory.MISC, ModItems.DURASTEEL_INGOT.get(), 0.25f, 200, "Durasteel");
-        oreBlasting(recipeOutput, DURASTEEL_SMELTABLES, RecipeCategory.MISC, ModItems.DURASTEEL_INGOT.get(), 0.25f, 100, "Durasteel");
-        oreSmelting(recipeOutput, AERO_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.AERO_CRYSTAL.get(), 0.25f, 200, "aero_crystal");
-        oreBlasting(recipeOutput, AERO_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.AERO_CRYSTAL.get(), 0.25f, 100, "aero_crystal");
-        oreSmelting(recipeOutput, SYNC_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.SYNC_CRYSTAL.get(), 0.25f, 200, "sync_crystal");
-        oreBlasting(recipeOutput, SYNC_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.SYNC_CRYSTAL.get(), 0.25f, 100, "sync_crystal");
-        oreSmelting(recipeOutput, THERMAL_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.THERMAL_CRYSTAL.get(), 0.25f, 200, "thermal_crystal");
-        oreBlasting(recipeOutput, THERMAL_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.THERMAL_CRYSTAL.get(), 0.25f, 100, "thermal_crystal");
-        oreSmelting(recipeOutput, AEGISALT_SMELTABLES, RecipeCategory.MISC, ModItems.REFINED_AEGISALT.get(), 0.25f, 200, "refined_aegisalt");
-        oreBlasting(recipeOutput, AEGISALT_SMELTABLES, RecipeCategory.MISC, ModItems.REFINED_AEGISALT.get(), 0.25f, 100, "refined_aegisalt");
-        oreSmelting(recipeOutput, TITANIUM_SMELTABLES, RecipeCategory.MISC, ModItems.TITANIUM_INGOT.get(), 0.25f, 200, "titanium");
-        oreBlasting(recipeOutput, TITANIUM_SMELTABLES, RecipeCategory.MISC, ModItems.TITANIUM_INGOT.get(), 0.25f, 100, "titanium");
-        oreSmelting(recipeOutput, LUME_SMELTABLES, RecipeCategory.MISC, ModItems.LUME_BIT.get(), 0.25f, 200, "lume_bit");
-        oreBlasting(recipeOutput, LUME_SMELTABLES, RecipeCategory.MISC, ModItems.LUME_BIT.get(), 0.25f, 100, "lume_bit");
-        oreSmelting(recipeOutput, AGATE_SMELTABLES, RecipeCategory.MISC, ModItems.AGATE.get(), 0.25f, 200, "agate");
-        oreBlasting(recipeOutput, AGATE_SMELTABLES, RecipeCategory.MISC, ModItems.AGATE.get(), 0.25f, 100, "agate");
-        oreSmelting(recipeOutput, NOVULITE_SMELTABLES, RecipeCategory.MISC, ModItems.NOVULITE.get(), 0.25f, 200, "novulite");
-        oreBlasting(recipeOutput, NOVULITE_SMELTABLES, RecipeCategory.MISC, ModItems.NOVULITE.get(), 0.25f, 100, "novulite");
+        oreSmelting(this.output, ARCAITES_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.ARCAITES_CRYSTAL.get(), 0.25f, 200, "arcaites_crystal");
+        oreBlasting(this.output, ARCAITES_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.ARCAITES_CRYSTAL.get(), 0.25f, 100, "arcaites_crystal");
+        oreSmelting(this.output, VILOUS_CERAMIC_SMELTABLES, RecipeCategory.MISC, ModItems.VILOUS_CERAMIC_INGOT.get(), 0.25f, 200, "vilous_ceramic");
+        oreBlasting(this.output, VILOUS_CERAMIC_SMELTABLES, RecipeCategory.MISC, ModItems.VILOUS_CERAMIC_INGOT.get(), 0.25f, 100, "vilous_ceramic");
+        oreSmelting(this.output, DURASTEEL_SMELTABLES, RecipeCategory.MISC, ModItems.DURASTEEL_INGOT.get(), 0.25f, 200, "Durasteel");
+        oreBlasting(this.output, DURASTEEL_SMELTABLES, RecipeCategory.MISC, ModItems.DURASTEEL_INGOT.get(), 0.25f, 100, "Durasteel");
+        oreSmelting(this.output, AERO_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.AERO_CRYSTAL.get(), 0.25f, 200, "aero_crystal");
+        oreBlasting(this.output, AERO_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.AERO_CRYSTAL.get(), 0.25f, 100, "aero_crystal");
+        oreSmelting(this.output, SYNC_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.SYNC_CRYSTAL.get(), 0.25f, 200, "sync_crystal");
+        oreBlasting(this.output, SYNC_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.SYNC_CRYSTAL.get(), 0.25f, 100, "sync_crystal");
+        oreSmelting(this.output, THERMAL_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.THERMAL_CRYSTAL.get(), 0.25f, 200, "thermal_crystal");
+        oreBlasting(this.output, THERMAL_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.THERMAL_CRYSTAL.get(), 0.25f, 100, "thermal_crystal");
+        oreSmelting(this.output, AEGISALT_SMELTABLES, RecipeCategory.MISC, ModItems.REFINED_AEGISALT.get(), 0.25f, 200, "refined_aegisalt");
+        oreBlasting(this.output, AEGISALT_SMELTABLES, RecipeCategory.MISC, ModItems.REFINED_AEGISALT.get(), 0.25f, 100, "refined_aegisalt");
+        oreSmelting(this.output, TITANIUM_SMELTABLES, RecipeCategory.MISC, ModItems.TITANIUM_INGOT.get(), 0.25f, 200, "titanium");
+        oreBlasting(this.output, TITANIUM_SMELTABLES, RecipeCategory.MISC, ModItems.TITANIUM_INGOT.get(), 0.25f, 100, "titanium");
+        oreSmelting(this.output, LUME_SMELTABLES, RecipeCategory.MISC, ModItems.LUME_BIT.get(), 0.25f, 200, "lume_bit");
+        oreBlasting(this.output, LUME_SMELTABLES, RecipeCategory.MISC, ModItems.LUME_BIT.get(), 0.25f, 100, "lume_bit");
+        oreSmelting(this.output, AGATE_SMELTABLES, RecipeCategory.MISC, ModItems.AGATE.get(), 0.25f, 200, "agate");
+        oreBlasting(this.output, AGATE_SMELTABLES, RecipeCategory.MISC, ModItems.AGATE.get(), 0.25f, 100, "agate");
+        oreSmelting(this.output, NOVULITE_SMELTABLES, RecipeCategory.MISC, ModItems.NOVULITE.get(), 0.25f, 200, "novulite");
+        oreBlasting(this.output, NOVULITE_SMELTABLES, RecipeCategory.MISC, ModItems.NOVULITE.get(), 0.25f, 100, "novulite");
 
     }
 

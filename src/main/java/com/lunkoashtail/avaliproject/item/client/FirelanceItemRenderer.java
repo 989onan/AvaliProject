@@ -2,6 +2,7 @@ package com.lunkoashtail.avaliproject.item.client;
 
 import com.lunkoashtail.avaliproject.item.custom.FirelanceItem;
 import com.lunkoashtail.avaliproject.util.AnimUtils;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 import software.bernie.geckolib.util.RenderUtil;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.cache.object.GeoBone;
@@ -50,19 +51,18 @@ public class FirelanceItemRenderer extends GeoItemRenderer<FirelanceItem> {
     }
 
     @Override
-    public void actuallyRender(PoseStack matrixStackIn, FirelanceItem animatable, BakedGeoModel model, RenderType type, MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, boolean isRenderer, float partialTicks, int packedLightIn,
+    public void actuallyRender(GeoRenderState state, PoseStack stack, BakedGeoModel model, RenderType type, MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, boolean isRenderer, float partialTicks, int packedLightIn,
                                int packedOverlayIn, int color) {
         this.currentBuffer = renderTypeBuffer;
         this.renderType = type;
-        this.animatable = animatable;
-        super.actuallyRender(matrixStackIn, animatable, model, type, renderTypeBuffer, vertexBuilder, isRenderer, partialTicks, packedLightIn, packedOverlayIn, color);
+        super.actuallyRender(state, stack, model, type, renderTypeBuffer, vertexBuilder, isRenderer, packedLightIn, packedOverlayIn, color);
         if (this.renderArms) {
             this.renderArms = false;
         }
     }
 
     @Override
-    public void renderRecursively(PoseStack stack, FirelanceItem animatable, GeoBone bone, RenderType type, MultiBufferSource buffer, VertexConsumer bufferIn, boolean isReRender, float partialTick, int packedLightIn, int packedOverlayIn, int color) {
+    public void renderRecursively(GeoRenderState state, PoseStack stack, GeoBone bone, RenderType type, MultiBufferSource buffer, VertexConsumer bufferIn, boolean isReRender, int packedLightIn, int packedOverlayIn, int color) {
         Minecraft mc = Minecraft.getInstance();
         String name = bone.getName();
         boolean renderingArms = false;
@@ -75,7 +75,7 @@ public class FirelanceItemRenderer extends GeoItemRenderer<FirelanceItem> {
         if (this.transformType.firstPerson() && renderingArms) {
             AbstractClientPlayer player = mc.player;
             PlayerRenderer playerRenderer = (PlayerRenderer) mc.getEntityRenderDispatcher().getRenderer(player);
-            PlayerModel<AbstractClientPlayer> model = playerRenderer.getModel();
+            PlayerModel model = playerRenderer.getModel();
             stack.pushPose();
             RenderUtil.translateMatrixToBone(stack, bone);
             RenderUtil.translateToPivotPoint(stack, bone);
@@ -98,7 +98,7 @@ public class FirelanceItemRenderer extends GeoItemRenderer<FirelanceItem> {
             }
             stack.popPose();
         }
-        super.renderRecursively(stack, animatable, bone, type, buffer, bufferIn, isReRender, partialTick, packedLightIn, packedOverlayIn, color);
+        super.renderRecursively(state, stack, bone, type, buffer, bufferIn, isReRender, packedLightIn, packedOverlayIn, color);
     }
 
     @Override

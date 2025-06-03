@@ -4,6 +4,7 @@ import com.lunkoashtail.avaliproject.item.custom.FirelanceItem;
 import software.bernie.geckolib.model.GeoModel;
 
 import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 public class FirelanceItemModel extends GeoModel<FirelanceItem> {
     @Override
@@ -12,12 +13,12 @@ public class FirelanceItemModel extends GeoModel<FirelanceItem> {
     }
 
     @Override
-    public ResourceLocation getModelResource(FirelanceItem animatable) {
+    public ResourceLocation getModelResource(GeoRenderState animatable) {
         return ResourceLocation.parse("avaliproject:geo/firelance.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(FirelanceItem animatable) {
+    public ResourceLocation getTextureResource(GeoRenderState animatable) {
         return ResourceLocation.parse("avaliproject:textures/item/firelance.png");
     }
 }

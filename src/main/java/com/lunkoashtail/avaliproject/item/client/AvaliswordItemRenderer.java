@@ -1,6 +1,7 @@
 package com.lunkoashtail.avaliproject.item.client;
 
 import com.lunkoashtail.avaliproject.item.custom.AvaliswordItem;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 
@@ -15,6 +16,7 @@ import java.util.HashSet;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 public class AvaliswordItemRenderer extends GeoItemRenderer<AvaliswordItem> {
     public AvaliswordItemRenderer() {
@@ -22,7 +24,7 @@ public class AvaliswordItemRenderer extends GeoItemRenderer<AvaliswordItem> {
     }
 
     @Override
-    public RenderType getRenderType(AvaliswordItem animatable, ResourceLocation texture, MultiBufferSource bufferSource, float partialTick) {
+    public RenderType getRenderType(GeoRenderState animatable, ResourceLocation texture) {
         return RenderType.entityTranslucent(getTextureLocation(animatable));
     }
 
@@ -30,31 +32,23 @@ public class AvaliswordItemRenderer extends GeoItemRenderer<AvaliswordItem> {
     protected boolean renderArms = false;
     protected MultiBufferSource currentBuffer;
     protected RenderType renderType;
-    public ItemDisplayContext transformType;
-    protected AvaliswordItem animatable;
+    //protected AvaliswordItem animatable;
     private final Set<String> hiddenBones = new HashSet<>();
     private final Set<String> suppressedBones = new HashSet<>();
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext transformType, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int p_239207_6_) {
-        this.transformType = transformType;
-        super.renderByItem(stack, transformType, matrixStack, bufferIn, combinedLightIn, p_239207_6_);
-    }
-
-    @Override
-    public void actuallyRender(PoseStack matrixStackIn, AvaliswordItem animatable, BakedGeoModel model, RenderType type, MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, boolean isRenderer, float partialTicks, int packedLightIn,
-                               int packedOverlayIn, int color) {
-        this.currentBuffer = renderTypeBuffer;
-        this.renderType = type;
-        this.animatable = animatable;
-        super.actuallyRender(matrixStackIn, animatable, model, type, renderTypeBuffer, vertexBuilder, isRenderer, partialTicks, packedLightIn, packedOverlayIn, color);
+    public void actuallyRender(GeoRenderState renderState, PoseStack poseStack, BakedGeoModel model, @Nullable RenderType renderType,
+                               MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, int packedLight, int packedOverlay, int renderColor) {
+        this.currentBuffer = bufferSource;
+        this.renderType = renderType;
+        super.actuallyRender(renderState,poseStack, model, renderType, bufferSource, buffer, isReRender, packedLight, packedOverlay, renderColor);
         if (this.renderArms) {
             this.renderArms = false;
         }
     }
 
     @Override
-    public ResourceLocation getTextureLocation(AvaliswordItem instance) {
+    public ResourceLocation getTextureLocation(GeoRenderState instance) {
         return super.getTextureLocation(instance);
     }
 }

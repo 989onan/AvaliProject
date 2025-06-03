@@ -1,12 +1,14 @@
 package com.lunkoashtail.avaliproject.entity.custom;
 
 import com.lunkoashtail.avaliproject.entity.ModEntities;
+import net.minecraft.core.component.DataComponents;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
+import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.GeoEntity;
 
@@ -36,7 +38,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
@@ -111,17 +113,17 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
 
     @Override
     public void playStepSound(BlockPos pos, BlockState blockIn) {
-        this.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.warden.step")), 0.15f, 1);
+        this.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.warden.step")).get().value(), 0.15f, 1);
     }
 
     @Override
     public SoundEvent getHurtSound(DamageSource ds) {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt")).get().value();
     }
 
     @Override
     public SoundEvent getDeathSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death")).get().value();
     }
 
     @Override
@@ -134,31 +136,31 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("Texture"))
-            this.setTexture(compound.getString("Texture"));
+            this.setTexture(compound.getString("Texture").get());
     }
 
     @Override
     public InteractionResult mobInteract(Player sourceentity, InteractionHand hand) {
         ItemStack itemstack = sourceentity.getItemInHand(hand);
-        InteractionResult retval = InteractionResult.sidedSuccess(this.level().isClientSide());
+        InteractionResult retval = InteractionResult.SUCCESS;
         Item item = itemstack.getItem();
         if (itemstack.getItem() instanceof SpawnEggItem) {
             retval = super.mobInteract(sourceentity, hand);
         } else if (this.level().isClientSide()) {
-            retval = (this.isTame() && this.isOwnedBy(sourceentity) || this.isFood(itemstack)) ? InteractionResult.sidedSuccess(this.level().isClientSide()) : InteractionResult.PASS;
+            retval = (this.isTame() && this.isOwnedBy(sourceentity) || this.isFood(itemstack)) ? InteractionResult.SUCCESS : InteractionResult.PASS;
         } else {
             if (this.isTame()) {
                 if (this.isOwnedBy(sourceentity)) {
                     if (this.isFood(itemstack) && this.getHealth() < this.getMaxHealth()) {
                         this.usePlayerItem(sourceentity, hand, itemstack);
-                        FoodProperties foodproperties = itemstack.getFoodProperties(this);
+                        FoodProperties foodproperties = itemstack.getItem().components().get(DataComponents.FOOD);
                         float nutrition = foodproperties != null ? (float) foodproperties.nutrition() : 1;
                         this.heal(nutrition);
-                        retval = InteractionResult.sidedSuccess(this.level().isClientSide());
+                        retval = InteractionResult.SUCCESS;
                     } else if (this.isFood(itemstack) && this.getHealth() < this.getMaxHealth()) {
                         this.usePlayerItem(sourceentity, hand, itemstack);
                         this.heal(4);
-                        retval = InteractionResult.sidedSuccess(this.level().isClientSide());
+                        retval = InteractionResult.SUCCESS;
                     } else {
                         retval = super.mobInteract(sourceentity, hand);
                     }
@@ -172,7 +174,7 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
                     this.level().broadcastEntityEvent(this, (byte) 6);
                 }
                 this.setPersistenceRequired();
-                retval = InteractionResult.sidedSuccess(this.level().isClientSide());
+                retval = InteractionResult.SUCCESS;
             } else {
                 retval = super.mobInteract(sourceentity, hand);
                 if (retval == InteractionResult.SUCCESS || retval == InteractionResult.CONSUME)
@@ -195,8 +197,8 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
 
     @Override
     public AgeableMob getBreedOffspring(ServerLevel serverWorld, AgeableMob ageable) {
-        StalkerEntity retval = ModEntities.STALKER.get().create(serverWorld);
-        retval.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(retval.blockPosition()), MobSpawnType.BREEDING, null);
+        StalkerEntity retval = ModEntities.STALKER.get().create(serverWorld, EntitySpawnReason.BREEDING);
+        retval.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(retval.blockPosition()), EntitySpawnReason.BREEDING, null);
         return retval;
     }
 
@@ -228,9 +230,9 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
         return builder;
     }
 
-    private PlayState movementPredicate(AnimationState event) {
+    private PlayState movementPredicate(AnimationTest<StalkerEntity> event) {
         if (this.animationprocedure.equals("empty")) {
-            if ((event.isMoving() || !(event.getLimbSwingAmount() > -0.15F && event.getLimbSwingAmount() < 0.15F))
+            if ((event.isMoving() || !(event.animatable().getDeltaMovement().lengthSqr() > .15f))
 
             ) {
                 return event.setAndContinue(RawAnimation.begin().thenLoop("Walk"));
@@ -240,19 +242,19 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
         return PlayState.STOP;
     }
 
-    private PlayState attackingPredicate(AnimationState event) {
+    private PlayState attackingPredicate(AnimationTest<StalkerEntity> event) {
         double d1 = this.getX() - this.xOld;
         double d0 = this.getZ() - this.zOld;
         float velocity = (float) Math.sqrt(d1 * d1 + d0 * d0);
-        if (getAttackAnim(event.getPartialTick()) > 0f && !this.swinging) {
+        if (getAttackAnim(event.getData(DataTickets.PARTIAL_TICK)) > 0f && !this.swinging) {
             this.swinging = true;
             this.lastSwing = level().getGameTime();
         }
         if (this.swinging && this.lastSwing + 7L <= level().getGameTime()) {
             this.swinging = false;
         }
-        if (this.swinging && event.getController().getAnimationState() == AnimationController.State.STOPPED) {
-            event.getController().forceAnimationReset();
+        if (this.swinging && event.controller().getAnimationState() == AnimationController.State.STOPPED) {
+            event.controller().forceAnimationReset();
             return event.setAndContinue(RawAnimation.begin().thenPlay("Bite"));
         }
         return PlayState.CONTINUE;
@@ -260,14 +262,14 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
 
     String prevAnim = "empty";
 
-    private PlayState procedurePredicate(AnimationState event) {
-        if (!animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
+    private PlayState procedurePredicate(AnimationTest<StalkerEntity> event) {
+        if (!animationprocedure.equals("empty") && event.controller().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
             if (!this.animationprocedure.equals(prevAnim))
-                event.getController().forceAnimationReset();
-            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
-            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                event.controller().forceAnimationReset();
+            event.controller().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.controller().getAnimationState() == AnimationController.State.STOPPED) {
                 this.animationprocedure = "empty";
-                event.getController().forceAnimationReset();
+                event.controller().forceAnimationReset();
             }
         } else if (animationprocedure.equals("empty")) {
             prevAnim = "empty";
@@ -282,7 +284,7 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
         ++this.deathTime;
         if (this.deathTime == 20) {
             this.remove(StalkerEntity.RemovalReason.KILLED);
-            this.dropExperience(this);
+            this.dropExperience(this.getServer().getLevel(this.level().dimension()), this);
         }
     }
 
@@ -296,9 +298,9 @@ public class StalkerEntity extends TamableAnimal implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        data.add(new AnimationController<>(this, "movement", 4, this::movementPredicate));
-        data.add(new AnimationController<>(this, "attacking", 4, this::attackingPredicate));
-        data.add(new AnimationController<>(this, "procedure", 4, this::procedurePredicate));
+        data.add(new AnimationController<>("movement", 4, this::movementPredicate));
+        data.add(new AnimationController<>("attacking", 4, this::attackingPredicate));
+        data.add(new AnimationController<>("procedure", 4, this::procedurePredicate));
     }
 
     @Override

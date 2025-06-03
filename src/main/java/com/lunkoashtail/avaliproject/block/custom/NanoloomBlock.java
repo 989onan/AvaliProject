@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -41,17 +41,17 @@ public class NanoloomBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
     @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+    public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof NanoloomBlockEntity NanoloomBlockEntity) {
                 NanoloomBlockEntity.drops();
             }
         }
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+        super.onPlace(pState, pLevel, pPos, pNewState, pIsMoving);
     }
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack pStack, BlockState pState, Level pLevel, BlockPos pPos,
+    protected InteractionResult useItemOn(ItemStack pStack, BlockState pState, Level pLevel, BlockPos pPos,
                                               Player pPlayer, InteractionHand pHand, BlockHitResult pHitResult) {
         if (!pLevel.isClientSide()) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
@@ -61,7 +61,13 @@ public class NanoloomBlock extends BaseEntityBlock {
                 throw new IllegalStateException("Our Container provider is missing!");
             }
         }
-        return ItemInteractionResult.sidedSuccess(pLevel.isClientSide());
+        if(pLevel.isClientSide()){
+            return InteractionResult.SUCCESS;
+        }
+        else{
+            return InteractionResult.PASS;
+        }
+
     }
     @Nullable
     @Override

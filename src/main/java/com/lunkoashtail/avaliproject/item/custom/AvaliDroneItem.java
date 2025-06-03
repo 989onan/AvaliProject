@@ -1,6 +1,8 @@
 package com.lunkoashtail.avaliproject.item.custom;
 
 import com.lunkoashtail.avaliproject.event.AvaliDroneSpawn;
+import com.lunkoashtail.avaliproject.event.CustomProjectileEvent;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ItemStack;
@@ -15,8 +17,9 @@ public class AvaliDroneItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player entity, InteractionHand hand) {
-        InteractionResultHolder<ItemStack> ar = super.use(world, entity, hand);
+    public InteractionResult use(Level world, Player entity, InteractionHand hand) {
+        InteractionResult ar = super.use(world, entity, hand);
+        ItemStack itemstack = entity.getItemInHand(hand);
         AvaliDroneSpawn.execute(world, entity.getX(), entity.getY(), entity.getZ());
         return ar;
     }

@@ -1,5 +1,6 @@
 package com.lunkoashtail.avaliproject.entity.client;
 
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.client.model.geom.builders.PartDefinition;
@@ -18,14 +19,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 // Made with Blockbench 4.11.2
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
-public class ModelCustomModel<T extends Entity> extends EntityModel<T> {
+public class ModelCustomModel<T extends EntityRenderState> extends EntityModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in
     // the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("avaliproject", "model_custom_model"), "main");
-    public final ModelPart bb_main;
 
     public ModelCustomModel(ModelPart root) {
-        this.bb_main = root.getChild("bb_main");
+        super(root.getChild("bb_main"));
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -36,11 +36,6 @@ public class ModelCustomModel<T extends Entity> extends EntityModel<T> {
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int rgb) {
-        bb_main.render(poseStack, vertexConsumer, packedLight, packedOverlay, rgb);
+    public void setupAnim(T renderState) {
     }
 }

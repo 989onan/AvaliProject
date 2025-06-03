@@ -1,6 +1,8 @@
 package com.lunkoashtail.avaliproject.entity.client;
 
 import com.lunkoashtail.avaliproject.entity.custom.AvaliEntity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 
@@ -11,23 +13,25 @@ import net.minecraft.client.renderer.MultiBufferSource;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
-public class AvaliRenderer extends GeoEntityRenderer<AvaliEntity> {
+public class AvaliRenderer<R extends EntityRenderState & GeoRenderState> extends GeoEntityRenderer<AvaliEntity, R>  {
     public AvaliRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new AvaliModel());
         this.shadowRadius = 0.5f;
     }
 
     @Override
-    public RenderType getRenderType(AvaliEntity animatable, ResourceLocation texture, MultiBufferSource bufferSource, float partialTick) {
+    public RenderType getRenderType(R animatable, ResourceLocation texture) {
         return RenderType.entityTranslucent(getTextureLocation(animatable));
     }
 
     @Override
-    public void preRender(PoseStack poseStack, AvaliEntity entity, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int color) {
+    public void preRender(R state, PoseStack poseStack, BakedGeoModel model, @Nullable MultiBufferSource bufferSource, @Nullable VertexConsumer buffer,
+                          boolean isReRender, int packedLight, int packedOverlay, int renderColor) {
         float scale = 0.65f;
         this.scaleHeight = scale;
         this.scaleWidth = scale;
-        super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, color);
+        super.preRender(state, poseStack, model, bufferSource, buffer, isReRender, packedLight, packedOverlay, renderColor);
     }
 }

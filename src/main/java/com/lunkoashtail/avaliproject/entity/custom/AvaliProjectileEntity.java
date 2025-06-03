@@ -70,7 +70,7 @@ public class AvaliProjectileEntity extends AbstractArrow implements ItemSupplier
     @Override
     public void tick() {
         super.tick();
-        if (this.inGround)
+        if (this.isInGround())
             this.discard();
     }
 

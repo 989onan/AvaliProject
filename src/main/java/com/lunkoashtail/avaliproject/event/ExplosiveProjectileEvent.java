@@ -49,6 +49,6 @@ public class ExplosiveProjectileEvent {
             projectileLevel.addFreshEntity(_entityToSpawn);
         }
         if (entity instanceof Player _player)
-            _player.getCooldowns().addCooldown(itemstack.getItem(), 150);
+            _player.getCooldowns().addCooldown(itemstack, 150);
     }
 }

@@ -85,9 +85,9 @@ public class NanoloomBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     protected void loadAdditional(CompoundTag pTag, HolderLookup.Provider pRegistries) {
         super.loadAdditional(pTag, pRegistries);
-        itemHandler.deserializeNBT(pRegistries, pTag.getCompound("inventory"));
-        progress = pTag.getInt("nanoloom.progress");
-        maxProgress = pTag.getInt("nanoloom.max_progress");
+        itemHandler.deserializeNBT(pRegistries, pTag.getCompound("inventory").get());
+        progress = pTag.getInt("nanoloom.progress").get();
+        maxProgress = pTag.getInt("nanoloom.max_progress").get();
     }
     public void drops() {
         SimpleContainer inv = new SimpleContainer(itemHandler.getSlots());

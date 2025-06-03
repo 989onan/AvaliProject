@@ -2,6 +2,9 @@ package com.lunkoashtail.avaliproject.item.client;
 
 import com.lunkoashtail.avaliproject.item.custom.BlizzardItem;
 import com.lunkoashtail.avaliproject.util.AnimUtils;
+import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.constant.DataTickets;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 import software.bernie.geckolib.util.RenderUtil;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.cache.object.GeoBone;
@@ -30,7 +33,7 @@ public class BlizzardItemRenderer extends GeoItemRenderer<BlizzardItem> {
     }
 
     @Override
-    public RenderType getRenderType(BlizzardItem animatable, ResourceLocation texture, MultiBufferSource bufferSource, float partialTick) {
+    public RenderType getRenderType(GeoRenderState animatable, ResourceLocation texture) {
         return RenderType.entityTranslucent(getTextureLocation(animatable));
     }
 
@@ -44,25 +47,18 @@ public class BlizzardItemRenderer extends GeoItemRenderer<BlizzardItem> {
     private final Set<String> suppressedBones = new HashSet<>();
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext transformType, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int p_239207_6_) {
-        this.transformType = transformType;
-        super.renderByItem(stack, transformType, matrixStack, bufferIn, combinedLightIn, p_239207_6_);
-    }
-
-    @Override
-    public void actuallyRender(PoseStack matrixStackIn, BlizzardItem animatable, BakedGeoModel model, RenderType type, MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, boolean isRenderer, float partialTicks, int packedLightIn,
-                               int packedOverlayIn, int color) {
-        this.currentBuffer = renderTypeBuffer;
-        this.renderType = type;
-        this.animatable = animatable;
-        super.actuallyRender(matrixStackIn, animatable, model, type, renderTypeBuffer, vertexBuilder, isRenderer, partialTicks, packedLightIn, packedOverlayIn, color);
+    public void actuallyRender(GeoRenderState renderState, PoseStack poseStack, BakedGeoModel model, @Nullable RenderType renderType,
+                               MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, int packedLight, int packedOverlay, int renderColor) {
+        this.currentBuffer = bufferSource;
+        this.renderType = renderType;
+        super.actuallyRender(renderState,poseStack, model, renderType, bufferSource, buffer, isReRender, packedLight, packedOverlay, renderColor);
         if (this.renderArms) {
             this.renderArms = false;
         }
     }
 
     @Override
-    public void renderRecursively(PoseStack stack, BlizzardItem animatable, GeoBone bone, RenderType type, MultiBufferSource buffer, VertexConsumer bufferIn, boolean isReRender, float partialTick, int packedLightIn, int packedOverlayIn, int color) {
+    public void renderRecursively(GeoRenderState renderState, PoseStack stack, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, int packedLightIn, int packedOverlay, int renderColor) {
         Minecraft mc = Minecraft.getInstance();
         String name = bone.getName();
         boolean renderingArms = false;
@@ -72,10 +68,10 @@ public class BlizzardItemRenderer extends GeoItemRenderer<BlizzardItem> {
         } else {
             bone.setHidden(this.hiddenBones.contains(name));
         }
-        if (this.transformType.firstPerson() && renderingArms) {
+        if (renderState.getGeckolibData(DataTickets.ITEM_RENDER_PERSPECTIVE).firstPerson() && renderingArms) {
             AbstractClientPlayer player = mc.player;
             PlayerRenderer playerRenderer = (PlayerRenderer) mc.getEntityRenderDispatcher().getRenderer(player);
-            PlayerModel<AbstractClientPlayer> model = playerRenderer.getModel();
+            PlayerModel model = playerRenderer.getModel();
             stack.pushPose();
             RenderUtil.translateMatrixToBone(stack, bone);
             RenderUtil.translateToPivotPoint(stack, bone);
@@ -98,11 +94,11 @@ public class BlizzardItemRenderer extends GeoItemRenderer<BlizzardItem> {
             }
             stack.popPose();
         }
-        super.renderRecursively(stack, animatable, bone, type, buffer, bufferIn, isReRender, partialTick, packedLightIn, packedOverlayIn, color);
+        super.renderRecursively(renderState, stack, bone, renderType, bufferSource, buffer, isReRender, packedLightIn, packedOverlay, renderColor);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(BlizzardItem instance) {
+    public ResourceLocation getTextureLocation(GeoRenderState instance) {
         return super.getTextureLocation(instance);
     }
 }

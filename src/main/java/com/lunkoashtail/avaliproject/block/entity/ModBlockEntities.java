@@ -15,8 +15,8 @@ public class ModBlockEntities {
             DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, AvaliProject.MOD_ID);
 
         public static final Supplier<BlockEntityType<NanoloomBlockEntity>> NANOLOOM_BE =
-            BLOCK_ENTITIES.register("nanoloom_be", () -> BlockEntityType.Builder.of(
-                    NanoloomBlockEntity::new, ModBlocks.NANOLOOM.get()).build(null));
+            BLOCK_ENTITIES.register("nanoloom_be", () -> new BlockEntityType<>(
+                    NanoloomBlockEntity::new, ModBlocks.NANOLOOM.get()));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

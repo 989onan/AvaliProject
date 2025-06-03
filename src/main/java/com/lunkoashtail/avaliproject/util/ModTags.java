@@ -17,6 +17,9 @@ public class ModTags {
         public static final TagKey<Block> NEEDS_CERAMIC_TOOL = createTag("needs_ceramic_tool");
         public static final TagKey<Block> INCORRECT_FOR_CERAMIC_TOOL = createTag("incorrect_for_ceramic_tool");
 
+
+
+
         private static TagKey<Block> createTag(String name) {
             return BlockTags.create(ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, name));
         }
@@ -25,6 +28,9 @@ public class ModTags {
     public static class Items {
         public static final TagKey<Item> TRANSFORMABLE_ITEMS = createTag("transformable_items");
 
+        public static final TagKey<Item> AEROGEL = createTag("needs_aerogel_tool");
+        public static final TagKey<Item> HARDLIGHT = createTag("needs_hardlight_tool");
+        public static final TagKey<Item> CERAMIC = createTag("needs_ceramic_tool");
         private static TagKey<Item> createTag(String name) {
             return ItemTags.create(ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, name));
         }

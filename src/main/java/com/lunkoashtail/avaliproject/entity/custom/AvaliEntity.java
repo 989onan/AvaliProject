@@ -7,12 +7,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
+import software.bernie.geckolib.animatable.processing.AnimationController;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.GeoEntity;
 
@@ -92,34 +93,32 @@ public class AvaliEntity extends Monster implements GeoEntity {
 
     protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHitIn) {
         super.dropCustomDeathLoot(serverLevel, source, recentlyHitIn);
-        this.spawnAtLocation(new ItemStack(Items.FEATHER));
+        this.spawnAtLocation(serverLevel, new ItemStack(Items.FEATHER, 1));
     }
 
     @Override
     public SoundEvent getAmbientSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.ambient"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.ambient")).get().value();
     }
 
     @Override
     public void playStepSound(BlockPos pos, BlockState blockIn) {
-        this.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.step")), 0.15f, 1);
+        this.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.step")).get().value(), 0.15f, 1);
     }
 
     @Override
     public SoundEvent getHurtSound(DamageSource ds) {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.hurt"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.hurt")).get().value();
     }
 
     @Override
     public SoundEvent getDeathSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.death"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.death")).get().value();
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (source.is(DamageTypes.FALL))
-            return false;
-        return super.hurt(source, amount);
+    public boolean causeFallDamage(double l, float d, @NotNull DamageSource source) {
+        return false;
     }
 
     @Override
@@ -132,7 +131,7 @@ public class AvaliEntity extends Monster implements GeoEntity {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("Texture"))
-            this.setTexture(compound.getString("Texture"));
+            this.setTexture(compound.getString("Texture").get());
     }
 
     @Override
@@ -162,9 +161,9 @@ public class AvaliEntity extends Monster implements GeoEntity {
         return builder;
     }
 
-    private PlayState movementPredicate(AnimationState event) {
+    private PlayState movementPredicate(AnimationTest<AvaliEntity> event) {
         if (this.animationprocedure.equals("empty")) {
-            if ((event.isMoving() || !(event.getLimbSwingAmount() > -0.15F && event.getLimbSwingAmount() < 0.15F))
+            if ((event.isMoving() || !(event.animatable().getDeltaMovement().lengthSqr() > .15f) && this.onGround())
 
             ) {
                 return event.setAndContinue(RawAnimation.begin().thenLoop("Walk"));
@@ -176,14 +175,14 @@ public class AvaliEntity extends Monster implements GeoEntity {
 
     String prevAnim = "empty";
 
-    private PlayState procedurePredicate(AnimationState event) {
-        if (!animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
+    private PlayState procedurePredicate(AnimationTest<AvaliEntity> event) {
+        if (!animationprocedure.equals("empty") && event.controller().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
             if (!this.animationprocedure.equals(prevAnim))
-                event.getController().forceAnimationReset();
-            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
-            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                event.controller().forceAnimationReset();
+            event.controller().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.controller().getAnimationState() == AnimationController.State.STOPPED) {
                 this.animationprocedure = "empty";
-                event.getController().forceAnimationReset();
+                event.controller().forceAnimationReset();
             }
         } else if (animationprocedure.equals("empty")) {
             prevAnim = "empty";
@@ -198,7 +197,7 @@ public class AvaliEntity extends Monster implements GeoEntity {
         ++this.deathTime;
         if (this.deathTime == 20) {
             this.remove(AvaliEntity.RemovalReason.KILLED);
-            this.dropExperience(this);
+            this.dropExperience(this.getServer().getLevel(this.level().dimension()), this);
         }
     }
 
@@ -212,8 +211,8 @@ public class AvaliEntity extends Monster implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        data.add(new AnimationController<>(this, "movement", 4, this::movementPredicate));
-        data.add(new AnimationController<>(this, "procedure", 4, this::procedurePredicate));
+        data.add(new AnimationController<>("movement", 4, this::movementPredicate));
+        data.add(new AnimationController<>("procedure", 4, this::procedurePredicate));
     }
 
     @Override

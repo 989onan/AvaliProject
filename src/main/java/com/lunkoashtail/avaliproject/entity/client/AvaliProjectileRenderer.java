@@ -1,5 +1,6 @@
 package com.lunkoashtail.avaliproject.entity.client;
 
+import com.lunkoashtail.avaliproject.entity.custom.AvaliExplosiveEntity;
 import com.lunkoashtail.avaliproject.entity.custom.AvaliProjectileEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.resources.ResourceLocation;
@@ -13,28 +14,42 @@ import com.mojang.math.Axis;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-public class AvaliProjectileRenderer extends EntityRenderer<AvaliProjectileEntity> {
+public class AvaliProjectileRenderer extends EntityRenderer<AvaliProjectileEntity, AvaliProjectileRenderState> {
     private static final ResourceLocation texture = ResourceLocation.parse("avaliproject:textures/entity/avali_projectile.png");
-    private final Modelavali_projectile_Converted model;
+    private final Modelavali_projectile_Converted<AvaliProjectileEntity> model;
 
     public AvaliProjectileRenderer(EntityRendererProvider.Context context) {
         super(context);
-        model = new Modelavali_projectile_Converted(context.bakeLayer(Modelavali_projectile_Converted.LAYER_LOCATION));
+        model = new Modelavali_projectile_Converted<>(context.bakeLayer(Modelavali_projectile_Converted.LAYER_LOCATION));
     }
 
     @Override
-    public void render(AvaliProjectileEntity entityIn, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn) {
+    public AvaliProjectileRenderState createRenderState() {
+        AvaliProjectileRenderState state = new AvaliProjectileRenderState();
+        return state;
+    }
+
+    @Override
+    public void render(AvaliProjectileRenderState entityIn, PoseStack poseStack, MultiBufferSource bufferIn, int packedLight) {
         VertexConsumer vb = bufferIn.getBuffer(RenderType.entityCutout(this.getTextureLocation(entityIn)));
         poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entityIn.yRotO, entityIn.getYRot()) - 90));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(90 + Mth.lerp(partialTicks, entityIn.xRotO, entityIn.getXRot())));
-        model.renderToBuffer(poseStack, vb, packedLightIn, OverlayTexture.NO_OVERLAY);
+        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(entityIn.partialTick, entityIn.yRotO, entityIn.getYRot0) - 90));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(90 + Mth.lerp(entityIn.partialTick, entityIn.xRotO, entityIn.getXRot0)));
+        model.renderToBuffer(poseStack, vb, packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
-        super.render(entityIn, entityYaw, partialTicks, poseStack, bufferIn, packedLightIn);
+        super.render(entityIn, poseStack, bufferIn, packedLight);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(AvaliProjectileEntity entity) {
+    public void extractRenderState(AvaliProjectileEntity entity, AvaliProjectileRenderState state, float tick_progress) {
+        super.extractRenderState(entity, state, tick_progress);
+        state.yRotO = entity.yRotO;
+        state.xRotO = entity.xRotO;
+        state.getXRot0 = entity.getXRot();
+        state.getYRot0 = entity.getYRot();
+    }
+
+    public ResourceLocation getTextureLocation(AvaliProjectileRenderState entity) {
         return texture;
     }
 }

@@ -5,22 +5,25 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class Aerogel extends Item {    public Aerogel(Properties properties) {
-    super(properties);
-}
+public class Aerogel extends Item {
+    public Aerogel(Properties properties) {
+        super(properties);
+    }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
         if(Screen.hasShiftDown()) {
-            tooltipComponents.add(Component.translatable("tooltip.avaliproject.aerogel.shift_down"));
+            tooltipAdder.accept(Component.translatable("tooltip.avaliproject.aerogel.shift_down"));
         } else {
-            tooltipComponents.add(Component.translatable("tooltip.avaliproject.aerogel"));
+            tooltipAdder.accept(Component.translatable("tooltip.avaliproject.aerogel"));
         }
 
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        super.appendHoverText(stack, context, tooltipDisplay, tooltipAdder, flag);
     }
 }

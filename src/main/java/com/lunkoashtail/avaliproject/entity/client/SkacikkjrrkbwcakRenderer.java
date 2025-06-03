@@ -1,32 +1,43 @@
 package com.lunkoashtail.avaliproject.entity.client;
 
+import com.lunkoashtail.avaliproject.entity.custom.SergalEntity;
 import com.lunkoashtail.avaliproject.entity.custom.SkacikkjrrkbwcakEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
-public class SkacikkjrrkbwcakRenderer extends GeoEntityRenderer<SkacikkjrrkbwcakEntity> {
+import static com.lunkoashtail.avaliproject.entity.client.AvaliProjectDataTickets.texture;
+
+public class SkacikkjrrkbwcakRenderer<R extends EntityRenderState & GeoRenderState>  extends GeoEntityRenderer<SkacikkjrrkbwcakEntity, R> {
     public SkacikkjrrkbwcakRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new SkacikkjrrkbwcakModel());
         this.shadowRadius = 0.75f;
     }
 
     @Override
-    public RenderType getRenderType(SkacikkjrrkbwcakEntity animatable, ResourceLocation texture, MultiBufferSource bufferSource, float partialTick) {
+    public RenderType getRenderType(R animatable, ResourceLocation texture) {
         return RenderType.entityTranslucent(getTextureLocation(animatable));
     }
 
     @Override
-    public void preRender(PoseStack poseStack, SkacikkjrrkbwcakEntity entity, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int color) {
+    public void addRenderData(SkacikkjrrkbwcakEntity animatable, Void relatedObject, R renderState) {
+        renderState.addGeckolibData(texture,animatable.getTexture());
+
+    }
+
+    @Override
+    public void preRender(R entity, PoseStack poseStack, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, int packedLight, int packedOverlay, int color) {
         float scale = 1f;
         this.scaleHeight = scale;
         this.scaleWidth = scale;
-        super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, color);
+        super.preRender( entity,poseStack, model, bufferSource, buffer, isReRender, packedLight, packedOverlay, color);
     }
 
 }

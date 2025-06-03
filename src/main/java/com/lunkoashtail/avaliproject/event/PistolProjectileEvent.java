@@ -49,6 +49,6 @@ public class PistolProjectileEvent {
             projectileLevel.addFreshEntity(_entityToSpawn);
         }
         if (entity instanceof Player _player)
-            _player.getCooldowns().addCooldown(itemstack.getItem(), 5);
+            _player.getCooldowns().addCooldown(itemstack, 5);
     }
 }

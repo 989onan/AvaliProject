@@ -4,6 +4,8 @@ import com.lunkoashtail.avaliproject.AvaliProject;
 import com.lunkoashtail.avaliproject.entity.custom.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.neoforged.bus.api.IEventBus;
@@ -14,78 +16,124 @@ import java.util.function.Supplier;
 
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
-            DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, AvaliProject.MOD_ID);
+            DeferredRegister.createEntities(AvaliProject.MOD_ID);
     public static final Supplier<EntityType<SksceegehkjaEntity>> SKSCEEGEHKJA =
             ENTITY_TYPES.register("sksceegehkja", () -> EntityType.Builder.of(SksceegehkjaEntity::new, MobCategory.CREATURE)
-                    .sized(2.25f, 2.25f).build("sksceegehkja"));
+                    .sized(2.25f, 2.25f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "sksceegehkja"))));
     public static final Supplier<EntityType<SkacikkjrrkbwcakEntity>> SKACIKKJRRKBWCAK =
             ENTITY_TYPES.register("skacikkjrrkbwcak", () -> EntityType.Builder.of(SkacikkjrrkbwcakEntity::new, MobCategory.CREATURE)
-                    .sized(0.6f, 0.6f).build("skacikkjrrkbwcak"));
+                    .sized(0.6f, 0.6f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "skacikkjrrkbwcak"))));
     public static final Supplier<EntityType<PrimagenEntity>> PRIMAGEN =
             ENTITY_TYPES.register("primagen", () -> EntityType.Builder.of(PrimagenEntity::new, MobCategory.CREATURE)
-                    .sized(1.25f, 2.5f).build("primagen"));
+                    .sized(1.25f, 2.5f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "primagen"))));
     public static final Supplier<EntityType<ProtogenEntity>> PROTOGEN =
             ENTITY_TYPES.register("protogen", () -> EntityType.Builder.of(ProtogenEntity::new, MobCategory.CREATURE)
-                    .sized(1.25f, 2.15f).build("protogen"));
+                    .sized(1.25f, 2.15f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "protogen"))));
     public static final Supplier<EntityType<AvaliEntity>> AVALI =
             ENTITY_TYPES.register("avali", () -> EntityType.Builder.of(AvaliEntity::new, MobCategory.CREATURE)
-                    .sized(0.95f, 1.90f).build("avali"));
+                    .sized(0.95f, 1.90f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "avali"))));
     public static final Supplier<EntityType<SergalEntity>> SERGAL =
             ENTITY_TYPES.register("sergal", () -> EntityType.Builder.of(SergalEntity::new, MobCategory.CREATURE)
-                    .sized(1.25f, 2.3f).build("sergal"));
+                    .sized(1.25f, 2.3f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "sergal"))));
     public static final Supplier<EntityType<EepuorEntity>> EEPUOR =
             ENTITY_TYPES.register("eepuor", () -> EntityType.Builder.of(EepuorEntity::new, MobCategory.CREATURE)
-                    .sized(1.5f, 1.25f).build("eepuor"));
+                    .sized(1.5f, 1.25f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "eepuor"))));
     public static final Supplier<EntityType<MamagenEntity>> MAMAGEN =
             ENTITY_TYPES.register("mamagen", () -> EntityType.Builder.of(MamagenEntity::new, MobCategory.CREATURE)
-                    .sized(1.25f, 2.5f).build("mamagen"));
+                    .sized(1.25f, 2.5f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "mamagen"))));
     public static final Supplier<EntityType<StalkerEntity>> STALKER =
             ENTITY_TYPES.register("stalker", () -> EntityType.Builder.of(StalkerEntity::new, MobCategory.CREATURE)
-                    .sized(2.25f, 1.4f).build("stalker"));
+                    .sized(2.25f, 1.4f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "stalker"))));
     public static final Supplier<EntityType<CaklerahEntity>> CAKLERAH =
             ENTITY_TYPES.register("caklerah", () -> EntityType.Builder.of(CaklerahEntity::new, MobCategory.CREATURE)
-                    .sized(1.5f, 1.25f).build("caklerah"));
+                    .sized(1.5f, 1.25f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "caklerah"))));
     public static final Supplier<EntityType<TalxleechEntity>> TALXLEECH =
             ENTITY_TYPES.register("talxleech", () -> EntityType.Builder.of(TalxleechEntity::new, MobCategory.CREATURE)
-                    .sized(5f, 2.25f).build("talxleech"));
+                    .sized(5f, 2.25f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "talxleech"))));
     public static final Supplier<EntityType<TalxweaselEntity>> TALXWEASEL =
             ENTITY_TYPES.register("talxweasel", () -> EntityType.Builder.of(TalxweaselEntity::new, MobCategory.CREATURE)
-                    .sized(1.95f, 1.25f).build("talxweasel"));
+                    .sized(1.95f, 1.25f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "talxweasel"))));
     public static final Supplier<EntityType<GohuntakiEntity>> GOHUNTAKI =
             ENTITY_TYPES.register("gohuntaki", () -> EntityType.Builder.of(GohuntakiEntity::new, MobCategory.CREATURE)
-                    .sized(3f, 2.3f).build("gohuntaki"));
+                    .sized(3f, 2.3f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "gohuntaki"))));
     public static final Supplier<EntityType<TalxdogEntity>> TALXDOG =
             ENTITY_TYPES.register("talxdog", () -> EntityType.Builder.of(TalxdogEntity::new, MobCategory.CREATURE)
-                    .sized(1.95f, 1.4f).build("talxdog"));
+                    .sized(1.95f, 1.4f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "talxdog"))));
     public static final Supplier<EntityType<TalxwolfEntity>> TALXWOLF =
             ENTITY_TYPES.register("talxwolf", () -> EntityType.Builder.of(TalxwolfEntity::new, MobCategory.CREATURE)
-                    .sized(2.25f, 1.7f).build("talxwolf"));
+                    .sized(2.25f, 1.7f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "talxwolf"))));
     public static final Supplier<EntityType<SporeEntity>> SPORE =
             ENTITY_TYPES.register("spore", () -> EntityType.Builder.of(SporeEntity::new, MobCategory.CREATURE)
-                    .sized(1.95f, 1.4f).build("spore"));
+                    .sized(1.95f, 1.4f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "spore"))));
     public static final Supplier<EntityType<MizoleEntity>> MIZOLE =
             ENTITY_TYPES.register("mizole", () -> EntityType.Builder.of(MizoleEntity::new, MobCategory.CREATURE)
-                    .sized(1.95f, 1.4f).build("mizole"));
+                    .sized(1.95f, 1.4f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "mizole"))));
     public static final Supplier<EntityType<MaleNevreanEntity>> MALE_NEVREAN =
             ENTITY_TYPES.register("male_nevrean", () -> EntityType.Builder.of(MaleNevreanEntity::new, MobCategory.CREATURE)
-                    .sized(0.95f, 1.65f).build("male_nevrean"));
+                    .sized(0.95f, 1.65f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "male_nevrean"))));
     public static final Supplier<EntityType<FemaleNevreanEntity>> FEMALE_NEVREAN =
             ENTITY_TYPES.register("female_nevrean", () -> EntityType.Builder.of(FemaleNevreanEntity::new, MobCategory.CREATURE)
-                    .sized(0.95f, 1.65f).build("female_nevrean"));
+                    .sized(0.95f, 1.65f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "female_nevrean"))));
     public static final Supplier<EntityType<ChrgakbzEntity>> CHRGAKBZ =
             ENTITY_TYPES.register("chrgakbz", () -> EntityType.Builder.of(ChrgakbzEntity::new, MobCategory.CREATURE)
-                    .sized(5f, 2.25f).build("chrgakbz"));
+                    .sized(5f, 2.25f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "chrgakbz"))));
     public static final Supplier<EntityType<AvaliDroneEntity>> AVALI_DRONE =
             ENTITY_TYPES.register("avali_drone", () -> EntityType.Builder.of(AvaliDroneEntity::new, MobCategory.CREATURE)
-                    .sized(2f, 2f).build("avali_drone"));
+                    .sized(2f, 2f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "avali_drone"))));
 
 
     public static final Supplier<EntityType<AvaliExplosiveEntity>> AVALI_EXPLOSIVE =
             ENTITY_TYPES.register("avali_explosive", () -> EntityType.Builder.<AvaliExplosiveEntity>of(AvaliExplosiveEntity::new, MobCategory.MISC)
-                    .sized(0.5f, 0.5f).build("avali_explosive"));
+                    .sized(0.5f, 0.5f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID,"avali_explosive"))));
     public static final Supplier<EntityType<AvaliProjectileEntity>> AVALI_PROJECTILE =
             ENTITY_TYPES.register("avali_projectile", () -> EntityType.Builder.<AvaliProjectileEntity>of(AvaliProjectileEntity::new, MobCategory.MISC)
-                    .sized(0.5f, 0.5f).build("avali_projectile"));
+                    .sized(0.5f, 0.5f).build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID,"avali_projectile"))));
 
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);

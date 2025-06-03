@@ -7,12 +7,12 @@ import net.minecraft.Util;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.ServerLevelAccessor;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.GeoEntity;
 
@@ -85,17 +85,17 @@ public class PrimagenEntity extends Monster implements GeoEntity {
 
     protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHitIn) {
         super.dropCustomDeathLoot(serverLevel, source, recentlyHitIn);
-        this.spawnAtLocation(new ItemStack(ModItems.PROTOGEN_RAM.get()));
+        this.spawnAtLocation(serverLevel, new ItemStack(ModItems.PROTOGEN_RAM.get()));
     }
 
     @Override
     public SoundEvent getHurtSound(DamageSource ds) {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt")).get().value();
     }
 
     @Override
     public SoundEvent getDeathSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death")).get().value();
     }
 
     @Override
@@ -127,9 +127,9 @@ public class PrimagenEntity extends Monster implements GeoEntity {
         return builder;
     }
 
-    private PlayState movementPredicate(AnimationState event) {
+    private PlayState movementPredicate(AnimationTest<PrimagenEntity> event) {
         if (this.animationprocedure.equals("empty")) {
-            if ((event.isMoving() || !(event.getLimbSwingAmount() > -0.15F && event.getLimbSwingAmount() < 0.15F))
+            if ((event.isMoving() || !(event.animatable().getDeltaMovement().lengthSqr() > .15f))
 
             ) {
                 return event.setAndContinue(RawAnimation.begin().thenLoop("Walk"));
@@ -141,14 +141,14 @@ public class PrimagenEntity extends Monster implements GeoEntity {
 
     String prevAnim = "empty";
 
-    private PlayState procedurePredicate(AnimationState event) {
-        if (!animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
+    private PlayState procedurePredicate(AnimationTest<PrimagenEntity> event) {
+        if (!animationprocedure.equals("empty") && event.controller().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
             if (!this.animationprocedure.equals(prevAnim))
-                event.getController().forceAnimationReset();
-            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
-            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                event.controller().forceAnimationReset();
+            event.controller().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.controller().getAnimationState() == AnimationController.State.STOPPED) {
                 this.animationprocedure = "empty";
-                event.getController().forceAnimationReset();
+                event.controller().forceAnimationReset();
             }
         } else if (animationprocedure.equals("empty")) {
             prevAnim = "empty";
@@ -163,7 +163,7 @@ public class PrimagenEntity extends Monster implements GeoEntity {
         ++this.deathTime;
         if (this.deathTime == 20) {
             this.remove(PrimagenEntity.RemovalReason.KILLED);
-            this.dropExperience(this);
+            this.dropExperience(this.getServer().getLevel(this.level().dimension()), this);
         }
     }
 
@@ -177,8 +177,8 @@ public class PrimagenEntity extends Monster implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        data.add(new AnimationController<>(this, "movement", 4, this::movementPredicate));
-        data.add(new AnimationController<>(this, "procedure", 4, this::procedurePredicate));
+        data.add(new AnimationController<>("movement", 4, this::movementPredicate));
+        data.add(new AnimationController<>("procedure", 4, this::procedurePredicate));
     }
 
     @Override
@@ -215,10 +215,10 @@ public class PrimagenEntity extends Monster implements GeoEntity {
     @Override
     public void readAdditionalSaveData(CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
-        this.entityData.set(VARIANT, pCompound.getInt("Variant"));
+        this.entityData.set(VARIANT, pCompound.getInt("Variant").get());
     }
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pSpawnType,
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, EntitySpawnReason pSpawnType,
                                         @Nullable SpawnGroupData pSpawnGroupData) {
         PrimagenVariant variant = Util.getRandom(PrimagenVariant.values(), this.random);
         this.setVariant(variant);

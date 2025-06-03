@@ -4,6 +4,7 @@ import com.lunkoashtail.avaliproject.item.custom.AvaliswordItem;
 import software.bernie.geckolib.model.GeoModel;
 
 import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 public class AvaliswordItemModel extends GeoModel<AvaliswordItem> {
     @Override
@@ -12,12 +13,12 @@ public class AvaliswordItemModel extends GeoModel<AvaliswordItem> {
     }
 
     @Override
-    public ResourceLocation getModelResource(AvaliswordItem animatable) {
+    public ResourceLocation getModelResource(GeoRenderState animatable) {
         return ResourceLocation.parse("avaliproject:geo/avali_sword.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(AvaliswordItem animatable) {
+    public ResourceLocation getTextureResource(GeoRenderState animatable) {
         return ResourceLocation.parse("avaliproject:textures/item/avali_sword.png");
     }
 }

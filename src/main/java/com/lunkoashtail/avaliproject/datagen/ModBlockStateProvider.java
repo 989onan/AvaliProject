@@ -6,23 +6,34 @@ import com.lunkoashtail.avaliproject.block.custom.GroouCropBlock;
 import com.lunkoashtail.avaliproject.block.custom.KiriCropBlock;
 import com.lunkoashtail.avaliproject.block.custom.NakatiCropBlock;
 import com.lunkoashtail.avaliproject.block.custom.PiruCropBlock;
+import net.minecraft.core.BlockPos;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
+import net.neoforged.neoforge.client.model.generators.blockstate.CompositeBlockStateModelBuilder;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
 import java.util.function.Function;
 
 public class ModBlockStateProvider extends BlockStateProvider {
-    public ModBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
-        super(output, AvaliProject.MOD_ID, exFileHelper);
+    public ModBlockStateProvider() {
+        super();
+    }
+
+    @Override
+    protected BlockStateProviderType<?> type() {
+        return null;
+    }
+
+    @Override
+    public BlockState getState(RandomSource randomSource, BlockPos blockPos) {
+        return null;
     }
 
     @Override

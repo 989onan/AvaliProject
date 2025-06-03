@@ -4,6 +4,7 @@ import com.lunkoashtail.avaliproject.item.custom.NovaItem;
 import software.bernie.geckolib.model.GeoModel;
 
 import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 public class NovaItemModel extends GeoModel<NovaItem> {
     @Override
@@ -12,12 +13,12 @@ public class NovaItemModel extends GeoModel<NovaItem> {
     }
 
     @Override
-    public ResourceLocation getModelResource(NovaItem animatable) {
+    public ResourceLocation getModelResource(GeoRenderState animatable) {
         return ResourceLocation.parse("avaliproject:geo/nova.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(NovaItem animatable) {
+    public ResourceLocation getTextureResource(GeoRenderState animatable) {
         return ResourceLocation.parse("avaliproject:textures/item/nova.png");
     }
 }

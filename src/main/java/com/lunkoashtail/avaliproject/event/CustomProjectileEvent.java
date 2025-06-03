@@ -49,6 +49,6 @@ public class CustomProjectileEvent {
             projectileLevel.addFreshEntity(_entityToSpawn);
         }
         if (entity instanceof Player _player)
-            _player.getCooldowns().addCooldown(itemstack.getItem(), 10);
+            _player.getCooldowns().addCooldown(itemstack, 10);
     }
 }

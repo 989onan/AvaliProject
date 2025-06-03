@@ -11,7 +11,7 @@ public class ModFoodProperties {
     public static final FoodProperties AVALI_MUFFIN = new FoodProperties.Builder().nutrition(3).saturationModifier(0.25f).build();
     public static final FoodProperties GROOU = new FoodProperties.Builder().nutrition(3).saturationModifier(0.25f).build();
     public static final FoodProperties GROOU_JUICE = new FoodProperties.Builder().nutrition(3).saturationModifier(0.25f)
-            .effect(() -> new MobEffectInstance(MobEffects.DAMAGE_BOOST, 400), 0.35f).build();
+            .effect(() -> new MobEffectInstance(MobEffects.STRENGTH, 400), 0.35f).build();
     public static final FoodProperties KIRI_CURRY = new FoodProperties.Builder().nutrition(3).saturationModifier(0.25f).build();
     public static final FoodProperties KIRI_JAM = new FoodProperties.Builder().nutrition(3).saturationModifier(0.25f).build();
     public static final FoodProperties PIRU_NOODLE = new FoodProperties.Builder().nutrition(3).saturationModifier(0.25f).build();

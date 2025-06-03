@@ -1,12 +1,13 @@
 package com.lunkoashtail.avaliproject.entity.custom;
 
 import com.lunkoashtail.avaliproject.entity.ModEntities;
+import net.minecraft.server.level.ServerLevel;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.GeoEntity;
 
@@ -89,20 +90,14 @@ public class TalxleechEntity extends Monster implements GeoEntity {
 
     @Override
     public SoundEvent getHurtSound(DamageSource ds) {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt")).get().value();
     }
 
     @Override
     public SoundEvent getDeathSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death")).get().value();
     }
 
-    @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (source.is(DamageTypes.DROWN))
-            return false;
-        return super.hurt(source, amount);
-    }
 
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
@@ -114,13 +109,16 @@ public class TalxleechEntity extends Monster implements GeoEntity {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("Texture"))
-            this.setTexture(compound.getString("Texture"));
+            this.setTexture(compound.getString("Texture").get());
     }
 
     @Override
     public void baseTick() {
         super.baseTick();
         this.refreshDimensions();
+        if (this.level() instanceof ServerLevel) {
+            this.setAirSupply(300);
+        }
     }
 
     @Override
@@ -146,9 +144,9 @@ public class TalxleechEntity extends Monster implements GeoEntity {
         return builder;
     }
 
-    private PlayState movementPredicate(AnimationState event) {
+    private PlayState movementPredicate(AnimationTest<TalxleechEntity> event) {
         if (this.animationprocedure.equals("empty")) {
-            if ((event.isMoving() || !(event.getLimbSwingAmount() > -0.15F && event.getLimbSwingAmount() < 0.15F))
+            if ((event.isMoving() || !(event.animatable().getDeltaMovement().lengthSqr() > .15f))
 
             ) {
                 return event.setAndContinue(RawAnimation.begin().thenLoop("Walk"));
@@ -160,14 +158,14 @@ public class TalxleechEntity extends Monster implements GeoEntity {
 
     String prevAnim = "empty";
 
-    private PlayState procedurePredicate(AnimationState event) {
-        if (!animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
+    private PlayState procedurePredicate(AnimationTest<TalxleechEntity> event) {
+        if (!animationprocedure.equals("empty") && event.controller().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
             if (!this.animationprocedure.equals(prevAnim))
-                event.getController().forceAnimationReset();
-            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
-            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                event.controller().forceAnimationReset();
+            event.controller().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.controller().getAnimationState() == AnimationController.State.STOPPED) {
                 this.animationprocedure = "empty";
-                event.getController().forceAnimationReset();
+                event.controller().forceAnimationReset();
             }
         } else if (animationprocedure.equals("empty")) {
             prevAnim = "empty";
@@ -182,7 +180,7 @@ public class TalxleechEntity extends Monster implements GeoEntity {
         ++this.deathTime;
         if (this.deathTime == 20) {
             this.remove(TalxleechEntity.RemovalReason.KILLED);
-            this.dropExperience(this);
+            this.dropExperience(this.getServer().getLevel(this.level().dimension()), this);
         }
     }
 
@@ -196,8 +194,8 @@ public class TalxleechEntity extends Monster implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        data.add(new AnimationController<>(this, "movement", 4, this::movementPredicate));
-        data.add(new AnimationController<>(this, "procedure", 4, this::procedurePredicate));
+        data.add(new AnimationController<>("movement", 4, this::movementPredicate));
+        data.add(new AnimationController<>("procedure", 4, this::procedurePredicate));
     }
 
     @Override

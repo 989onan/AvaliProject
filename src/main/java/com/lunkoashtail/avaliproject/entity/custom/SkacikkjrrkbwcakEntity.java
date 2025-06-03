@@ -7,12 +7,12 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.GeoEntity;
 
@@ -32,7 +32,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
@@ -79,7 +79,7 @@ public class SkacikkjrrkbwcakEntity extends Animal implements GeoEntity {
         this.entityData.set(TEXTURE, texture);
     }
 
-    public static boolean canSpawnHere(EntityType<SkacikkjrrkbwcakEntity> type, ServerLevelAccessor world, MobSpawnType reason, BlockPos pos, RandomSource random) {
+    public static boolean canSpawnHere(EntityType<SkacikkjrrkbwcakEntity> type, ServerLevelAccessor world, EntitySpawnReason reason, BlockPos pos, RandomSource random) {
         return world.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK) && world.getBrightness(LightLayer.SKY, pos) > 8;
     }
 
@@ -105,12 +105,12 @@ public class SkacikkjrrkbwcakEntity extends Animal implements GeoEntity {
 
     @Override
     public SoundEvent getHurtSound(DamageSource ds) {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt")).get().value();
     }
 
     @Override
     public SoundEvent getDeathSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death"));
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death")).get().value();
     }
 
     @Override
@@ -123,7 +123,7 @@ public class SkacikkjrrkbwcakEntity extends Animal implements GeoEntity {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("Texture"))
-            this.setTexture(compound.getString("Texture"));
+            this.setTexture(compound.getString("Texture").get());
     }
 
     @Override
@@ -139,8 +139,8 @@ public class SkacikkjrrkbwcakEntity extends Animal implements GeoEntity {
 
     @Override
     public AgeableMob getBreedOffspring(ServerLevel serverWorld, AgeableMob ageable) {
-        SkacikkjrrkbwcakEntity retval = ModEntities.SKACIKKJRRKBWCAK.get().create(serverWorld);
-        retval.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(retval.blockPosition()), MobSpawnType.BREEDING, null);
+        SkacikkjrrkbwcakEntity retval = ModEntities.SKACIKKJRRKBWCAK.get().create(serverWorld, EntitySpawnReason.BREEDING);
+        retval.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(retval.blockPosition()), EntitySpawnReason.BREEDING, null);
         return retval;
     }
 
@@ -171,9 +171,9 @@ public class SkacikkjrrkbwcakEntity extends Animal implements GeoEntity {
         return builder;
     }
 
-    private PlayState movementPredicate(AnimationState event) {
+    private PlayState movementPredicate(AnimationTest<SkacikkjrrkbwcakEntity> event) {
         if (this.animationprocedure.equals("empty")) {
-            if ((event.isMoving() || !(event.getLimbSwingAmount() > -0.15F && event.getLimbSwingAmount() < 0.15F))
+            if ((event.isMoving() || !(event.animatable().getDeltaMovement().lengthSqr() > .15f))
 
             ) {
                 return event.setAndContinue(RawAnimation.begin().thenLoop("Walk"));
@@ -185,14 +185,14 @@ public class SkacikkjrrkbwcakEntity extends Animal implements GeoEntity {
 
     String prevAnim = "empty";
 
-    private PlayState procedurePredicate(AnimationState event) {
-        if (!animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
+    private PlayState procedurePredicate(AnimationTest<SkacikkjrrkbwcakEntity> event) {
+        if (!animationprocedure.equals("empty") && event.controller().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
             if (!this.animationprocedure.equals(prevAnim))
-                event.getController().forceAnimationReset();
-            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
-            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                event.controller().forceAnimationReset();
+            event.controller().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.controller().getAnimationState() == AnimationController.State.STOPPED) {
                 this.animationprocedure = "empty";
-                event.getController().forceAnimationReset();
+                event.controller().forceAnimationReset();
             }
         } else if (animationprocedure.equals("empty")) {
             prevAnim = "empty";
@@ -207,7 +207,7 @@ public class SkacikkjrrkbwcakEntity extends Animal implements GeoEntity {
         ++this.deathTime;
         if (this.deathTime == 20) {
             this.remove(SkacikkjrrkbwcakEntity.RemovalReason.KILLED);
-            this.dropExperience(this);
+            this.dropExperience(this.getServer().getLevel(this.level().dimension()), this);
         }
     }
 
@@ -221,8 +221,8 @@ public class SkacikkjrrkbwcakEntity extends Animal implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        data.add(new AnimationController<>(this, "movement", 4, this::movementPredicate));
-        data.add(new AnimationController<>(this, "procedure", 4, this::procedurePredicate));
+        data.add(new AnimationController<>("movement", 4, this::movementPredicate));
+        data.add(new AnimationController<>("procedure", 4, this::procedurePredicate));
     }
 
     @Override

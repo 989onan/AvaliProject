@@ -1,6 +1,7 @@
 package com.lunkoashtail.avaliproject.entity.client;
 
 import com.lunkoashtail.avaliproject.entity.custom.AvaliDroneEntity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 
@@ -11,23 +12,34 @@ import net.minecraft.client.renderer.MultiBufferSource;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
-public class AvaliDroneRenderer extends GeoEntityRenderer<AvaliDroneEntity> {
+import static com.lunkoashtail.avaliproject.entity.client.AvaliProjectDataTickets.texture;
+
+public class AvaliDroneRenderer<R extends EntityRenderState & GeoRenderState> extends GeoEntityRenderer<AvaliDroneEntity, R> {
+
+
     public AvaliDroneRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new AvaliDroneModel());
         this.shadowRadius = 0.5f;
     }
 
     @Override
-    public RenderType getRenderType(AvaliDroneEntity animatable, ResourceLocation texture, MultiBufferSource bufferSource, float partialTick) {
-        return RenderType.entityTranslucent(getTextureLocation(animatable));
+    public RenderType getRenderType(R renderState, ResourceLocation texture) {
+        return RenderType.entityTranslucent(getTextureLocation(renderState));
     }
 
     @Override
-    public void preRender(PoseStack poseStack, AvaliDroneEntity entity, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int color) {
+    public void addRenderData(AvaliDroneEntity animatable, Void relatedObject, R renderState) {
+        renderState.addGeckolibData(texture,animatable.getTexture());
+
+    }
+
+    @Override
+    public void preRender(R renderState,PoseStack poseStack, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, int packedLight, int packedOverlay, int color) {
         float scale = 1f;
         this.scaleHeight = scale;
         this.scaleWidth = scale;
-        super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, color);
+        super.preRender(renderState,poseStack, model, bufferSource, buffer, isReRender, packedLight, packedOverlay, color);
     }
 }
