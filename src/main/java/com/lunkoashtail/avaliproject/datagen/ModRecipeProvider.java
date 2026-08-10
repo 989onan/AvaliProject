@@ -350,6 +350,49 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_durasteel_ingot", has(ModItems.DURASTEEL_INGOT))
                 .save(recipeOutput);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SERGAL_LANCE.get(), 4)
+                .pattern("C")
+                .pattern("S")
+                .pattern("S")
+                .define('S', Items.STICK)
+                .define('C', ModItems.VILOUS_CERAMIC_INGOT.get())
+                .unlockedBy("has_vilous_ceramic", has(ModItems.VILOUS_CERAMIC_INGOT))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.VILOUS_CERAMIC_INGOT_BLOCK.get(), 4)
+                .pattern("CCC")
+                .pattern("CCC")
+                .pattern("CCC")
+                .define('C', ModItems.VILOUS_CERAMIC_INGOT.get())
+                .unlockedBy("has_vilous_ceramic", has(ModItems.VILOUS_CERAMIC_INGOT))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SERGAL_MACE.get(), 4)
+                .pattern("CBC")
+                .pattern(" S ")
+                .pattern(" S ")
+                .define('S', Items.STICK)
+                .define('B', ModItems.VILOUS_CERAMIC_INGOT_BLOCK.get())
+                .define('C', ModItems.VILOUS_CERAMIC_INGOT.get())
+                .unlockedBy("has_vilous_ceramic_ingot_block", has(ModItems.VILOUS_CERAMIC_INGOT_BLOCK))
+                .save(recipeOutput);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SERGAL_GREATSWORD.get(), 4)
+                .pattern("CC")
+                .pattern("CC")
+                .pattern(" S")
+                .define('S', Items.STICK)
+                .define('C', ModItems.VILOUS_CERAMIC_INGOT.get())
+                .unlockedBy("has_vilous_ceramic", has(ModItems.VILOUS_CERAMIC_INGOT))
+                .save(recipeOutput);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SERGAL_SWORD.get(), 4)
+                .pattern("C")
+                .pattern("C")
+                .pattern("S")
+                .define('S', Items.STICK)
+                .define('C', ModItems.VILOUS_CERAMIC_INGOT.get())
+                .unlockedBy("has_vilous_ceramic", has(ModItems.VILOUS_CERAMIC_INGOT))
+                .save(recipeOutput);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.PROTOGEN_AXE.get())
                 .pattern(" BB")
                 .pattern(" CA")
