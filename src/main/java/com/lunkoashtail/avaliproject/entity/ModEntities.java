@@ -6,6 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -74,7 +75,7 @@ public class ModEntities {
                     .sized(0.95f, 1.65f).build("female_nevrean"));
     public static final Supplier<EntityType<ChrgakbzEntity>> CHRGAKBZ =
             ENTITY_TYPES.register("chrgakbz", () -> EntityType.Builder.of(ChrgakbzEntity::new, MobCategory.CREATURE)
-                    .sized(5f, 2.25f).build("chrgakbz"));
+                    .sized(5.5f, 3.5f).build("chrgakbz"));
     public static final Supplier<EntityType<AvaliDroneEntity>> AVALI_DRONE =
             ENTITY_TYPES.register("avali_drone", () -> EntityType.Builder.of(AvaliDroneEntity::new, MobCategory.CREATURE)
                     .sized(2f, 2f).build("avali_drone"));
@@ -87,6 +88,10 @@ public class ModEntities {
             ENTITY_TYPES.register("avali_projectile", () -> EntityType.Builder.<AvaliProjectileEntity>of(AvaliProjectileEntity::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f).build("avali_projectile"));
 
+    public static final Supplier<EntityType<GlassShardEntity>> GLASS_SHARD =
+            ENTITY_TYPES.register("glass_shard", () -> EntityType.Builder.<GlassShardEntity>of(GlassShardEntity::new, MobCategory.MISC)
+                    .sized(0.4f, 0.4f).noSave().build("glass_shard"));
+
     public static final Supplier<EntityType<BosAgudnerEntity>> BOS_AGUDNER =
             ENTITY_TYPES.register("bos_agudner", () -> EntityType.Builder.of(BosAgudnerEntity::new, MobCategory.MONSTER)
                     .sized(1.5f, 2.5f).build("bos_agudner"));
@@ -98,8 +103,10 @@ public class ModEntities {
                     .sized(0.8f, 1.2f).build("rab_agudner"));
 
     public static final Supplier<EntityType<ExpieEntity>> EXPIE =
-            ENTITY_TYPES.register("expie", () -> EntityType.Builder.of(ExpieEntity::new, MobCategory.CREATURE)
-                    .sized(0.5f, 1.5f).build("expie"));
+            ENTITY_TYPES.register("expie", () -> EntityType.Builder.of(ExpieEntity::new, MobCategory.MONSTER)
+                    .sized(0.5f, 1.5f)
+                    .vehicleAttachment(new Vec3(0.0, 0.85, -0.2))
+                    .build("expie"));
 
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);

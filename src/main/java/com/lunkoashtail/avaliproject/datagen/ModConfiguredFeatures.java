@@ -28,7 +28,6 @@ public class ModConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> OVERWORLD_TITANIUM_ORES_KEY = registerKey("titanium_ores");
     public static final ResourceKey<ConfiguredFeature<?, ?>> OVERWORLD_DURASTEEL_ORES_KEY = registerKey("durasteel_ores");
     public static final ResourceKey<ConfiguredFeature<?, ?>> OVERWORLD_AERO_CRYSTAL_ORES_KEY = registerKey("aero_crystal_ores");
-    public static final ResourceKey<ConfiguredFeature<?, ?>> OVERWORLD_SYNC_CRYSTAL_ORES_KEY = registerKey("sync_crystal_ores");
     public static final ResourceKey<ConfiguredFeature<?, ?>> OVERWORLD_THERMAL_CRYSTAL_ORES_KEY = registerKey("thermal_crystal_ores");
     public static final ResourceKey<ConfiguredFeature<?, ?>> OVERWORLD_AEGISALT_ORES_KEY = registerKey("aegisalt_ores");
     public static final ResourceKey<ConfiguredFeature<?, ?>> OVERWORLD_VILOUS_CERAMIC_ORES_KEY = registerKey("vilous_ceramic_ores");
@@ -41,6 +40,12 @@ public class ModConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> NAKATI_NODULE_KEY = registerKey("nakati_nodule");
     public static final ResourceKey<ConfiguredFeature<?, ?>> KIRI_NODULE_KEY = registerKey("kiri_nodule");
     public static final ResourceKey<ConfiguredFeature<?, ?>> GROOU_NODULE_KEY = registerKey("groou_nodule");
+
+    public static final ResourceKey<ConfiguredFeature<?, ?>> CONTAINER_CRATE_KEY = registerKey("container_crate");
+
+    public static final ResourceKey<ConfiguredFeature<?, ?>> GEOTREE_KEY = registerKey("geotree");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> HYDREED_KEY = registerKey("hydreed");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> GLOWPLANT_KEY = registerKey("glowplant");
 
 
 
@@ -61,9 +66,6 @@ public class ModConfiguredFeatures {
         List<OreConfiguration.TargetBlockState> overworldAeroCrystalOres = List.of(
                 OreConfiguration.target(stoneReplaceables, ModBlocks.AERO_CRYSTAL_ORE.get().defaultBlockState()),
                 OreConfiguration.target(deepslateReplaceables, ModBlocks.AERO_CRYSTAL_DEEPSLATE_ORE.get().defaultBlockState()));
-        List<OreConfiguration.TargetBlockState> overworldSyncCrystalOres = List.of(
-                OreConfiguration.target(stoneReplaceables, ModBlocks.SYNC_CRYSTAL_ORE.get().defaultBlockState()),
-                OreConfiguration.target(deepslateReplaceables, ModBlocks.SYNC_CRYSTAL_DEEPSLATE_ORE.get().defaultBlockState()));
         List<OreConfiguration.TargetBlockState> overworldThermalCrystalOres = List.of(
                 OreConfiguration.target(stoneReplaceables, ModBlocks.THERMAL_CRYSTAL_ORE.get().defaultBlockState()),
                 OreConfiguration.target(deepslateReplaceables, ModBlocks.THERMAL_CRYSTAL_DEEPSLATE_ORE.get().defaultBlockState()));
@@ -87,7 +89,6 @@ public class ModConfiguredFeatures {
         register(context, OVERWORLD_TITANIUM_ORES_KEY, Feature.ORE, new OreConfiguration(overworldTitaniumOres, 4));
         register(context, OVERWORLD_DURASTEEL_ORES_KEY, Feature.ORE, new OreConfiguration(overworldDurasteelOres, 4));
         register(context, OVERWORLD_AERO_CRYSTAL_ORES_KEY, Feature.ORE, new OreConfiguration(overworldAeroCrystalOres, 4));
-        register(context, OVERWORLD_SYNC_CRYSTAL_ORES_KEY, Feature.ORE, new OreConfiguration(overworldSyncCrystalOres, 3));
         register(context, OVERWORLD_THERMAL_CRYSTAL_ORES_KEY, Feature.ORE, new OreConfiguration(overworldThermalCrystalOres, 4));
         register(context, OVERWORLD_AEGISALT_ORES_KEY, Feature.ORE, new OreConfiguration(overworldAegisaltOres, 4));
         register(context, OVERWORLD_VILOUS_CERAMIC_ORES_KEY, Feature.ORE, new OreConfiguration(overworldVilousCeramicOres, 4));
@@ -105,7 +106,15 @@ public class ModConfiguredFeatures {
         register(context, GROOU_NODULE_KEY, Feature.FLOWER, new RandomPatchConfiguration(32, 6, 2,
                 PlacementUtils.onlyWhenEmpty(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.GROOU_NODULE.get())))));
 
+        register(context, CONTAINER_CRATE_KEY, com.lunkoashtail.avaliproject.worldgen.ModFeatures.CONTAINER_CRATE_FEATURE.get(),
+                net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration.INSTANCE);
 
+        register(context, GEOTREE_KEY, com.lunkoashtail.avaliproject.worldgen.ModFeatures.CAVE_BLOCK_FEATURE.get(),
+                new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.GEOTREE.get())));
+        register(context, HYDREED_KEY, com.lunkoashtail.avaliproject.worldgen.ModFeatures.CAVE_BLOCK_FEATURE.get(),
+                new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.HYDREED.get())));
+        register(context, GLOWPLANT_KEY, com.lunkoashtail.avaliproject.worldgen.ModFeatures.CAVE_BLOCK_FEATURE.get(),
+                new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.GLOWPLANT.get())));
 
     }
 

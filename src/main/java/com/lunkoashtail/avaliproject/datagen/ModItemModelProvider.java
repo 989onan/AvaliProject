@@ -46,6 +46,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.THERMAL_CRYSTAL.get());
         basicItem(ModItems.SYNC_CRYSTAL.get());
         basicItem(ModItems.AEROGEL.get());
+        basicItem(ModItems.AEROGEL_BATTERY.get());
         basicItem(ModItems.AEROMER.get());
         basicItem(ModItems.AEROMER.get());
         basicItem(ModItems.AVALI_BOTTLE.get());
@@ -98,8 +99,10 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.BLIZZARD_HILT.get());
         basicItem(ModItems.BLIZZARD_MUZZLE.get());
         basicItem(ModItems.BLIZZARD_CORE.get());
+        basicItem(ModItems.RAILGUN.get());
         basicItem(ModItems.EXPIE_PLUSH.get());
-        basicItem(ModItems.BANDAGE.get());
+        basicItem(ModItems.DRESSING.get());
+        basicItem(ModItems.RIPPED_DRESSING.get());
 
         // Plushies
         basicItem(ModItems.AKITU_PLUSHIE.get());
@@ -158,7 +161,22 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.WATER_BOTTLE.get());
         basicItem(ModItems.WOUND_GLUE.get());
 
+        basicItem(ModItems.CHUNK_OF_PLASTIC.get());
+        basicItem(ModItems.FLEXIGLASS.get());
+        basicItem(ModItems.SCRAP_CUBE.get());
+        basicItem(ModItems.SCRAP_TUBE.get());
+        basicItem(ModItems.BUNDLE_OF_WIRES.get());
+        basicItem(ModItems.CIRCUIT_BOARD.get());
+        basicItem(ModItems.AUTO_INJECTOR.get());
+        basicItem(ModItems.SCRAP_METAL.get());
+        basicItem(ModItems.SCRAP_PANEL.get());
+        basicItem(ModItems.ROPE.get());
+        basicItem(ModItems.TEMPORARY_BOTTLE.get());
+        basicItem(ModItems.NUMBERRY.get());
+        basicItem(ModItems.GLOWPLANT_FRUIT.get());
+
         //Icons
+        basicItem(ModItems.GALAXY_ICON.get());
         basicItem(ModItems.AVALI_ICON.get());
         basicItem(ModItems.PROTOGEN_ICON.get());
         basicItem(ModItems.SERGAL_ICON.get());

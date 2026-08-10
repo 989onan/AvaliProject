@@ -18,14 +18,25 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 /**
  * Client → Server: request to reduce bleed on a specific limb.
  *
- * Sent by the client when a bandage minigame completes successfully.
- * The server validates, applies the reduction, then echoes a LimbDataSyncPayload
- * back to the client.
+ * Sent progressively by DressingMinigameScreen as the player circles the wound. Healing and
+ * durability spend are deliberately decoupled — one whole dressing (2 * LimbData.MAX_BLEED
+ * durability) is calibrated to last a fixed number of clockwise revolutions, while bleed heals
+ * at its own (faster) rate per revolution — so bleedAmount and durabilityAmount are not
+ * necessarily equal on a given packet.
  *
- * limbOrdinal: Limb.values()[limbOrdinal] — the target limb.
- * amount:      how many bleed points to remove (e.g. 30).
+ * The whole minigame session is bound to the exact stack in {@code mainHand ? main hand : off
+ * hand} at the moment the screen was opened — like a pickaxe breaking, a depleted dressing is
+ * NOT swapped for another one in the inventory, even if the player is carrying more. The server
+ * only ever spends durabilityAmount out of that one stack; if it can't fully pay (durability hit
+ * 0, or the stack is gone), bleedAmount is NOT granted for that packet (no healing without
+ * material) and a DressingDepletedPayload is sent back so the screen can auto-close.
+ *
+ * limbOrdinal:      Limb.values()[limbOrdinal] — the target limb.
+ * bleedAmount:       how many bleed points this increment is requesting to heal.
+ * durabilityAmount:  how many durability points this increment costs.
+ * mainHand:          true to spend from the main hand's stack, false for the off hand's.
  */
-public record ReduceBleedPayload(int limbOrdinal, int amount) implements CustomPacketPayload {
+public record ReduceBleedPayload(int limbOrdinal, int bleedAmount, int durabilityAmount, boolean mainHand) implements CustomPacketPayload {
 
     public static final CustomPacketPayload.Type<ReduceBleedPayload> TYPE =
             new CustomPacketPayload.Type<>(
@@ -34,7 +45,9 @@ public record ReduceBleedPayload(int limbOrdinal, int amount) implements CustomP
     public static final StreamCodec<ByteBuf, ReduceBleedPayload> STREAM_CODEC =
             StreamCodec.composite(
                     ByteBufCodecs.INT, ReduceBleedPayload::limbOrdinal,
-                    ByteBufCodecs.INT, ReduceBleedPayload::amount,
+                    ByteBufCodecs.INT, ReduceBleedPayload::bleedAmount,
+                    ByteBufCodecs.INT, ReduceBleedPayload::durabilityAmount,
+                    ByteBufCodecs.BOOL, ReduceBleedPayload::mainHand,
                     ReduceBleedPayload::new
             );
 
@@ -43,34 +56,45 @@ public record ReduceBleedPayload(int limbOrdinal, int amount) implements CustomP
         return TYPE;
     }
 
-    private static boolean tryConsumeBandage(ItemStack stack) {
-        if (stack.is(ModItems.BANDAGE.get())) {
-            stack.shrink(1);
-            return true;
-        }
-        return false;
+    private static boolean isDressing(ItemStack stack) {
+        return stack.is(ModItems.DRESSING.get()) || stack.is(ModItems.STERILIZED_DRESSING.get());
     }
 
-    /** Server-side handler: apply reduction and sync updated data to client. */
+    private static int spendDurability(ItemStack stack, int needed) {
+        if (needed <= 0 || stack.isEmpty() || !isDressing(stack)) return 0;
+        int maxDamage = stack.getMaxDamage();
+        int available = maxDamage - stack.getDamageValue();
+        if (available <= 0) return 0;
+
+        int spend = Math.min(needed, available);
+        stack.setDamageValue(stack.getDamageValue() + spend);
+        if (stack.getDamageValue() >= maxDamage) {
+            stack.shrink(1);
+        }
+        return spend;
+    }
+
     public static void handle(ReduceBleedPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
 
             Limb[] limbs = Limb.values();
             if (payload.limbOrdinal() < 0 || payload.limbOrdinal() >= limbs.length) return;
-
             Limb limb = limbs[payload.limbOrdinal()];
-            LimbData data = serverPlayer.getData(ModAttachments.LIMB_DATA);
-            data.reduceBleed(limb, payload.amount());
 
-            // Consume one bandage — check main hand, then off hand, then inventory.
-            if (!tryConsumeBandage(serverPlayer.getMainHandItem()))
-                if (!tryConsumeBandage(serverPlayer.getOffhandItem()))
-                    for (int i = 0; i < serverPlayer.getInventory().getContainerSize(); i++)
-                        if (tryConsumeBandage(serverPlayer.getInventory().getItem(i))) break;
+            ItemStack stack = payload.mainHand() ? serverPlayer.getMainHandItem() : serverPlayer.getOffhandItem();
+            int durabilitySpent = spendDurability(stack, payload.durabilityAmount());
+            boolean fullyPaid = durabilitySpent >= payload.durabilityAmount();
 
-            // Send the authoritative state back to the client.
-            PacketDistributor.sendToPlayer(serverPlayer, LimbDataSyncPayload.from(data));
+            if (fullyPaid && payload.bleedAmount() > 0) {
+                LimbData data = serverPlayer.getData(ModAttachments.LIMB_DATA);
+                data.reduceBleed(limb, payload.bleedAmount());
+                PacketDistributor.sendToPlayer(serverPlayer, LimbDataSyncPayload.from(data));
+            }
+
+            if (!fullyPaid) {
+                PacketDistributor.sendToPlayer(serverPlayer, new DressingDepletedPayload());
+            }
         });
     }
 }

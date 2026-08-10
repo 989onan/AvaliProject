@@ -1,36 +1,45 @@
 package com.lunkoashtail.avaliproject.item.custom;
 
-import com.lunkoashtail.avaliproject.limb.ModAttachments;
-import com.lunkoashtail.avaliproject.screen.custom.LimbSelectionScreen;
-import com.lunkoashtail.avaliproject.screen.custom.SyringeMinigameScreen;
-import com.lunkoashtail.avaliproject.species.Species;
-import net.minecraft.client.Minecraft;
+import com.lunkoashtail.avaliproject.component.DrugDosage;
+import com.lunkoashtail.avaliproject.component.ModDataComponents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+
+import java.util.List;
 
 public class HeroinItem extends Item {
 
     public HeroinItem() {
-        super(new Item.Properties().stacksTo(16));
+        super(new Item.Properties().stacksTo(1));
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        if (level.isClientSide()) {
-            if (player.getData(ModAttachments.SPECIES) != Species.EXPIE) {
-                player.sendSystemMessage(Component.literal("You're not an expie"));
-                return InteractionResultHolder.fail(player.getItemInHand(hand));
-            }
-            Minecraft.getInstance().setScreen(new LimbSelectionScreen(selectedLimb ->
-                    Minecraft.getInstance().setScreen(
-                            new SyringeMinigameScreen(SyringeMinigameScreen.DrugType.HEROIN, selectedLimb))
-            ));
+    public ItemStack getDefaultInstance() {
+        ItemStack stack = super.getDefaultInstance();
+        stack.set(ModDataComponents.DRUG_DOSAGE, new DrugDosage((DrugType.MIN_DOSAGE + DrugType.MAX_DOSAGE) / 2f));
+        return stack;
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        if (!level.isClientSide() && !stack.has(ModDataComponents.DRUG_DOSAGE)) {
+            float dosage = DrugType.MIN_DOSAGE + level.getRandom().nextFloat() * (DrugType.MAX_DOSAGE - DrugType.MIN_DOSAGE);
+            stack.set(ModDataComponents.DRUG_DOSAGE, new DrugDosage(dosage));
         }
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        DrugDosage dosage = stack.get(ModDataComponents.DRUG_DOSAGE);
+        if (dosage != null) {
+            tooltipComponents.add(Component.literal((int) dosage.dosage() + " mL").withStyle(ChatFormatting.AQUA));
+        }
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 }

@@ -10,7 +10,9 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
@@ -107,6 +109,20 @@ public class ModBlockStateProvider extends BlockStateProvider {
         simpleBlock(ModBlocks.POTTED_KIRI_NODULE.get(), models().singleTexture("potted_kiri_nodule", ResourceLocation.parse("flower_pot_cross"), "plant",
                 blockTexture(ModBlocks.KIRI_NODULE.get())).renderType("cutout"));
 
+        blockWithItem(ModBlocks.CONTAINER_CRATE);
+
+        simpleBlock(ModBlocks.HYDREED.get(),
+                models().cross("hydreed", ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "block/hydreed")).renderType("cutout"));
+        simpleBlock(ModBlocks.GLOWPLANT.get(),
+                models().cross("glowplant", ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "block/glowplant")).renderType("cutout"));
+
+        ModelFile geotreeBottom = models().cross("geotree_bottom",
+                ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "block/geotree_bottom")).renderType("cutout");
+        ModelFile geotreeTop = models().cross("geotree_top",
+                ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "block/geotree_top")).renderType("cutout");
+        getVariantBuilder(ModBlocks.GEOTREE.get()).forAllStates(state ->
+                new ConfiguredModel[]{new ConfiguredModel(
+                        state.getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.LOWER ? geotreeBottom : geotreeTop)});
     }
 
 

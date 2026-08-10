@@ -1,7 +1,9 @@
 package com.lunkoashtail.avaliproject.screen.custom;
 
+import com.lunkoashtail.avaliproject.AvaliProject;
 import com.lunkoashtail.avaliproject.limb.BleedingTier;
 import com.lunkoashtail.avaliproject.limb.Limb;
+import com.lunkoashtail.avaliproject.limb.LimbConditions;
 import com.lunkoashtail.avaliproject.limb.LimbData;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
 import net.minecraft.client.Minecraft;
@@ -9,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,11 +42,24 @@ import java.util.function.Consumer;
  *   Place 16×16 PNG files at those paths — the game renders pink/white squares
  *   if a file is missing, so add the PNGs before shipping.
  *
+ * ── Shrapnel indicator + inspect-mode shortcut ──────────────────────────────
+ *   A limb with any embedded shrapnel shows a small badge (top-left corner) using
+ *   expie_shrapnel.png, and its combined status line calls it out alongside any
+ *   bleeding tier (both can be true at once - shrapnel is NOT exclusive with
+ *   bleeding/other conditions, and using an item like a syringe or dressing on a
+ *   shrapneled limb still works completely normally; nothing here blocks that).
+ *   The only special behavior is in INSPECT mode (onLimbSelected == null, opened by
+ *   the H keybinding with no item in hand): clicking a shrapneled limb there opens
+ *   ShrapnelMinigameScreen directly, since no item currently triggers it - this is
+ *   just a convenient stand-in entry point, not a restriction.
+ *
  * ── Two operating modes ────────────────────────────────────────────────────
- *   Item mode   (onLimbSelected ≠ null): clicking a limb fires the callback
- *               (which opens the minigame) without calling onClose().
- *   Inspect mode (onLimbSelected == null): opened by the H keybinding; clicking
- *               a limb closes the wheel without further action.
+ *   Item mode   (onLimbSelected ≠ null): clicking a limb always fires the callback
+ *               (which opens that item's own minigame) without calling onClose(),
+ *               regardless of whether the limb also has shrapnel.
+ *   Inspect mode (onLimbSelected == null): opened by the H keybinding; clicking a
+ *               limb opens ShrapnelMinigameScreen if it has shrapnel, otherwise
+ *               just closes the wheel.
  */
 public class LimbSelectionScreen extends Screen {
 
@@ -58,6 +74,11 @@ public class LimbSelectionScreen extends Screen {
     /** Size of the bleed-tier icon rendered inside each button. */
     private static final int ICON_SIZE    = 16;
 
+    private static final ResourceLocation SHRAPNEL_ICON =
+            ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "textures/gui/shrapnel/expie_shrapnel.png");
+    private static final int SHRAPNEL_ICON_TEX_W = 27, SHRAPNEL_ICON_TEX_H = 138;
+    private static final int SHRAPNEL_BADGE_W = 8, SHRAPNEL_BADGE_H = 14;
+
     // -------------------------------------------------------------------------
     // Colours
     // -------------------------------------------------------------------------
@@ -71,6 +92,7 @@ public class LimbSelectionScreen extends Screen {
     private static final int COL_TITLE        = 0xFFCCCCFF;
     private static final int COL_HINT         = 0xFF666666;
     private static final int COL_HEALTHY      = 0xFF44BB66;
+    private static final int COL_BORDER_SHRAPNEL = 0xFFFFAA33;
 
     // -------------------------------------------------------------------------
     // Wheel order — clockwise from 12 o'clock
@@ -173,15 +195,16 @@ public class LimbSelectionScreen extends Screen {
         );
     }
 
-    /** Draws all six buttons, reading bleed data from the client-side attachment. */
     private void drawLimbButtons(GuiGraphics gfx) {
         Player player = Minecraft.getInstance().player;
         LimbData data = (player != null) ? player.getData(ModAttachments.LIMB_DATA) : new LimbData();
+        LimbConditions conditions = (player != null) ? player.getData(ModAttachments.LIMB_CONDITIONS) : new LimbConditions();
 
         for (int i = 0; i < WHEEL_ORDER.length; i++) {
             Limb limb  = WHEEL_ORDER[i];
             int  bleed = data.getBleed(limb);
-            drawButton(gfx, btnX[i], btnY[i], limb, bleed, limb == hoveredLimb);
+            boolean hasShrapnel = conditions.getShrapnel(limb) > 0;
+            drawButton(gfx, btnX[i], btnY[i], limb, bleed, hasShrapnel, limb == hoveredLimb);
         }
     }
 
@@ -190,20 +213,19 @@ public class LimbSelectionScreen extends Screen {
      *
      * Structure (top → bottom inside the 44×44 square):
      *   ┌──────────────────────┐
-     *   │ [tier icon]   [name] │  ← icon top-right, name centred
+     *   │[!]  [tier icon][name]│  ← shrapnel badge top-left, tier icon top-right, name centred
      *   │       name line 2    │
      *   │  ████████░░░░░░░░░   │  ← bleed bar at bottom
      *   └──────────────────────┘
      *
-     * The tier icon is only drawn when bleed > 0.
+     * The tier icon is only drawn when bleed > 0; the shrapnel badge only when shrapnel > 0.
      */
-    private void drawButton(GuiGraphics gfx, int cx, int cy, Limb limb, int bleed, boolean hovered) {
+    private void drawButton(GuiGraphics gfx, int cx, int cy, Limb limb, int bleed, boolean hasShrapnel, boolean hovered) {
         int x = cx - BTN_R, y = cy - BTN_R;
         int w = BTN_R * 2,  h = BTN_R * 2;   // 44 × 44
 
-        // Background + border
         gfx.fill(x, y, x + w, y + h, hovered ? COL_BTN_HOVER : COL_BTN_IDLE);
-        int bc = hovered ? COL_BORDER_HOVER : COL_BORDER_IDLE;
+        int bc = hasShrapnel ? COL_BORDER_SHRAPNEL : (hovered ? COL_BORDER_HOVER : COL_BORDER_IDLE);
         gfx.fill(x,         y,         x + w, y + 1,     bc);
         gfx.fill(x,         y + h - 1, x + w, y + h,     bc);
         gfx.fill(x,         y,         x + 1, y + h,     bc);
@@ -216,6 +238,11 @@ public class LimbSelectionScreen extends Screen {
             int iconX = x + w - ICON_SIZE - 2; // 2 px from right edge
             int iconY = y + 2;                  // 2 px from top edge
             drawTierIcon(gfx, tier, iconX, iconY);
+        }
+
+        if (hasShrapnel) {
+            gfx.blit(SHRAPNEL_ICON, x + 2, y + 2, SHRAPNEL_BADGE_W, SHRAPNEL_BADGE_H,
+                    0f, 0f, SHRAPNEL_ICON_TEX_W, SHRAPNEL_ICON_TEX_H, SHRAPNEL_ICON_TEX_W, SHRAPNEL_ICON_TEX_H);
         }
 
         // ── Limb name (centred; split on first space for two-word names) ────
@@ -261,19 +288,20 @@ public class LimbSelectionScreen extends Screen {
 
         Player player = Minecraft.getInstance().player;
         LimbData data = (player != null) ? player.getData(ModAttachments.LIMB_DATA) : new LimbData();
+        LimbConditions conditions = (player != null) ? player.getData(ModAttachments.LIMB_CONDITIONS) : new LimbConditions();
         int bleed = data.getBleed(hoveredLimb);
+        boolean hasShrapnel = conditions.getShrapnel(hoveredLimb) > 0;
 
         BleedingTier tier = BleedingTier.fromBleedValue(bleed);
 
         String statusStr;
         int statusCol;
         if (tier == null) {
-            statusStr = "Healthy";
-            statusCol = COL_HEALTHY;
+            statusStr = hasShrapnel ? "Shrapnel embedded" : "Healthy";
+            statusCol = hasShrapnel ? COL_BORDER_SHRAPNEL : COL_HEALTHY;
         } else {
-            // e.g. "Heavy Bleeding (63%)"
-            statusStr = tier.getDisplayName().getString() + " (" + bleed + "%)";
-            statusCol = tier.getColor();
+            statusStr = tier.getDisplayName().getString() + " (" + bleed + "%)" + (hasShrapnel ? " + Shrapnel" : "");
+            statusCol = hasShrapnel ? COL_BORDER_SHRAPNEL : tier.getColor();
         }
 
         String label = hoveredLimb.getDisplayName().getString() + "  —  " + statusStr;
@@ -281,6 +309,8 @@ public class LimbSelectionScreen extends Screen {
 
         if (onLimbSelected != null) {
             gfx.drawCenteredString(font, "Click to treat this limb", width / 2, height - 16, 0x88FFFFFF);
+        } else if (hasShrapnel) {
+            gfx.drawCenteredString(font, "Click to remove the shrapnel", width / 2, height - 16, 0xFFFFAA33);
         }
     }
 
@@ -304,10 +334,16 @@ public class LimbSelectionScreen extends Screen {
 
         if (button == 0 && hoveredLimb != null) {
             if (onLimbSelected != null) {
-                // Callback sets the next screen; do NOT call onClose() or it overwrites it.
                 onLimbSelected.accept(hoveredLimb);
             } else {
-                onClose(); // inspect mode
+                Player player = Minecraft.getInstance().player;
+                LimbConditions conditions = (player != null) ? player.getData(ModAttachments.LIMB_CONDITIONS) : new LimbConditions();
+                int shrapnel = conditions.getShrapnel(hoveredLimb);
+                if (shrapnel > 0) {
+                    Minecraft.getInstance().setScreen(new ShrapnelMinigameScreen(hoveredLimb, shrapnel));
+                } else {
+                    onClose();
+                }
             }
             return true;
         }

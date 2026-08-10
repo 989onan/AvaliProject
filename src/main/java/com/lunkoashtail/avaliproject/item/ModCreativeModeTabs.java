@@ -4,7 +4,6 @@ import com.lunkoashtail.avaliproject.AvaliProject;
 import com.lunkoashtail.avaliproject.block.ModBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
@@ -16,9 +15,11 @@ public class ModCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TAB =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, AvaliProject.MOD_ID);
 
-    public static final Supplier<CreativeModeTab> AVALI_ITEMS_TAB = CREATIVE_MODE_TAB.register("avali_items_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.AVALI_ICON.get()))
-                    .title(Component.translatable("creativetab.avaliproject.avali_items"))
+    public static final Supplier<CreativeModeTab> GALAXY_TAB = CREATIVE_MODE_TAB.register("galaxy_comes_alive_tab",
+            () -> CreativeModeTab.builder()
+                    .icon(() -> new ItemStack(ModItems.GALAXY_ICON.get()))
+                    .title(Component.translatable("creativetab.avaliproject.galaxy_comes_alive"))
+                    .withSearchBar()
                     .displayItems((itemDisplayParameters, output) -> {
                         output.accept(ModBlocks.LUME_DEEPSLATE_ORE);
                         output.accept(ModBlocks.THERMAL_CRYSTAL_DEEPSLATE_ORE);
@@ -65,6 +66,7 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.PIRU_NOODLE);
                         output.accept(ModItems.PIRUZA);
                         output.accept(ModItems.AEROGEL);
+                        output.accept(ModItems.AEROGEL_BATTERY);
                         output.accept(ModItems.PIRU_FLOUR);
                         output.accept(ModItems.SYNC_CRYSTAL);
                         output.accept(ModItems.AERO_CRYSTAL);
@@ -115,19 +117,17 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.BLIZZARD_HILT);
                         output.accept(ModItems.BLIZZARD_CORE);
                         output.accept(ModItems.BLIZZARD_MUZZLE);
-
                         output.accept(ModItems.QRC);
                         output.accept(ModItems.NOVA);
                         output.accept(ModItems.MLSERIES);
                         output.accept(ModItems.FIRELANCE);
                         output.accept(ModItems.STORM);
                         output.accept(ModItems.BLIZZARD);
-
+                        output.accept(ModItems.RAILGUN);
                         output.accept(ModBlocks.GROOU_NODULE);
                         output.accept(ModBlocks.KIRI_NODULE);
                         output.accept(ModBlocks.NAKATI_NODULE);
                         output.accept(ModBlocks.PIRU_NODULE);
-
                         output.accept(ModItems.SKSCEEGEHKJA_SPAWN_EGG);
                         output.accept(ModItems.SKACIKKJRRBWCAK_SPAWN_EGG);
                         output.accept(ModItems.EEPUOR_SPAWN_EGG);
@@ -136,15 +136,6 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.CAKLERAH_SPAWN_EGG);
                         output.accept(ModItems.CHRGAKBZ_SPAWN_EGG);
 
-//                        output.accept(ModBlocks.NANOLOOM.get());
-
-                    }).build());
-
-    public static final Supplier<CreativeModeTab> PROTOGEN_ITEM_TAB = CREATIVE_MODE_TAB.register("protogen_items_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.PROTOGEN_ICON.get()))
-                    .withTabsBefore(ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "avali_items_tab"))
-                    .title(Component.translatable("creativetab.avaliproject.protogen_items"))
-                    .displayItems((itemDisplayParameters, output) -> {
                         output.accept(ModBlocks.TITANIUM_ORE);
                         output.accept(ModBlocks.TITANIUM_DEEPSLATE_ORE);
                         output.accept(ModBlocks.DURASTEEL_ORE);
@@ -162,12 +153,9 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.RAW_DURASTEEL);
                         output.accept(ModItems.RAW_TITANIUM);
                         output.accept(ModItems.TITANIUM_INGOT);
-                        output.accept(ModItems.WOVEN_FABRIC);
-                        output.accept(ModItems.WOVEN_GRAPHENE);
                         output.accept(ModItems.NANITE_INJECTOR);
                         output.accept(ModItems.PROTOSTEEL_INGOT);
                         output.accept(ModItems.DURASTEEL_INGOT);
-                        output.accept(ModItems.FIBER);
                         output.accept(ModItems.PROTOGEN_RAM);
                         output.accept(ModItems.PROTOGEN_AXE);
                         output.accept(ModItems.PROTOGEN_SWORD);
@@ -176,13 +164,7 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.PRIMAGEN_SPAWN_EGG);
                         output.accept(ModItems.MAMAGEN_SPAWN_EGG);
                         output.accept(ModItems.CYBERNETIC_HEART_MUSIC_DISC);
-                    }).build());
 
-    public static final Supplier<CreativeModeTab> SERGAL_ITEM_TAB = CREATIVE_MODE_TAB.register("sergal_items_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.SERGAL_ICON.get()))
-                    .withTabsBefore(ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "protogen_items_tab"))
-                    .title(Component.translatable("creativetab.avaliproject.sergal_item"))
-                    .displayItems((itemDisplayParameters, output) -> {
                         output.accept(ModBlocks.VILOUS_CERAMIC_DEEPSLATE_ORE);
                         output.accept(ModBlocks.VILOUS_CERAMIC_ORE);
                         output.accept(ModBlocks.AGATE_ORE);
@@ -212,17 +194,10 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.BOS_AGUDNER_SPAWN_EGG);
                         output.accept(ModItems.GOAT_AGUDNER_SPAWN_EGG);
                         output.accept(ModItems.RAB_AGUDNER_SPAWN_EGG);
-                    }).build());
 
-    public static final Supplier<CreativeModeTab> EXPIE_ITEM_TAB = CREATIVE_MODE_TAB.register("expie_items_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.EXPIE_PLUSH.get()))
-                    .withTabsBefore(ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "sergal_items_tab"))
-                    .title(Component.translatable("creativetab.avaliproject.expie_item"))
-                    .displayItems((itemDisplayParameters, output) -> {
                         output.accept(ModItems.EXPIE_PLUSH);
-                        output.accept(ModItems.BANDAGE);
-
-                        // Plushies
+                        output.accept(ModItems.DRESSING);
+                        output.accept(ModItems.RIPPED_DRESSING);
                         output.accept(ModItems.AKITU_PLUSHIE);
                         output.accept(ModItems.AMS_PLUSHIE);
                         output.accept(ModItems.BOT_PLUSHIE);
@@ -241,8 +216,6 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.TACO_PLUSHIE);
                         output.accept(ModItems.WEH_PLUSHIE);
                         output.accept(ModItems.WICK_PLUSHIE);
-
-                        // Medical & survival items
                         output.accept(ModItems.ALCOHOL);
                         output.accept(ModItems.ANTI_DEPRESSANTS);
                         output.accept(ModItems.ANTIBIOTICS);
@@ -278,10 +251,24 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.TRASH_BAG);
                         output.accept(ModItems.WATER_BOTTLE);
                         output.accept(ModItems.WOUND_GLUE);
+                        output.accept(ModItems.CHUNK_OF_PLASTIC);
+                        output.accept(ModItems.FLEXIGLASS);
+                        output.accept(ModItems.BUNDLE_OF_WIRES);
+                        output.accept(ModItems.CIRCUIT_BOARD);
+                        output.accept(ModItems.AUTO_INJECTOR);
+                        output.accept(ModItems.SCRAP_METAL);
+                        output.accept(ModItems.SCRAP_CUBE);
+                        output.accept(ModItems.SCRAP_TUBE);
+                        output.accept(ModItems.SCRAP_PANEL);
+                        output.accept(ModItems.ROPE);
+                        output.accept(ModItems.TEMPORARY_BOTTLE);
+                        output.accept(ModItems.NUMBERRY);
+                        output.accept(ModItems.GLOWPLANT_FRUIT);
+                        output.accept(ModBlocks.CONTAINER_CRATE);
                         output.accept(ModItems.EXPIE_SPAWN_EGG);
                     }).build());
 
-    public static void register (IEventBus eventBus) {
+    public static void register(IEventBus eventBus) {
         CREATIVE_MODE_TAB.register(eventBus);
     }
 }

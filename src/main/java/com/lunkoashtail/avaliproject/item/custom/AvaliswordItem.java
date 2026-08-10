@@ -1,5 +1,7 @@
 package com.lunkoashtail.avaliproject.item.custom;
 
+import com.lunkoashtail.avaliproject.component.ModDataComponents;
+import com.lunkoashtail.avaliproject.component.SwordCondition;
 import com.lunkoashtail.avaliproject.item.client.AvaliswordItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.animation.RawAnimation;
@@ -11,6 +13,7 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.GeoItem;
 
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.Rarity;
@@ -29,7 +32,7 @@ public class AvaliswordItem extends Item implements GeoItem {
     public String animationprocedure = "empty";
 
     public AvaliswordItem() {
-        super(new Item.Properties().durability(1996).rarity(Rarity.RARE)
+        super(new Item.Properties().rarity(Rarity.RARE)
                 .attributes(ItemAttributeModifiers.builder().add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 8, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
                         .add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -2.4, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND).build()));
     }
@@ -105,7 +108,28 @@ public class AvaliswordItem extends Item implements GeoItem {
 
     @Override
     public boolean hurtEnemy(ItemStack itemstack, LivingEntity entity, LivingEntity sourceentity) {
-        itemstack.hurtAndBreak(1, entity, LivingEntity.getSlotForHand(entity.getUsedItemHand()));
+        SwordCondition condition = itemstack.getOrDefault(ModDataComponents.SWORD_CONDITION.get(), SwordCondition.FRESH);
+        if (!condition.shattered()) {
+            itemstack.set(ModDataComponents.SWORD_CONDITION.get(), condition.afterHit());
+        }
         return true;
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack stack) {
+        return stack.has(ModDataComponents.SWORD_CONDITION.get());
+    }
+
+    @Override
+    public int getBarWidth(ItemStack stack) {
+        SwordCondition condition = stack.getOrDefault(ModDataComponents.SWORD_CONDITION.get(), SwordCondition.FRESH);
+        float remaining = 1.0f - Math.min(1.0f, (float) condition.hitCount() / SwordCondition.SHATTER_THRESHOLD);
+        return Math.round(remaining * 13.0f);
+    }
+
+    @Override
+    public int getBarColor(ItemStack stack) {
+        SwordCondition condition = stack.getOrDefault(ModDataComponents.SWORD_CONDITION.get(), SwordCondition.FRESH);
+        return condition.shattered() ? 0xFF3333 : Mth.hsvToRgb(Math.max(0.0f, 1.0f - (float) condition.hitCount() / SwordCondition.SHATTER_THRESHOLD) / 3.0f, 1.0f, 1.0f);
     }
 }

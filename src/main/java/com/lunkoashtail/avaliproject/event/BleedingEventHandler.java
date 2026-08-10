@@ -5,10 +5,14 @@ import com.lunkoashtail.avaliproject.limb.Limb;
 import com.lunkoashtail.avaliproject.limb.LimbData;
 import com.lunkoashtail.avaliproject.limb.BleedingTier;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
+import com.lunkoashtail.avaliproject.limb.PainData;
 import com.lunkoashtail.avaliproject.network.LimbDataSyncPayload;
+import com.lunkoashtail.avaliproject.network.PainSyncPayload;
 import com.lunkoashtail.avaliproject.species.Species;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -55,6 +59,12 @@ public class BleedingEventHandler {
      */
     private static final int BLEED_TICK_INTERVAL = 40;
 
+    private static final float PAIN_PER_DAMAGE_POINT = 1.2f;
+    private static final int PAIN_TICK_INTERVAL = 40;
+    private static final float PAIN_DECAY_PER_INTERVAL = 0.6f;
+    private static final float HIGH_PAIN_SLOWDOWN_THRESHOLD = 50f;
+    private static final float SEVERE_PAIN_SLOWDOWN_THRESHOLD = 80f;
+
     // -------------------------------------------------------------------------
     // Login / respawn — sync stored LimbData so the client menu is never stale
     // -------------------------------------------------------------------------
@@ -63,12 +73,14 @@ public class BleedingEventHandler {
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         PacketDistributor.sendToPlayer(player, LimbDataSyncPayload.from(player.getData(ModAttachments.LIMB_DATA)));
+        PacketDistributor.sendToPlayer(player, PainSyncPayload.from(player.getData(ModAttachments.PAIN_DATA)));
     }
 
     @SubscribeEvent
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         PacketDistributor.sendToPlayer(player, LimbDataSyncPayload.from(player.getData(ModAttachments.LIMB_DATA)));
+        PacketDistributor.sendToPlayer(player, PainSyncPayload.from(player.getData(ModAttachments.PAIN_DATA)));
     }
 
     // -------------------------------------------------------------------------
@@ -98,6 +110,9 @@ public class BleedingEventHandler {
     @SubscribeEvent
     public static void onLivingDamage(LivingDamageEvent.Pre event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+
+        addPain(player, event.getNewDamage() * PAIN_PER_DAMAGE_POINT);
+
         if (player.getData(ModAttachments.SPECIES) != Species.EXPIE) return;
 
         float damage = event.getNewDamage();
@@ -175,5 +190,32 @@ public class BleedingEventHandler {
         //     if (data.getBleed(limb) > 0) data.reduceBleed(limb, 1);
         // }
         // PacketDistributor.sendToPlayer(player, LimbDataSyncPayload.from(data));
+    }
+
+
+    private static void addPain(ServerPlayer player, float amount) {
+        if (amount <= 0f) return;
+        PainData pain = player.getData(ModAttachments.PAIN_DATA);
+        pain.add(amount);
+        PacketDistributor.sendToPlayer(player, PainSyncPayload.from(pain));
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTickPain(PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        if (player.tickCount % PAIN_TICK_INTERVAL != 0) return;
+
+        PainData pain = player.getData(ModAttachments.PAIN_DATA);
+        if (pain.get() <= 0f) return;
+
+        pain.add(-PAIN_DECAY_PER_INTERVAL);
+
+        if (pain.get() >= SEVERE_PAIN_SLOWDOWN_THRESHOLD) {
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, PAIN_TICK_INTERVAL + 5, 1, false, false));
+        } else if (pain.get() >= HIGH_PAIN_SLOWDOWN_THRESHOLD) {
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, PAIN_TICK_INTERVAL + 5, 0, false, false));
+        }
+
+        PacketDistributor.sendToPlayer(player, PainSyncPayload.from(pain));
     }
 }

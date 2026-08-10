@@ -12,19 +12,16 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.GeoItem;
 
-import net.minecraft.world.level.Level;
-import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 
 import java.util.function.Consumer;
 
-public class NovaItem extends Item implements GeoItem {
+public class NovaItem extends Item implements GeoItem, HitscanWeapon {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public String animationprocedure = "empty";
 
@@ -91,15 +88,9 @@ public class NovaItem extends Item implements GeoItem {
         return this.cache;
     }
 
-    @Override
-    public UseAnim getUseAnimation(ItemStack itemstack) {
-        return UseAnim.BOW;
-    }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player entity, InteractionHand hand) {
-        InteractionResultHolder<ItemStack> ar = super.use(world, entity, hand);
-        CustomProjectileEvent.execute(world, entity.getX(), entity.getY(), entity.getZ(), entity, ar.getObject());
-        return ar;
+    public void fire(ServerLevel level, ServerPlayer player, ItemStack stack) {
+        CustomProjectileEvent.execute(level, player.getX(), player.getY(), player.getZ(), player, stack);
     }
 }

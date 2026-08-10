@@ -28,6 +28,8 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> AVALI_ICON = ITEMS.register("avali_icon",
             () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> GALAXY_ICON = ITEMS.register("galaxy_icon",
+            () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> PROTOGEN_ICON = ITEMS.register("protogen_icon",
             () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> SERGAL_ICON = ITEMS.register("sergal_icon",
@@ -143,12 +145,14 @@ public class ModItems {
             });
     public static final DeferredItem<Item> AEROGEL = ITEMS.register("aerogel",
             () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> AEROGEL_BATTERY = ITEMS.register("aerogel_battery",
+            () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> AERO_CRYSTAL = ITEMS.register("aero_crystal",
             () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> ARCAITES_CRYSTAL = ITEMS.register("arcaites_crystal",
             () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> SYNC_CRYSTAL = ITEMS.register("sync_crystal",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().rarity(Rarity.EPIC).stacksTo(16)));
     public static final DeferredItem<Item> RAW_DURASTEEL = ITEMS.register("raw_durasteel",
             () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> RAW_AEGISALT = ITEMS.register("raw_aegisalt",
@@ -316,7 +320,9 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> EXPIE_PLUSH = ITEMS.register("expie_plush",
             () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> BANDAGE = ITEMS.register("bandage", BandageItem::new);
+    public static final DeferredItem<Item> DRESSING = ITEMS.register("dressing", DressingItem::new);
+    public static final DeferredItem<Item> RIPPED_DRESSING = ITEMS.register("ripped_dressing",
+            () -> new Item(new Item.Properties().stacksTo(16)));
 
 
     public static final DeferredItem<Item> QRC = ITEMS.register("qrc",
@@ -331,6 +337,8 @@ public class ModItems {
             StormItem::new);
     public static final DeferredItem<Item> BLIZZARD = ITEMS.register("blizzard",
             BlizzardItem::new);
+    public static final DeferredItem<Item> RAILGUN = ITEMS.register("railgun",
+            RailgunItem::new);
     public static final DeferredItem<Item> AVALI_PROJECTILE_ITEM = ITEMS.register("avali_projectile_item",
             AvaliProjectileItemItem::new);
 
@@ -370,24 +378,9 @@ public class ModItems {
 
 
     public static final DeferredItem<PickaxeItem> AVALI_PICKAXE = ITEMS.register("avali_pickaxe",
-            () -> new PickaxeItem(ModToolTiers.AEROGEL, new Item.Properties()
-                    .attributes(PickaxeItem.createAttributes(ModToolTiers.AEROGEL, 1.0F, -2.8f))){
-                @Override
-                public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-                    tooltipComponents.add(Component.translatable("tooltip.avaliproject.avali_pickaxe.tooltip"));
-                    super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-                }
-            });
-//    public static final DeferredItem<Item> AVALI_AXE = ITEMS.register("avali_axe", AvaliAxeItem::new );
+            AeroPickaxeItem::new);
     public static final DeferredItem<AxeItem> AVALI_AXE = ITEMS.register("avali_axe",
-        () -> new AxeItem(ModToolTiers.AEROGEL, new Item.Properties()
-                .attributes(AxeItem.createAttributes(ModToolTiers.AEROGEL, 4.0F, -2.8f))){
-            @Override
-            public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-                tooltipComponents.add(Component.translatable("tooltip.avaliproject.avali_axe.tooltip"));
-                super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-            }
-        });
+            AeroAxeItem::new);
 
     public static final DeferredItem<AxeItem> PROTOGEN_AXE = ITEMS.register("protogen_axe",
             () -> new AxeItem(ModToolTiers.HARDLIGHT, new Item.Properties()
@@ -401,14 +394,7 @@ public class ModItems {
 
 
     public static final DeferredItem<HoeItem> AVALI_HOE = ITEMS.register("avali_hoe",
-            () -> new HoeItem(ModToolTiers.AEROGEL, new Item.Properties()
-                    .attributes(HoeItem.createAttributes(ModToolTiers.AEROGEL, 0F, -3.0f))){
-                @Override
-                public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-                    tooltipComponents.add(Component.translatable("tooltip.avaliproject.avali_hoe.tooltip"));
-                    super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-                }
-            });
+            AeroHoeItem::new);
 
     public static final DeferredItem<Item> PIRU_FROND = ITEMS.register("piru_frond",
             () -> new Item(new Item.Properties().food(ModFoodProperties.PIRU_FROND)){
@@ -557,14 +543,15 @@ public class ModItems {
     public static final DeferredItem<Item> ANTISEPTIC = ITEMS.register("antiseptic", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> ANTISERUM = ITEMS.register("antiserum", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> APPLE_JUICE = ITEMS.register("apple_juice", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> BLOOD_BAG = ITEMS.register("blood_bag", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> BLOOD_BAG = ITEMS.register("blood_bag", BloodBagItem::new);
     public static final DeferredItem<Item> BRUISE_KIT = ITEMS.register("bruise_kit", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> CANTEEN = ITEMS.register("canteen", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> CHEST_DRAIN = ITEMS.register("chest_drain", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> EMPTY_BLOOD_BAG = ITEMS.register("empty_blood_bag", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CANTEEN = ITEMS.register("canteen", CanteenItem::new);
+    public static final DeferredItem<Item> CHEST_DRAIN = ITEMS.register("chest_drain", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> EMPTY_BLOOD_BAG = ITEMS.register("empty_blood_bag", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> FENTANYL = ITEMS.register("fentanyl", FentanylItem::new);
     public static final DeferredItem<Item> FOLIAGE = ITEMS.register("foliage", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> GEOFRUIT = ITEMS.register("geofruit", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> GEOFRUIT = ITEMS.register("geofruit",
+            () -> new ItemNameBlockItem(ModBlocks.GEOTREE.get(), new Item.Properties().food(ModFoodProperties.GEOFRUIT)));
     public static final DeferredItem<Item> HEROIN = ITEMS.register("heroin", HeroinItem::new);
     public static final DeferredItem<Item> LOCKPICKING_KIT = ITEMS.register("lockpicking_kit", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> MANUAL_DEFIBRILLATOR = ITEMS.register("manual_defibrillator", () -> new Item(new Item.Properties()));
@@ -573,18 +560,34 @@ public class ModItems {
     public static final DeferredItem<Item> MORPHINE = ITEMS.register("morphine", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> NALOXONE = ITEMS.register("naloxone", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> OPIUM = ITEMS.register("opium", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> PAINKILLERS = ITEMS.register("painkillers", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> PAINKILLERS = ITEMS.register("painkillers", PainkillersItem::new);
     public static final DeferredItem<Item> RELIEF_CREAM = ITEMS.register("relief_cream", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> SALINE = ITEMS.register("saline", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> SLEEPING_PILLS = ITEMS.register("sleeping_pills", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> SODIUM_NITROPRUSSIDE = ITEMS.register("sodium_nitroprusside", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> STERILIZED_DRESSING = ITEMS.register("sterilized_dressing", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> STERILIZED_DRESSING = ITEMS.register("sterilized_dressing", DressingItem::new);
     public static final DeferredItem<Item> STREPTOKINASE = ITEMS.register("streptokinase", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> SYRINGE = ITEMS.register("syringe", SyringeItem::new);
     public static final DeferredItem<Item> TOURNIQUET = ITEMS.register("tourniquet", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> TRASH_BAG = ITEMS.register("trash_bag", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> WATER_BOTTLE = ITEMS.register("water_bottle", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> WOUND_GLUE = ITEMS.register("wound_glue", () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> CHUNK_OF_PLASTIC = ITEMS.register("chunk_of_plastic", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> FLEXIGLASS = ITEMS.register("flexiglass", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> BUNDLE_OF_WIRES = ITEMS.register("bundle_of_wires", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CIRCUIT_BOARD = ITEMS.register("circuit_board", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> AUTO_INJECTOR = ITEMS.register("auto_injector", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> SCRAP_METAL = ITEMS.register("scrap_metal", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> SCRAP_CUBE = ITEMS.register("scrap_cube", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> SCRAP_TUBE = ITEMS.register("scrap_tube", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> SCRAP_PANEL = ITEMS.register("scrap_panel", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> ROPE = ITEMS.register("rope", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> TEMPORARY_BOTTLE = ITEMS.register("temporary_bottle", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> NUMBERRY = ITEMS.register("numberry",
+            () -> new ItemNameBlockItem(ModBlocks.HYDREED.get(), new Item.Properties()));
+    public static final DeferredItem<Item> GLOWPLANT_FRUIT = ITEMS.register("glowplant_fruit",
+            () -> new ItemNameBlockItem(ModBlocks.GLOWPLANT.get(), new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

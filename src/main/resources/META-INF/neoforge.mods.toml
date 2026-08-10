@@ -26,7 +26,7 @@ modId="avaliproject" #mandatory
 version="1.2.1" #mandatory
 
 # A display name for the mod
-displayName="The Avali Project" #mandatory
+displayName="The Galaxy Comes Alive" #mandatory
 
 # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
@@ -91,6 +91,31 @@ type="required"
 versionRange="[4.7,)"
 ordering="NONE"
 side="BOTH"
+
+# Optional integrations - the mod loads and functions identically if these aren't present.
+[[dependencies.avaliproject]]
+    modId="appliedenergistics2"
+    type="optional"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.avaliproject]]
+    modId="refinedstorage"
+    type="optional"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.avaliproject]]
+    modId="opencomputers"
+    type="optional"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.avaliproject]]
+    modId="computercraft"
+    type="optional"
+    ordering="AFTER"
+    side="BOTH"
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.

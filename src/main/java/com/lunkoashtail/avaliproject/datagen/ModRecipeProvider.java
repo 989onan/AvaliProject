@@ -3,6 +3,12 @@ package com.lunkoashtail.avaliproject.datagen;
 import com.lunkoashtail.avaliproject.AvaliProject;
 import com.lunkoashtail.avaliproject.block.ModBlocks;
 import com.lunkoashtail.avaliproject.item.ModItems;
+import com.lunkoashtail.avaliproject.recipe.custom.BiochemRecipe;
+import com.lunkoashtail.avaliproject.recipe.custom.FentanylCraftRecipe;
+import com.lunkoashtail.avaliproject.recipe.custom.MorphineRecipe;
+import com.lunkoashtail.avaliproject.recipe.custom.OpiumRecipe;
+import com.lunkoashtail.avaliproject.recipe.custom.SalineRecipe;
+import com.lunkoashtail.avaliproject.recipe.custom.WaterBottleRecipe;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
@@ -291,6 +297,12 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .requires(ModItems.PIRU_FROND)
                 .unlockedBy("avaliproject:has_piru_frond", has(ModItems.PIRU_FROND))
                 .save(recipeOutput, "avaliproject:piru_flour_from_piru_frond");
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.AVALI_SWORD.get())
+                .requires(ModItems.AVALI_SWORD)
+                .requires(ModItems.AEROGEL_BATTERY)
+                .unlockedBy("avaliproject:has_aerogel_battery", has(ModItems.AEROGEL_BATTERY))
+                .save(recipeOutput, "avaliproject:avali_sword_restore");
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.LUME_BIT.get(), 9)
                 .requires(ModItems.LUME)
@@ -1000,6 +1012,130 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         oreBlasting(recipeOutput, AGATE_SMELTABLES, RecipeCategory.MISC, ModItems.AGATE.get(), 0.25f, 100, "agate");
         oreSmelting(recipeOutput, NOVULITE_SMELTABLES, RecipeCategory.MISC, ModItems.NOVULITE.get(), 0.25f, 200, "novulite");
         oreBlasting(recipeOutput, NOVULITE_SMELTABLES, RecipeCategory.MISC, ModItems.NOVULITE.get(), 0.25f, 100, "novulite");
+
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.DRESSING.get())
+                .requires(ModItems.RIPPED_DRESSING.get(), 2)
+                .unlockedBy("avaliproject:has_ripped_dressing", has(ModItems.RIPPED_DRESSING))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RIPPED_DRESSING.get(), 2)
+                .requires(ModItems.FOLIAGE.get())
+                .unlockedBy("avaliproject:has_foliage", has(ModItems.FOLIAGE))
+                .save(recipeOutput, "avaliproject:ripped_dressing_from_foliage");
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.CHUNK_OF_PLASTIC.get(), 2)
+                .requires(ModItems.TRASH_BAG.get())
+                .unlockedBy("avaliproject:has_trash_bag", has(ModItems.TRASH_BAG))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.FLEXIGLASS.get())
+                .requires(ModItems.CHUNK_OF_PLASTIC.get(), 4)
+                .unlockedBy("avaliproject:has_chunk_of_plastic", has(ModItems.CHUNK_OF_PLASTIC))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.BUNDLE_OF_WIRES.get())
+                .requires(Items.COPPER_INGOT)
+                .requires(ModItems.CHUNK_OF_PLASTIC.get(), 3)
+                .unlockedBy("avaliproject:has_chunk_of_plastic", has(ModItems.CHUNK_OF_PLASTIC))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AUTO_INJECTOR.get())
+                .pattern(" BD")
+                .pattern("AEA")
+                .pattern(" C ")
+                .define('A', ModItems.FLEXIGLASS.get())
+                .define('B', ModItems.SCRAP_TUBE.get())
+                .define('C', ModItems.CHUNK_OF_PLASTIC.get())
+                .define('D', ModItems.BUNDLE_OF_WIRES.get())
+                .define('E', ModItems.CIRCUIT_BOARD.get())
+                .unlockedBy("avaliproject:has_bundle_of_wires", has(ModItems.BUNDLE_OF_WIRES))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SCRAP_CUBE.get(), 2)
+                .requires(ModItems.SCRAP_METAL.get(), 4)
+                .unlockedBy("avaliproject:has_scrap_metal", has(ModItems.SCRAP_METAL))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SCRAP_TUBE.get(), 2)
+                .requires(ModItems.SCRAP_CUBE.get(), 4)
+                .unlockedBy("avaliproject:has_scrap_cube", has(ModItems.SCRAP_CUBE))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SCRAP_PANEL.get(), 2)
+                .requires(ModItems.SCRAP_CUBE.get(), 2)
+                .unlockedBy("avaliproject:has_scrap_cube", has(ModItems.SCRAP_CUBE))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.BRUISE_KIT.get())
+                .requires(ModItems.DRESSING.get())
+                .requires(ModItems.OPIUM.get())
+                .unlockedBy("avaliproject:has_dressing", has(ModItems.DRESSING))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ROPE.get())
+                .requires(ModItems.FOLIAGE.get(), 2)
+                .unlockedBy("avaliproject:has_foliage", has(ModItems.FOLIAGE))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.CANTEEN.get())
+                .requires(ModItems.ROPE.get())
+                .requires(ModItems.CHUNK_OF_PLASTIC.get(), 2)
+                .unlockedBy("avaliproject:has_rope", has(ModItems.ROPE))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.CHEST_DRAIN.get())
+                .requires(ModItems.AUTO_INJECTOR.get())
+                .requires(ModItems.CHUNK_OF_PLASTIC.get())
+                .requires(ModItems.FLEXIGLASS.get(), 2)
+                .requires(ModItems.SCRAP_TUBE.get())
+                .unlockedBy("avaliproject:has_auto_injector", has(ModItems.AUTO_INJECTOR))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.EMPTY_BLOOD_BAG.get())
+                .pattern(" A ")
+                .pattern("BCB")
+                .pattern(" D ")
+                .define('A', ModItems.CHUNK_OF_PLASTIC.get())
+                .define('B', ModItems.FLEXIGLASS.get())
+                .define('C', ModItems.BUNDLE_OF_WIRES.get())
+                .define('D', ModItems.AUTO_INJECTOR.get())
+                .unlockedBy("avaliproject:has_auto_injector", has(ModItems.AUTO_INJECTOR))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.LOCKPICKING_KIT.get(), 3)
+                .requires(ModItems.SCRAP_PANEL.get())
+                .requires(ModItems.SCRAP_TUBE.get())
+                .requires(ModItems.CHUNK_OF_PLASTIC.get())
+                .unlockedBy("avaliproject:has_scrap_panel", has(ModItems.SCRAP_PANEL))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.STERILIZED_DRESSING.get())
+                .requires(ModItems.DRESSING.get())
+                .requires(ModItems.ANTISEPTIC.get())
+                .unlockedBy("avaliproject:has_dressing", has(ModItems.DRESSING))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SYRINGE.get())
+                .requires(ModItems.CANTEEN.get())
+                .requires(ModItems.CHUNK_OF_PLASTIC.get())
+                .requires(ModItems.SCRAP_TUBE.get())
+                .unlockedBy("avaliproject:has_canteen", has(ModItems.CANTEEN))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.TOURNIQUET.get())
+                .requires(ModItems.ROPE.get(), 2)
+                .requires(Items.STRING)
+                .requires(ModItems.CHUNK_OF_PLASTIC.get())
+                .unlockedBy("avaliproject:has_rope", has(ModItems.ROPE))
+                .save(recipeOutput);
+
+        SpecialRecipeBuilder.special(BiochemRecipe::new).save(recipeOutput, "avaliproject:biochem");
+        SpecialRecipeBuilder.special(OpiumRecipe::new).save(recipeOutput, "avaliproject:opium");
+        SpecialRecipeBuilder.special(MorphineRecipe::new).save(recipeOutput, "avaliproject:morphine");
+        SpecialRecipeBuilder.special(SalineRecipe::new).save(recipeOutput, "avaliproject:saline");
+        SpecialRecipeBuilder.special(FentanylCraftRecipe::new).save(recipeOutput, "avaliproject:fentanyl_craft");
+        SpecialRecipeBuilder.special(WaterBottleRecipe::new).save(recipeOutput, "avaliproject:water_bottle_craft");
 
     }
 

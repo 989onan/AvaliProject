@@ -2,85 +2,86 @@ package com.lunkoashtail.avaliproject.entity.custom;
 
 import com.lunkoashtail.avaliproject.entity.ModEntities;
 import com.lunkoashtail.avaliproject.item.ModItems;
-import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.item.Items;
-import org.joml.Vector3d;
-import software.bernie.geckolib.util.GeckoLibUtil;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.GeoEntity;
-
-import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
-import net.neoforged.neoforge.event.EventHooks;
-
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.monster.RangedAttackMob;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
-import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.ai.control.FlyingMoveControl;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.SpawnPlacementTypes;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.util.RandomSource;
-import net.minecraft.util.Mth;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.registries.BuiltInRegistries;
+import com.lunkoashtail.avaliproject.util.HitscanUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnPlacementTypes;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
+import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
-
-import java.util.List;
 import java.util.EnumSet;
+import java.util.List;
 
 public class AvaliDroneEntity extends TamableAnimal implements RangedAttackMob, GeoEntity {
-    public static final EntityDataAccessor<Boolean> SHOOT = SynchedEntityData.defineId(AvaliDroneEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<String> ANIMATION = SynchedEntityData.defineId(AvaliDroneEntity.class, EntityDataSerializers.STRING);
-    public static final EntityDataAccessor<String> TEXTURE = SynchedEntityData.defineId(AvaliDroneEntity.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<Boolean> SHOOT =
+            SynchedEntityData.defineId(AvaliDroneEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<String> ANIMATION =
+            SynchedEntityData.defineId(AvaliDroneEntity.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<String> TEXTURE =
+            SynchedEntityData.defineId(AvaliDroneEntity.class, EntityDataSerializers.STRING);
+
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private boolean swinging;
-    private boolean lastloop;
-    private long lastSwing;
+
     public String animationprocedure = "empty";
+    private String prevAnim = "empty";
 
     public AvaliDroneEntity(EntityType<AvaliDroneEntity> type, Level world) {
         super(type, world);
-        xpReward = 0;
-        setNoAi(false);
+        this.xpReward = 0;
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.FIRELANCE.get()));
         this.moveControl = new FlyingMoveControl(this, 10, true);
     }
@@ -102,146 +103,6 @@ public class AvaliDroneEntity extends TamableAnimal implements RangedAttackMob, 
     }
 
     @Override
-    protected PathNavigation createNavigation(Level world) {
-        return new FlyingPathNavigation(this, world);
-    }
-
-    @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal(this, Monster.class, true, false));
-        this.goalSelector.addGoal(2, new FollowOwnerGoal(this, 1, (float) 10, (float) 2));
-        this.goalSelector.addGoal(3, new RandomStrollGoal(this, 3, 20) {
-            @Override
-            protected Vec3 getPosition() {
-                RandomSource random = AvaliDroneEntity.this.getRandom();
-                double dir_x = AvaliDroneEntity.this.getX() + ((random.nextFloat() * 2 - 1) * 16);
-                double dir_y = AvaliDroneEntity.this.getY() + ((random.nextFloat() * 2 - 1) * 16);
-                double dir_z = AvaliDroneEntity.this.getZ() + ((random.nextFloat() * 2 - 1) * 16);
-                return new Vec3(dir_x, dir_y, dir_z);
-            }
-        });
-        this.goalSelector.addGoal(4, new OwnerHurtByTargetGoal(this));
-        this.targetSelector.addGoal(5, new OwnerHurtTargetGoal(this));
-        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(1, new AvaliDroneEntity.RangedAttackGoal(this, 1.25, 25, 10f) {
-            @Override
-            public boolean canContinueToUse() {
-                return this.canUse();
-            }
-        });
-    }
-
-    public class RangedAttackGoal extends Goal {
-        private final Mob mob;
-        private final RangedAttackMob rangedAttackMob;
-        @Nullable
-        private LivingEntity target;
-        private int attackTime = -1;
-        private final double speedModifier;
-        private int seeTime;
-        private final int attackIntervalMin;
-        private final int attackIntervalMax;
-        private final float attackRadius;
-        private final float attackRadiusSqr;
-
-        public RangedAttackGoal(RangedAttackMob p_25768_, double p_25769_, int p_25770_, float p_25771_) {
-            this(p_25768_, p_25769_, p_25770_, p_25770_, p_25771_);
-        }
-
-        public RangedAttackGoal(RangedAttackMob p_25773_, double p_25774_, int p_25775_, int p_25776_, float p_25777_) {
-            if (!(p_25773_ instanceof LivingEntity)) {
-                throw new IllegalArgumentException("ArrowAttackGoal requires Mob implements RangedAttackMob");
-            } else {
-                this.rangedAttackMob = p_25773_;
-                this.mob = (Mob) p_25773_;
-                this.speedModifier = p_25774_;
-                this.attackIntervalMin = p_25775_;
-                this.attackIntervalMax = p_25776_;
-                this.attackRadius = p_25777_;
-                this.attackRadiusSqr = p_25777_ * p_25777_;
-                this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
-            }
-        }
-
-        public boolean canUse() {
-            LivingEntity livingentity = this.mob.getTarget();
-            if (livingentity != null && livingentity.isAlive()) {
-                this.target = livingentity;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public boolean canContinueToUse() {
-            return this.canUse() || this.target.isAlive() && !this.mob.getNavigation().isDone();
-        }
-
-        public void stop() {
-            this.target = null;
-            this.seeTime = 0;
-            this.attackTime = -1;
-            ((AvaliDroneEntity) rangedAttackMob).entityData.set(SHOOT, false);
-        }
-
-        public boolean requiresUpdateEveryTick() {
-            return true;
-        }
-
-        public void tick() {
-            double d0 = this.mob.distanceToSqr(this.target.getX(), this.target.getY(), this.target.getZ());
-            boolean flag = this.mob.getSensing().hasLineOfSight(this.target);
-            if (flag) {
-                ++this.seeTime;
-            } else {
-                this.seeTime = 0;
-            }
-            if (!(d0 > (double) this.attackRadiusSqr) && this.seeTime >= 5) {
-                this.mob.getNavigation().stop();
-            } else {
-                this.mob.getNavigation().moveTo(this.target, this.speedModifier);
-            }
-            this.mob.getLookControl().setLookAt(this.target, 30.0F, 30.0F);
-            if (--this.attackTime == 0) {
-                if (!flag) {
-                    ((AvaliDroneEntity) rangedAttackMob).entityData.set(SHOOT, false);
-                    return;
-                }
-                ((AvaliDroneEntity) rangedAttackMob).entityData.set(SHOOT, true);
-                float f = (float) Math.sqrt(d0) / this.attackRadius;
-                float f1 = Mth.clamp(f, 0.1F, 1.0F);
-                this.rangedAttackMob.performRangedAttack(this.target, f1);
-                this.attackTime = Mth.floor(f * (float) (this.attackIntervalMax - this.attackIntervalMin) + (float) this.attackIntervalMin);
-            } else if (this.attackTime < 0) {
-                this.attackTime = Mth.floor(Mth.lerp(Math.sqrt(d0) / (double) this.attackRadius, (double) this.attackIntervalMin, (double) this.attackIntervalMax));
-            } else
-                ((AvaliDroneEntity) rangedAttackMob).entityData.set(SHOOT, false);
-        }
-    }
-
-
-    protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHitIn) {
-        super.dropCustomDeathLoot(serverLevel, source, recentlyHitIn);
-        this.spawnAtLocation(new ItemStack(Items.IRON_INGOT, 6));
-    }
-
-    @Override
-    public SoundEvent getHurtSound(DamageSource ds) {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
-    }
-
-    @Override
-    public SoundEvent getDeathSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death"));
-    }
-
-    @Override
-    public boolean causeFallDamage(float l, float d, DamageSource source) {
-        return false;
-    }
-
-    @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putString("Texture", this.getTexture());
@@ -254,81 +115,116 @@ public class AvaliDroneEntity extends TamableAnimal implements RangedAttackMob, 
             this.setTexture(compound.getString("Texture"));
     }
 
+
     @Override
-    public InteractionResult mobInteract(Player sourceentity, InteractionHand hand) {
-        ItemStack itemstack = sourceentity.getItemInHand(hand);
-        InteractionResult retval = InteractionResult.sidedSuccess(this.level().isClientSide());
-        Item item = itemstack.getItem();
-        if (itemstack.getItem() instanceof SpawnEggItem) {
-            retval = super.mobInteract(sourceentity, hand);
-        } else if (this.level().isClientSide()) {
-            retval = (this.isTame() && this.isOwnedBy(sourceentity) || this.isFood(itemstack)) ? InteractionResult.sidedSuccess(this.level().isClientSide()) : InteractionResult.PASS;
-        } else {
-            if (this.isTame()) {
-                if (this.isOwnedBy(sourceentity)) {
-                    if (this.isFood(itemstack) && this.getHealth() < this.getMaxHealth()) {
-                        this.usePlayerItem(sourceentity, hand, itemstack);
-                        FoodProperties foodproperties = itemstack.getFoodProperties(this);
-                        float nutrition = foodproperties != null ? (float) foodproperties.nutrition() : 1;
-                        this.heal(nutrition);
-                        retval = InteractionResult.sidedSuccess(this.level().isClientSide());
-                    } else if (this.isFood(itemstack) && this.getHealth() < this.getMaxHealth()) {
-                        this.usePlayerItem(sourceentity, hand, itemstack);
-                        this.heal(4);
-                        retval = InteractionResult.sidedSuccess(this.level().isClientSide());
-                    } else {
-                        retval = super.mobInteract(sourceentity, hand);
-                    }
-                }
-            } else if (this.isFood(itemstack)) {
-                this.usePlayerItem(sourceentity, hand, itemstack);
-                if (this.random.nextInt(3) == 0 && !EventHooks.onAnimalTame(this, sourceentity)) {
-                    this.tame(sourceentity);
-                    this.level().broadcastEntityEvent(this, (byte) 7);
-                } else {
-                    this.level().broadcastEntityEvent(this, (byte) 6);
-                }
-                this.setPersistenceRequired();
-                retval = InteractionResult.sidedSuccess(this.level().isClientSide());
-            } else {
-                retval = super.mobInteract(sourceentity, hand);
-                if (retval == InteractionResult.SUCCESS || retval == InteractionResult.CONSUME)
-                    this.setPersistenceRequired();
+    protected PathNavigation createNavigation(Level world) {
+        return new FlyingPathNavigation(this, world);
+    }
+
+    @Override
+    protected void registerGoals() {
+        super.registerGoals();
+        this.goalSelector.addGoal(1, new HitscanAttackGoal(this, 1.25, 25, ATTACK_RANGE));
+        this.goalSelector.addGoal(2, new FollowOwnerGoal(this, 1, 10, 2));
+        this.goalSelector.addGoal(3, new HoverWanderGoal());
+        this.goalSelector.addGoal(4, new OwnerHurtByTargetGoal(this));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal(this, Monster.class, true, false) {
+            @Override
+            public boolean canUse() {
+                return !AvaliDroneEntity.this.isTame() && super.canUse();
             }
+
+            @Override
+            public boolean canContinueToUse() {
+                return !AvaliDroneEntity.this.isTame() && super.canContinueToUse();
+            }
+        });
+        this.targetSelector.addGoal(5, new OwnerHurtTargetGoal(this));
+    }
+
+    private class HoverWanderGoal extends RandomStrollGoal {
+        HoverWanderGoal() {
+            super(AvaliDroneEntity.this, 3, 20);
         }
-        return retval;
+
+        @Override
+        protected Vec3 getPosition() {
+            RandomSource random = AvaliDroneEntity.this.getRandom();
+            double x = AvaliDroneEntity.this.getX() + (random.nextFloat() * 2 - 1) * 16;
+            double z = AvaliDroneEntity.this.getZ() + (random.nextFloat() * 2 - 1) * 16;
+            double groundY = groundHeightAt(BlockPos.containing(x, AvaliDroneEntity.this.getY(), z));
+            return new Vec3(x, groundY + HOVER_HEIGHT, z);
+        }
+    }
+
+
+    private static final double HOVER_HEIGHT = 3.5;
+    private static final double HOVER_MAX_STEP = 0.3;
+    private static final double GROUND_SMOOTH_STEP = 0.15;
+    private static final double GROUND_RESAMPLE_DISTANCE_SQR = 0.6 * 0.6;
+
+    private double smoothedGroundY = Double.NaN;
+    private double groundSampleX = Double.NaN;
+    private double groundSampleZ = Double.NaN;
+    private double lastGroundSample;
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!this.level().isClientSide())
+            applyHover();
     }
 
     @Override
-    public void baseTick() {
-        super.baseTick();
-        this.refreshDimensions();
+    public void travel(Vec3 travelVector) {
+        super.travel(new Vec3(travelVector.x, 0.0, travelVector.z));
+    }
+
+    private void applyHover() {
+        double dx = this.getX() - groundSampleX;
+        double dz = this.getZ() - groundSampleZ;
+        if (Double.isNaN(groundSampleX) || dx * dx + dz * dz > GROUND_RESAMPLE_DISTANCE_SQR) {
+            lastGroundSample = groundHeightAt(this.blockPosition());
+            groundSampleX = this.getX();
+            groundSampleZ = this.getZ();
+        }
+        double groundY = lastGroundSample;
+
+        if (Double.isNaN(smoothedGroundY))
+            smoothedGroundY = groundY;
+        else
+            smoothedGroundY += Mth.clamp(groundY - smoothedGroundY, -GROUND_SMOOTH_STEP, GROUND_SMOOTH_STEP);
+
+        double targetY = smoothedGroundY + HOVER_HEIGHT;
+
+        double currentY = this.getY();
+        double step = Mth.clamp(targetY - currentY, -HOVER_MAX_STEP, HOVER_MAX_STEP);
+        double candidateY = currentY + step;
+
+        boolean blocked = !this.level().noBlockCollision(this, hoverBoxAt(candidateY));
+        if (!blocked)
+            this.setPos(this.getX(), candidateY, this.getZ());
+
+        Vec3 motion = this.getDeltaMovement();
+        this.setDeltaMovement(motion.x, 0, motion.z);
+    }
+
+    private AABB hoverBoxAt(double y) {
+        return this.getDimensions(this.getPose()).makeBoundingBox(this.getX(), y, this.getZ());
+    }
+
+    private double groundHeightAt(BlockPos pos) {
+        return this.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos).getY();
     }
 
     @Override
-    public EntityDimensions getDefaultDimensions(Pose pose) {
-        return super.getDefaultDimensions(pose).scale(1f);
+    public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
+        return false;
     }
 
     @Override
-    public void performRangedAttack(LivingEntity target, float flval) {
-        AvaliProjectileEntity.shoot(this, target);
-    }
-
-    @Override
-    public AgeableMob getBreedOffspring(ServerLevel serverWorld, AgeableMob ageable) {
-        AvaliDroneEntity retval = ModEntities.AVALI_DRONE.get().create(serverWorld);
-        retval.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(retval.blockPosition()), MobSpawnType.BREEDING, null);
-        return retval;
-    }
-
-    @Override
-    public boolean isFood(ItemStack stack) {
-        return List.of(ModItems.AVALI_DATA_CHIT.get()).contains(stack.getItem());
-    }
-
-    @Override
-    protected void checkFallDamage(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
+    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
     }
 
     @Override
@@ -343,63 +239,232 @@ public class AvaliDroneEntity extends TamableAnimal implements RangedAttackMob, 
         this.setNoGravity(true);
     }
 
-    public static void init(RegisterSpawnPlacementsEvent event) {
-        event.register(ModEntities.AVALI_DRONE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                (entityType, world, reason, pos, random) -> (world.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && world.getRawBrightness(pos, 0) > 8), RegisterSpawnPlacementsEvent.Operation.REPLACE);
-    }
 
-    public static AttributeSupplier.Builder createAttributes() {
-        AttributeSupplier.Builder builder = Mob.createMobAttributes();
-        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.3);
-        builder = builder.add(Attributes.MAX_HEALTH, 30);
-        builder = builder.add(Attributes.ARMOR, 5);
-        builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
-        builder = builder.add(Attributes.FOLLOW_RANGE, 16);
-        builder = builder.add(Attributes.STEP_HEIGHT, 0.6);
-        builder = builder.add(Attributes.KNOCKBACK_RESISTANCE, 3);
-        builder = builder.add(Attributes.FLYING_SPEED, 0.3);
-        return builder;
-    }
+    private static final float ATTACK_RANGE = 10f;
+    private static final double ATTACK_HITSCAN_RANGE = 16;
+    private static final double ATTACK_KNOCKBACK = 0.4;
 
-    private PlayState movementPredicate(AnimationState event) {
-        if (this.animationprocedure.equals("empty")) {
-            if ((event.isMoving() || !(event.getLimbSwingAmount() > -0.15F && event.getLimbSwingAmount() < 0.15F)) && this.onGround()) {
-                return event.setAndContinue(RawAnimation.begin().thenLoop("Walk"));
-            }
-            if (!this.onGround()) {
-                return event.setAndContinue(RawAnimation.begin().thenLoop("Fly"));
-            }
-            return event.setAndContinue(RawAnimation.begin().thenLoop("Idle"));
+    @Override
+    public void performRangedAttack(LivingEntity target, float distanceFactor) {
+        if (this.level() instanceof ServerLevel serverLevel) {
+            double damage = this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+            Vec3 origin = this.getEyePosition();
+            Vec3 look = target.getEyePosition().subtract(origin).normalize();
+            HitscanUtil.fire(serverLevel, this, origin, look, damage, ATTACK_KNOCKBACK, ATTACK_HITSCAN_RANGE);
         }
-        return PlayState.STOP;
     }
 
-    String prevAnim = "empty";
+    private static class HitscanAttackGoal extends Goal {
+        private final Mob mob;
+        private final RangedAttackMob attacker;
+        private final double speed;
+        private final int attackIntervalMin;
+        private final int attackIntervalMax;
+        private final float attackRadius;
+        private final float attackRadiusSqr;
 
-    private PlayState procedurePredicate(AnimationState event) {
-        if (!animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
-            if (!this.animationprocedure.equals(prevAnim))
-                event.getController().forceAnimationReset();
-            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
-            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
-                this.animationprocedure = "empty";
-                event.getController().forceAnimationReset();
-            }
-        } else if (animationprocedure.equals("empty")) {
-            prevAnim = "empty";
-            return PlayState.STOP;
+        @Nullable
+        private LivingEntity target;
+        private int seeTime;
+        private int attackTime = -1;
+
+        HitscanAttackGoal(RangedAttackMob attacker, double speed, int attackInterval, float attackRadius) {
+            this.attacker = attacker;
+            this.mob = (Mob) attacker;
+            this.speed = speed;
+            this.attackIntervalMin = attackInterval;
+            this.attackIntervalMax = attackInterval;
+            this.attackRadius = attackRadius;
+            this.attackRadiusSqr = attackRadius * attackRadius;
+            this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         }
-        prevAnim = this.animationprocedure;
-        return PlayState.CONTINUE;
+
+        @Override
+        public boolean canUse() {
+            LivingEntity candidate = this.mob.getTarget();
+            if (candidate == null || !candidate.isAlive())
+                return false;
+            this.target = candidate;
+            return true;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return canUse();
+        }
+
+        @Override
+        public void stop() {
+            this.target = null;
+            this.seeTime = 0;
+            this.attackTime = -1;
+            ((AvaliDroneEntity) this.attacker).entityData.set(SHOOT, false);
+        }
+
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void tick() {
+            double distanceSqr = this.mob.distanceToSqr(this.target.getX(), this.target.getY(), this.target.getZ());
+            boolean sees = this.mob.getSensing().hasLineOfSight(this.target);
+            this.seeTime = sees ? this.seeTime + 1 : 0;
+
+            if (distanceSqr <= this.attackRadiusSqr && this.seeTime >= 5)
+                this.mob.getNavigation().stop();
+            else
+                this.mob.getNavigation().moveTo(this.target, this.speed);
+            this.mob.getLookControl().setLookAt(this.target, 30f, 30f);
+
+            if (--this.attackTime == 0) {
+                if (!sees) {
+                    ((AvaliDroneEntity) this.attacker).entityData.set(SHOOT, false);
+                    return;
+                }
+                ((AvaliDroneEntity) this.attacker).entityData.set(SHOOT, true);
+                float distanceFactor = Mth.clamp((float) Math.sqrt(distanceSqr) / this.attackRadius, 0.1f, 1.0f);
+                this.attacker.performRangedAttack(this.target, distanceFactor);
+                this.attackTime = Mth.floor(distanceFactor * (this.attackIntervalMax - this.attackIntervalMin) + this.attackIntervalMin);
+            } else if (this.attackTime < 0) {
+                this.attackTime = Mth.floor(Mth.lerp(Math.sqrt(distanceSqr) / this.attackRadius, this.attackIntervalMin, this.attackIntervalMax));
+            } else {
+                ((AvaliDroneEntity) this.attacker).entityData.set(SHOOT, false);
+            }
+        }
+    }
+
+
+    @Override
+    public boolean isFood(ItemStack stack) {
+        return List.of(ModItems.AVALI_DATA_CHIT.get()).contains(stack.getItem());
+    }
+
+    @Override
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        boolean clientSide = this.level().isClientSide();
+
+        if (stack.getItem() instanceof SpawnEggItem)
+            return super.mobInteract(player, hand);
+
+        if (clientSide) {
+            boolean canRespond = (this.isTame() && this.isOwnedBy(player)) || this.isFood(stack);
+            return canRespond ? InteractionResult.sidedSuccess(true) : InteractionResult.PASS;
+        }
+
+        if (this.isTame()) {
+            if (!this.isOwnedBy(player))
+                return InteractionResult.PASS;
+            if (this.isFood(stack) && this.getHealth() < this.getMaxHealth()) {
+                this.usePlayerItem(player, hand, stack);
+                FoodProperties food = stack.getFoodProperties(this);
+                this.heal(food != null ? (float) food.nutrition() : 1f);
+                return InteractionResult.sidedSuccess(false);
+            }
+            return super.mobInteract(player, hand);
+        }
+
+        if (this.isFood(stack)) {
+            this.usePlayerItem(player, hand, stack);
+            if (this.random.nextInt(3) == 0 && !EventHooks.onAnimalTame(this, player)) {
+                this.tame(player);
+                this.level().broadcastEntityEvent(this, (byte) 7);
+            } else {
+                this.level().broadcastEntityEvent(this, (byte) 6);
+            }
+            this.setPersistenceRequired();
+            return InteractionResult.sidedSuccess(false);
+        }
+
+        InteractionResult result = super.mobInteract(player, hand);
+        if (result == InteractionResult.SUCCESS || result == InteractionResult.CONSUME)
+            this.setPersistenceRequired();
+        return result;
+    }
+
+    @Override
+    public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob mate) {
+        AvaliDroneEntity offspring = ModEntities.AVALI_DRONE.get().create(serverLevel);
+        if (offspring != null)
+            offspring.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(offspring.blockPosition()), MobSpawnType.BREEDING, null);
+        return offspring;
+    }
+
+
+    @Override
+    public SoundEvent getHurtSound(DamageSource source) {
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
+    }
+
+    @Override
+    public SoundEvent getDeathSound() {
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death"));
+    }
+
+    @Override
+    protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHit) {
+        super.dropCustomDeathLoot(serverLevel, source, recentlyHit);
+        this.spawnAtLocation(new ItemStack(Items.IRON_INGOT, 6));
     }
 
     @Override
     protected void tickDeath() {
         ++this.deathTime;
         if (this.deathTime == 20) {
-            this.remove(AvaliDroneEntity.RemovalReason.KILLED);
+            this.remove(RemovalReason.KILLED);
             this.dropExperience(this);
         }
+    }
+
+
+    public static void init(RegisterSpawnPlacementsEvent event) {
+        event.register(ModEntities.AVALI_DRONE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                (entityType, world, reason, pos, random) ->
+                        world.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && world.getRawBrightness(pos, 0) > 8,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
+    }
+
+    public static AttributeSupplier.Builder createAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.3)
+                .add(Attributes.MAX_HEALTH, 30)
+                .add(Attributes.ARMOR, 5)
+                .add(Attributes.ATTACK_DAMAGE, 3)
+                .add(Attributes.FOLLOW_RANGE, 16)
+                .add(Attributes.STEP_HEIGHT, 0.6)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 3)
+                .add(Attributes.FLYING_SPEED, 0.3);
+    }
+
+
+    private PlayState movementPredicate(AnimationState event) {
+        if (!this.animationprocedure.equals("empty"))
+            return PlayState.STOP;
+        boolean moving = event.isMoving() || !(event.getLimbSwingAmount() > -0.15f && event.getLimbSwingAmount() < 0.15f);
+        return event.setAndContinue(RawAnimation.begin().thenLoop(moving ? "Fly" : "Idle"));
+    }
+
+    private PlayState procedurePredicate(AnimationState event) {
+        boolean stopped = event.getController().getAnimationState() == AnimationController.State.STOPPED;
+        boolean changed = !this.animationprocedure.equals(this.prevAnim);
+
+        if (this.animationprocedure.equals("empty")) {
+            this.prevAnim = "empty";
+            return PlayState.STOP;
+        }
+        if (stopped || changed) {
+            if (changed)
+                event.getController().forceAnimationReset();
+            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                this.animationprocedure = "empty";
+                event.getController().forceAnimationReset();
+            }
+        }
+        this.prevAnim = this.animationprocedure;
+        return PlayState.CONTINUE;
     }
 
     public String getSyncedAnimation() {

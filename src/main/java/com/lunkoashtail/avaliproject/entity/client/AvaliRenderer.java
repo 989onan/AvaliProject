@@ -21,6 +21,7 @@ public class AvaliRenderer extends GeoEntityRenderer<AvaliEntity> {
     public AvaliRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new AvaliModel());
         this.shadowRadius = 0.5f;
+        this.addRenderLayer(new AvaliEquipmentLayer(this));
     }
 
     private static final Map<AvaliVariant, ResourceLocation> LOCATION_BY_VARIANT =

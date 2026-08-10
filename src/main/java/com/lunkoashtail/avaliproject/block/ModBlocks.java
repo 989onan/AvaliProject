@@ -218,6 +218,16 @@ public class ModBlocks {
     public static final DeferredBlock<Block> PIRU_CROP_BLOCK = BLOCKS.register("piru_crop_block",
             () -> new PiruCropBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT)));
 
+    public static final DeferredBlock<Block> GEOTREE = BLOCKS.register("geotree",
+            () -> new GeotreeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.TALL_GRASS).strength(1.0f)));
+    public static final DeferredBlock<Block> HYDREED = BLOCKS.register("hydreed",
+            () -> new HydreedBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.SHORT_GRASS).strength(1.0f)));
+    public static final DeferredBlock<Block> GLOWPLANT = BLOCKS.register("glowplant",
+            () -> new GlowplantBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.SHORT_GRASS).strength(1.0f).lightLevel(state -> 10)));
+
+    public static final DeferredBlock<Block> CONTAINER_CRATE = registerBlock("container_crate",
+            () -> new ContainerCrateBlock(BlockBehaviour.Properties.of().strength(2.5f).sound(SoundType.WOOD)));
+
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);

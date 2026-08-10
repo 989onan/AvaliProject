@@ -39,9 +39,6 @@ public class ModPlacedFeatures {
         register(context, AERO_CRYSTAL_ORES_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.OVERWORLD_AERO_CRYSTAL_ORES_KEY),
                 ModOrePlacements.commonOrePlacement(12,
                         HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(80))));
-        register(context, SYNC_CRYSTAL_ORES_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.OVERWORLD_SYNC_CRYSTAL_ORES_KEY),
-                ModOrePlacements.commonOrePlacement(12,
-                        HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(80))));
         register(context, VILOUS_CERAMIC_ORES_PLACED_KEY, configuredFeatures.getOrThrow(OVERWORLD_VILOUS_CERAMIC_ORES_KEY),
                 ModOrePlacements.commonOrePlacement(12,
                         HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(80))));
@@ -65,6 +62,19 @@ public class ModPlacedFeatures {
         register(context, KIRI_NODULE_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.KIRI_NODULE_KEY),
                 List.of(RarityFilter.onAverageOnceEvery(16), InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP, BiomeFilter.biome()));
 
+        register(context, CONTAINER_CRATE_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.CONTAINER_CRATE_KEY),
+                List.of(CountPlacement.of(3), InSquarePlacement.spread(),
+                        HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(40)), BiomeFilter.biome()));
+
+        register(context, GEOTREE_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.GEOTREE_KEY),
+                List.of(CountPlacement.of(8), InSquarePlacement.spread(),
+                        HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(40)), BiomeFilter.biome()));
+        register(context, HYDREED_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.HYDREED_KEY),
+                List.of(CountPlacement.of(8), InSquarePlacement.spread(),
+                        HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(40)), BiomeFilter.biome()));
+        register(context, GLOWPLANT_PLACED_KEY, configuredFeatures.getOrThrow(ModConfiguredFeatures.GLOWPLANT_KEY),
+                List.of(CountPlacement.of(8), InSquarePlacement.spread(),
+                        HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(40)), BiomeFilter.biome()));
 
     }
 
@@ -72,6 +82,10 @@ public class ModPlacedFeatures {
     public static final ResourceKey<PlacedFeature> NAKATI_NODULE_PLACED_KEY = registerKey("nakati_nodule_placed");
     public static final ResourceKey<PlacedFeature> GROOU_NODULE_PLACED_KEY = registerKey("groou_nodule_placed");
     public static final ResourceKey<PlacedFeature> KIRI_NODULE_PLACED_KEY = registerKey("kiri_nodule_placed");
+    public static final ResourceKey<PlacedFeature> CONTAINER_CRATE_PLACED_KEY = registerKey("container_crate_placed");
+    public static final ResourceKey<PlacedFeature> GEOTREE_PLACED_KEY = registerKey("geotree_placed");
+    public static final ResourceKey<PlacedFeature> HYDREED_PLACED_KEY = registerKey("hydreed_placed");
+    public static final ResourceKey<PlacedFeature> GLOWPLANT_PLACED_KEY = registerKey("glowplant_placed");
 
 
     private static ResourceKey<PlacedFeature> registerKey(String name) {
@@ -88,7 +102,6 @@ public class ModPlacedFeatures {
     public static final ResourceKey<PlacedFeature> AEGISALT_ORES_PLACED_KEY = registerKey("aegisalt_ores_placed");
     public static final ResourceKey<PlacedFeature> THERMAL_CRYSTAL_ORES_PLACED_KEY = registerKey("thermal_crystal_ores_placed");
     public static final ResourceKey<PlacedFeature> AERO_CRYSTAL_ORES_PLACED_KEY = registerKey("aero_crystal_ores_placed");
-    public static final ResourceKey<PlacedFeature> SYNC_CRYSTAL_ORES_PLACED_KEY = registerKey("sync_crystal_ores_placed");
     public static final ResourceKey<PlacedFeature> VILOUS_CERAMIC_ORES_PLACED_KEY = registerKey("vilous_ceramic_ores_placed");
     public static final ResourceKey<PlacedFeature> ARCAITES_CRYSTAL_ORES_PLACED_KEY = registerKey("arcaites_crystal_ores_placed");
     public static final ResourceKey<PlacedFeature> NOVULITE_ORES_PLACED_KEY = registerKey("novulite_ores_placed");

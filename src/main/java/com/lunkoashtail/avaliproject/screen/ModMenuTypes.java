@@ -1,6 +1,8 @@
 package com.lunkoashtail.avaliproject.screen;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
+import com.lunkoashtail.avaliproject.screen.custom.AugmentMenu;
+import com.lunkoashtail.avaliproject.screen.custom.AvaliEquipMenu;
 import com.lunkoashtail.avaliproject.screen.custom.NanoloomMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -18,6 +20,12 @@ public class ModMenuTypes {
 
     public static final DeferredHolder<MenuType<?>, MenuType<NanoloomMenu>> NANOLOOM_MENU =
             registerMenuType("nanoloom_menu", NanoloomMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<AvaliEquipMenu>> AVALI_EQUIP_MENU =
+            registerMenuType("avali_equip_menu", AvaliEquipMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<AugmentMenu>> AUGMENT_MENU =
+            registerMenuType("augment_menu", AugmentMenu::new);
 
     private static <T extends AbstractContainerMenu>DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name,
                                                                                                               IContainerFactory<T> factory) {

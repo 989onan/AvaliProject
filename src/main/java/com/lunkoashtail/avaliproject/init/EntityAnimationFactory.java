@@ -10,6 +10,13 @@ public class EntityAnimationFactory {
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Pre event) {
         if (event != null && event.getEntity() != null) {
+            if (event.getEntity() instanceof ExpieEntity syncable) {
+                String animation = syncable.getSyncedAnimation();
+                if (!animation.equals("undefined")) {
+                    syncable.setAnimation("undefined");
+                    syncable.animationprocedure = animation;
+                }
+            }
             if (event.getEntity() instanceof SkacikkjrrkbwcakEntity syncable) {
                 String animation = syncable.getSyncedAnimation();
                 if (!animation.equals("undefined")) {

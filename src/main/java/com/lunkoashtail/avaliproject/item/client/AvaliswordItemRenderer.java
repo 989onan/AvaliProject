@@ -1,5 +1,7 @@
 package com.lunkoashtail.avaliproject.item.client;
 
+import com.lunkoashtail.avaliproject.component.ModDataComponents;
+import com.lunkoashtail.avaliproject.component.SwordCondition;
 import com.lunkoashtail.avaliproject.item.custom.AvaliswordItem;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
@@ -55,6 +57,12 @@ public class AvaliswordItemRenderer extends GeoItemRenderer<AvaliswordItem> {
 
     @Override
     public ResourceLocation getTextureLocation(AvaliswordItem instance) {
+        ItemStack stack = this.getCurrentItemStack();
+        if (stack != null) {
+            SwordCondition condition = stack.getOrDefault(ModDataComponents.SWORD_CONDITION.get(), SwordCondition.FRESH);
+            if (condition.shattered())
+                return AvaliswordItemModel.SHATTERED_TEXTURE;
+        }
         return super.getTextureLocation(instance);
     }
 }

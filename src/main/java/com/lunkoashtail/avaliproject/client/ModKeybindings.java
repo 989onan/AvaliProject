@@ -25,8 +25,16 @@ public class ModKeybindings {
             "key.categories.avaliproject"
     );
 
+    public static final KeyMapping OPEN_PACK_GUI = new KeyMapping(
+            "key.avaliproject.open_pack_gui",
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_K,
+            "key.categories.avaliproject"
+    );
+
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(OPEN_LIMB_WHEEL);
+        event.register(OPEN_PACK_GUI);
     }
 }

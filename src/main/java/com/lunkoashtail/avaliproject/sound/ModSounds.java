@@ -34,6 +34,17 @@ public class ModSounds {
     public static final Supplier<SoundEvent> SYRINGE_STAB   = registerSoundEvent("syringe_stab");
     public static final Supplier<SoundEvent> SYRINGE_INJECT = registerSoundEvent("syringe_inject");
 
+    public static final Supplier<SoundEvent> SHRAPNEL_PULL     = registerSoundEvent("shrapnel_pull");
+    public static final Supplier<SoundEvent> SHRAPNEL_SLIP     = registerSoundEvent("shrapnel_slip");
+    public static final Supplier<SoundEvent> SHRAPNEL_COMPLETE = registerSoundEvent("shrapnel_complete");
+
+    public static final Supplier<SoundEvent> DISLOCATION_STRAIN = registerSoundEvent("dislocation_strain");
+    public static final Supplier<SoundEvent> DISLOCATION_POP    = registerSoundEvent("dislocation_pop");
+
+    public static final Supplier<SoundEvent> EXPIE_HURT     = registerSoundEvent("expie_hurt");
+    public static final Supplier<SoundEvent> EXPIE_CALL     = registerSoundEvent("expie_call");
+    public static final Supplier<SoundEvent> EXPIE_INTERACT = registerSoundEvent("expie_interact");
+
 
     private static ResourceKey<JukeboxSong> createSong(String name) {
         return ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, name));

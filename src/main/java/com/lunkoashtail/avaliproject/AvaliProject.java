@@ -1,13 +1,45 @@
 package com.lunkoashtail.avaliproject;
 
 import com.lunkoashtail.avaliproject.block.ModBlocks;
+import com.lunkoashtail.avaliproject.component.ModDataComponents;
+import com.lunkoashtail.avaliproject.diplomacy.DiplomacyData;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
+import com.lunkoashtail.avaliproject.network.AvaliOpenEquipPayload;
+import com.lunkoashtail.avaliproject.network.AvaliRecruitPayload;
+import com.lunkoashtail.avaliproject.network.AvaliRecruitProposalAcceptPayload;
+import com.lunkoashtail.avaliproject.network.AvaliRecruitProposalDeclinePayload;
+import com.lunkoashtail.avaliproject.network.AvaliRecruitProposalPayload;
+import com.lunkoashtail.avaliproject.network.AvaliSocializeInteractionPayload;
+import com.lunkoashtail.avaliproject.network.AvaliOpenAugmentPayload;
+import com.lunkoashtail.avaliproject.network.AvaliOpenTradePayload;
+import com.lunkoashtail.avaliproject.network.HitscanFirePayload;
+import com.lunkoashtail.avaliproject.network.PackDataSyncPayload;
+import com.lunkoashtail.avaliproject.network.PackInvitePayload;
+import com.lunkoashtail.avaliproject.network.PackKickPayload;
+import com.lunkoashtail.avaliproject.network.PackOpenPayload;
+import com.lunkoashtail.avaliproject.network.PackRenamePayload;
+import com.lunkoashtail.avaliproject.command.PackCommand;
+import com.lunkoashtail.avaliproject.screen.custom.AugmentScreen;
+import com.lunkoashtail.avaliproject.network.AvaliTrustSyncPayload;
+import com.lunkoashtail.avaliproject.network.DiplomacySyncPayload;
+import com.lunkoashtail.avaliproject.network.DressingDepletedPayload;
+import com.lunkoashtail.avaliproject.network.LimbConditionsSyncPayload;
 import com.lunkoashtail.avaliproject.network.LimbDataSyncPayload;
+import com.lunkoashtail.avaliproject.network.PainSyncPayload;
 import com.lunkoashtail.avaliproject.network.ReduceBleedPayload;
+import com.lunkoashtail.avaliproject.network.ShrapnelSlipPayload;
+import com.lunkoashtail.avaliproject.network.RemoveShrapnelPayload;
+import com.lunkoashtail.avaliproject.network.ResetDislocationPayload;
 import com.lunkoashtail.avaliproject.network.SpeciesSyncPayload;
 import com.lunkoashtail.avaliproject.network.SyringeEffectPayload;
+import com.lunkoashtail.avaliproject.network.SyringeLoadPayload;
+import com.lunkoashtail.avaliproject.network.DrawBloodPayload;
+import com.lunkoashtail.avaliproject.network.ExpieHugPayload;
+import com.lunkoashtail.avaliproject.network.ExpieOpenTradePayload;
+import com.lunkoashtail.avaliproject.screen.custom.AvaliEquipScreen;
 import com.lunkoashtail.avaliproject.species.Species;
 import com.lunkoashtail.avaliproject.block.entity.ModBlockEntities;
+import com.lunkoashtail.avaliproject.recipe.ModRecipeSerializers;
 import com.lunkoashtail.avaliproject.entity.ModEntities;
 import com.lunkoashtail.avaliproject.entity.client.*;
 import com.lunkoashtail.avaliproject.event.ExplosiveProjectileEvent;
@@ -68,6 +100,7 @@ public class AvaliProject {
         NeoForge.EVENT_BUS.register(this);
 
         ModAttachments.register(modEventBus);
+        ModDataComponents.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
@@ -80,6 +113,8 @@ public class AvaliProject {
 
         ModBlockEntities.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        ModRecipeSerializers.register(modEventBus);
+        com.lunkoashtail.avaliproject.worldgen.ModFeatures.register(modEventBus);
 
         modEventBus.addListener(this::addCreative);
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -91,6 +126,22 @@ public class AvaliProject {
                 SyringeEffectPayload.TYPE,
                 SyringeEffectPayload.STREAM_CODEC,
                 SyringeEffectPayload::handle);
+        registrar.playToServer(
+                SyringeLoadPayload.TYPE,
+                SyringeLoadPayload.STREAM_CODEC,
+                SyringeLoadPayload::handle);
+        registrar.playToServer(
+                DrawBloodPayload.TYPE,
+                DrawBloodPayload.STREAM_CODEC,
+                DrawBloodPayload::handle);
+        registrar.playToServer(
+                ExpieHugPayload.TYPE,
+                ExpieHugPayload.STREAM_CODEC,
+                ExpieHugPayload::handle);
+        registrar.playToServer(
+                ExpieOpenTradePayload.TYPE,
+                ExpieOpenTradePayload.STREAM_CODEC,
+                ExpieOpenTradePayload::handle);
 
         // Limb system packets
         registrar.playToClient(
@@ -101,12 +152,105 @@ public class AvaliProject {
                 ReduceBleedPayload.TYPE,
                 ReduceBleedPayload.STREAM_CODEC,
                 ReduceBleedPayload::handle);
+        registrar.playToClient(
+                DressingDepletedPayload.TYPE,
+                DressingDepletedPayload.STREAM_CODEC,
+                DressingDepletedPayload::handle);
+
+        registrar.playToClient(
+                LimbConditionsSyncPayload.TYPE,
+                LimbConditionsSyncPayload.STREAM_CODEC,
+                LimbConditionsSyncPayload::handle);
+        registrar.playToServer(
+                RemoveShrapnelPayload.TYPE,
+                RemoveShrapnelPayload.STREAM_CODEC,
+                RemoveShrapnelPayload::handle);
+        registrar.playToServer(
+                ResetDislocationPayload.TYPE,
+                ResetDislocationPayload.STREAM_CODEC,
+                ResetDislocationPayload::handle);
+        registrar.playToServer(
+                ShrapnelSlipPayload.TYPE,
+                ShrapnelSlipPayload.STREAM_CODEC,
+                ShrapnelSlipPayload::handle);
+
+        registrar.playToClient(
+                PainSyncPayload.TYPE,
+                PainSyncPayload.STREAM_CODEC,
+                PainSyncPayload::handle);
 
         // Species system packets
         registrar.playToClient(
                 SpeciesSyncPayload.TYPE,
                 SpeciesSyncPayload.STREAM_CODEC,
                 SpeciesSyncPayload::handle);
+
+        registrar.playToServer(
+                AvaliSocializeInteractionPayload.TYPE,
+                AvaliSocializeInteractionPayload.STREAM_CODEC,
+                AvaliSocializeInteractionPayload::handle);
+        registrar.playToServer(
+                AvaliRecruitPayload.TYPE,
+                AvaliRecruitPayload.STREAM_CODEC,
+                AvaliRecruitPayload::handle);
+        registrar.playToServer(
+                AvaliOpenTradePayload.TYPE,
+                AvaliOpenTradePayload.STREAM_CODEC,
+                AvaliOpenTradePayload::handle);
+        registrar.playToServer(
+                HitscanFirePayload.TYPE,
+                HitscanFirePayload.STREAM_CODEC,
+                HitscanFirePayload::handle);
+        registrar.playToServer(
+                AvaliOpenEquipPayload.TYPE,
+                AvaliOpenEquipPayload.STREAM_CODEC,
+                AvaliOpenEquipPayload::handle);
+        registrar.playToClient(
+                AvaliTrustSyncPayload.TYPE,
+                AvaliTrustSyncPayload.STREAM_CODEC,
+                AvaliTrustSyncPayload::handle);
+        registrar.playToClient(
+                AvaliRecruitProposalPayload.TYPE,
+                AvaliRecruitProposalPayload.STREAM_CODEC,
+                AvaliRecruitProposalPayload::handle);
+        registrar.playToServer(
+                AvaliRecruitProposalDeclinePayload.TYPE,
+                AvaliRecruitProposalDeclinePayload.STREAM_CODEC,
+                AvaliRecruitProposalDeclinePayload::handle);
+        registrar.playToServer(
+                AvaliRecruitProposalAcceptPayload.TYPE,
+                AvaliRecruitProposalAcceptPayload.STREAM_CODEC,
+                AvaliRecruitProposalAcceptPayload::handle);
+
+        registrar.playToClient(
+                DiplomacySyncPayload.TYPE,
+                DiplomacySyncPayload.STREAM_CODEC,
+                DiplomacySyncPayload::handle);
+
+        registrar.playToClient(
+                PackDataSyncPayload.TYPE,
+                PackDataSyncPayload.STREAM_CODEC,
+                PackDataSyncPayload::handle);
+        registrar.playToServer(
+                PackOpenPayload.TYPE,
+                PackOpenPayload.STREAM_CODEC,
+                PackOpenPayload::handle);
+        registrar.playToServer(
+                PackInvitePayload.TYPE,
+                PackInvitePayload.STREAM_CODEC,
+                PackInvitePayload::handle);
+        registrar.playToServer(
+                PackKickPayload.TYPE,
+                PackKickPayload.STREAM_CODEC,
+                PackKickPayload::handle);
+        registrar.playToServer(
+                PackRenamePayload.TYPE,
+                PackRenamePayload.STREAM_CODEC,
+                PackRenamePayload::handle);
+        registrar.playToServer(
+                AvaliOpenAugmentPayload.TYPE,
+                AvaliOpenAugmentPayload.STREAM_CODEC,
+                AvaliOpenAugmentPayload::handle);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -117,11 +261,27 @@ public class AvaliProject {
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ModBlocks.KIRI_NODULE.getId(), ModBlocks.POTTED_KIRI_NODULE);
             System.out.println("Common setup for Avali Project.");
         });
+        initOptionalIntegrations();
         LOGGER.info("HELLO FROM COMMON SETUP");
         if (Config.logDirtBlock)
             LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
         LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+    }
+
+    private void initOptionalIntegrations() {
+        if (ModList.get().isLoaded("appliedenergistics2")) {
+            com.lunkoashtail.avaliproject.compat.ae2.AE2Compat.init();
+        }
+        if (ModList.get().isLoaded("refinedstorage")) {
+            com.lunkoashtail.avaliproject.compat.rs.RefinedStorageCompat.init();
+        }
+        if (ModList.get().isLoaded("opencomputers")) {
+            com.lunkoashtail.avaliproject.compat.oc.OpenComputersCompat.init();
+        }
+        if (ModList.get().isLoaded("computercraft")) {
+            com.lunkoashtail.avaliproject.compat.cc.ComputerCraftCompat.init();
+        }
     }
     @EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
@@ -159,10 +319,13 @@ public class AvaliProject {
             EntityRenderers.register(ModEntities.GOAT_AGUDNER.get(), GoatAgudnerRenderer::new);
             EntityRenderers.register(ModEntities.RAB_AGUDNER.get(), RabAgudnerRenderer::new);
             EntityRenderers.register(ModEntities.EXPIE.get(), ExpieRenderer::new);
+            EntityRenderers.register(ModEntities.GLASS_SHARD.get(), GlassShardRenderer::new);
         }
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(ModMenuTypes.NANOLOOM_MENU.get(), NanoloomScreen::new);
+            event.register(ModMenuTypes.AVALI_EQUIP_MENU.get(), AvaliEquipScreen::new);
+            event.register(ModMenuTypes.AUGMENT_MENU.get(), AugmentScreen::new);
         }
     }
 
@@ -350,6 +513,7 @@ public class AvaliProject {
     public void onRegisterCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(BleedingCommand.build());
         event.getDispatcher().register(SpeciesCommand.build());
+        event.getDispatcher().register(PackCommand.build());
     }
 
     @SubscribeEvent
@@ -357,5 +521,7 @@ public class AvaliProject {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         Species species = player.getData(ModAttachments.SPECIES);
         PacketDistributor.sendToPlayer(player, new SpeciesSyncPayload(species.ordinal()));
+        DiplomacyData diplomacy = player.getData(ModAttachments.DIPLOMACY_DATA);
+        PacketDistributor.sendToPlayer(player, new DiplomacySyncPayload(diplomacy.renown()));
     }
 }

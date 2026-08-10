@@ -1,11 +1,11 @@
-# The Avali Project
+# The Galaxy Comes Alive
 
 <a href="https://modrinth.com/mod/avali-project"><img alt="Modrinth Downloads"
 src="https://img.shields.io/modrinth/dt/yPbBrzEX?logo=modrinth&label=Modrinth%20downloads&color=%231bd96a&style=for-the-badge"></a>
 <a href="https://www.curseforge.com/minecraft/mc-mods/the-avali-project"><img alt="CurseForge Downloads"
 src="https://img.shields.io/curseforge/dt/1143745?logo=curseforge&label=CurseForge%20Downloads&color=%23f16436&style=for-the-badge"></a>
 
-The Avali Project is a mod that is designed to add content from multiple species. From avali to sergals and not forgetting protogens, this early mod aim to grasp everything that has been done around those species, their universe and implement them in game. More races could be added but this is for now an early build.
+The Galaxy Comes Alive is a mod that is designed to add content from multiple species. From avali to sergals and not forgetting protogens, this early mod aim to grasp everything that has been done around those species, their universe and implement them in game. More races could be added but this is for now an early build.
 
 [![Showcase video](https://img.youtube.com/vi/jtFi8f-pAtA/0.jpg)](https://www.youtube.com/watch?v=jtFi8f-pAtA)
 

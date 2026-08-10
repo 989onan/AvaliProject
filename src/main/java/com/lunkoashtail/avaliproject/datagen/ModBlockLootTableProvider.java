@@ -16,12 +16,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
 import java.util.Set;
@@ -146,9 +148,20 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.PIRU_NODULE.get());
         this.add(ModBlocks.POTTED_PIRU_NODULE.get(), createPotFlowerItemTable(ModBlocks.PIRU_NODULE));
 
+        this.add(ModBlocks.GEOTREE.get(), block -> createFoliageAndFruitTable(ModItems.GEOFRUIT.get()));
+        this.add(ModBlocks.HYDREED.get(), block -> createFoliageAndFruitTable(ModItems.NUMBERRY.get()));
+        this.add(ModBlocks.GLOWPLANT.get(), block -> createFoliageAndFruitTable(ModItems.GLOWPLANT_FRUIT.get()));
 
+        this.add(ModBlocks.CONTAINER_CRATE.get(), block ->
+                createSingleItemTable(ModItems.SCRAP_METAL.get())
+                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(2))));
 
+    }
 
+    private LootTable.Builder createFoliageAndFruitTable(Item fruit) {
+        return LootTable.lootTable()
+                .withPool(LootPool.lootPool().add(LootItem.lootTableItem(ModItems.FOLIAGE.get())))
+                .withPool(LootPool.lootPool().add(LootItem.lootTableItem(fruit)));
     }
 
     protected LootTable.Builder createMultipleOreDrops(Block pBlock, Item item, float minDrops, float maxDrops) {

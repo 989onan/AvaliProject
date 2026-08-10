@@ -18,4 +18,20 @@ public enum Species {
             return HUMAN;
         }
     }
+
+    public int bloodColorRgb() {
+        return switch (this) {
+            case AVALI -> 0xB19CD9;
+            case EXPIE -> 0xF4D63A;
+            default -> 0xAA0000;
+        };
+    }
+
+    public String bloodName() {
+        return switch (this) {
+            case AVALI -> "pale violet";
+            case EXPIE -> "yellow";
+            default -> "red";
+        };
+    }
 }

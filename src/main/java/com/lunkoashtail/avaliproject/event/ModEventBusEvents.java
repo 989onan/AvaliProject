@@ -1,6 +1,7 @@
 package com.lunkoashtail.avaliproject.event;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
+import com.lunkoashtail.avaliproject.block.entity.ModBlockEntities;
 import com.lunkoashtail.avaliproject.entity.ModEntities;
 import com.lunkoashtail.avaliproject.entity.custom.*;
 import net.minecraft.world.entity.Mob;
@@ -9,6 +10,8 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
@@ -17,6 +20,12 @@ import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 public class ModEventBusEvents {
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+    }
+
+    @SubscribeEvent
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModBlockEntities.NANOLOOM_BE.get(),
+                (blockEntity, side) -> blockEntity.itemHandler);
     }
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
@@ -97,5 +106,7 @@ public class ModEventBusEvents {
                 Mob::checkMobSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ModEntities.RAB_AGUDNER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 Mob::checkMobSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+
+        ExpieEntity.init(event);
     }
 }

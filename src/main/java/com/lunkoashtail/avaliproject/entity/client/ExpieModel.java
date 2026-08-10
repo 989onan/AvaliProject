@@ -11,6 +11,17 @@ import net.minecraft.util.Mth;
 
 public class ExpieModel extends GeoModel<ExpieEntity> {
 
+    private static final float CLING_BODY_ROT_X   = -12f * Mth.DEG_TO_RAD;
+    private static final float CLING_ARM_ROT_X    = 135f * Mth.DEG_TO_RAD;
+    private static final float CLING_ARM_ROT_Z    = 20f * Mth.DEG_TO_RAD;
+    private static final float CLING_THIGH_ROT_X  = 65f * Mth.DEG_TO_RAD;
+    private static final float CLING_LEG_ROT_X    = -85f * Mth.DEG_TO_RAD;
+    private static final float CLING_TAIL_ROT_X   = 55f * Mth.DEG_TO_RAD;
+    private static final float RIDING_EXTRA_LEAN  = -18f * Mth.DEG_TO_RAD;
+
+    private static final float HOLD_ARM_ROT_X = 60f * Mth.DEG_TO_RAD;
+    private static final float HOLD_ARM_ROT_Z = 48f * Mth.DEG_TO_RAD;
+
     @Override
     public ResourceLocation getAnimationResource(ExpieEntity entity) {
         return ResourceLocation.parse("avaliproject:animations/expie.animation.json");
@@ -23,7 +34,10 @@ public class ExpieModel extends GeoModel<ExpieEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ExpieEntity entity) {
-        return ResourceLocation.parse("avaliproject:textures/entity/expie/expie.png");
+        return switch (entity.getVariant()) {
+            case WHITE -> ResourceLocation.parse("avaliproject:textures/entity/expie/expie_white.png");
+            case NORMAL -> ResourceLocation.parse("avaliproject:textures/entity/expie/expie.png");
+        };
     }
 
     @Override
@@ -34,5 +48,31 @@ public class ExpieModel extends GeoModel<ExpieEntity> {
             head.setRotX(entityData.headPitch() * Mth.DEG_TO_RAD);
             head.setRotY(entityData.netHeadYaw() * Mth.DEG_TO_RAD);
         }
+
+        boolean clinging = animatable.isComfortClinging();
+        boolean curledUp = clinging || animatable.isSleepingNearPlayer();
+        if (curledUp) {
+            float lean = clinging ? RIDING_EXTRA_LEAN : 0f;
+            setBoneRotation("body", CLING_BODY_ROT_X + lean, 0f, 0f);
+            setBoneRotation("rightarm", CLING_ARM_ROT_X, 0f, -CLING_ARM_ROT_Z);
+            setBoneRotation("leftarm", CLING_ARM_ROT_X, 0f, CLING_ARM_ROT_Z);
+            setBoneRotation("rightthigh", CLING_THIGH_ROT_X, 0f, 0f);
+            setBoneRotation("leftthigh", CLING_THIGH_ROT_X, 0f, 0f);
+            setBoneRotation("rightleg", CLING_LEG_ROT_X, 0f, 0f);
+            setBoneRotation("leftleg", CLING_LEG_ROT_X, 0f, 0f);
+            setBoneRotation("basetail", CLING_TAIL_ROT_X, 0f, 0f);
+            setBoneRotation("endtail", CLING_TAIL_ROT_X, 0f, 0f);
+        } else if (!animatable.getHeldPlush().isEmpty()) {
+            setBoneRotation("rightarm", HOLD_ARM_ROT_X, 0f, -HOLD_ARM_ROT_Z);
+            setBoneRotation("leftarm", HOLD_ARM_ROT_X, 0f, HOLD_ARM_ROT_Z);
+        }
+    }
+
+    private void setBoneRotation(String boneName, float rotX, float rotY, float rotZ) {
+        GeoBone bone = getAnimationProcessor().getBone(boneName);
+        if (bone == null) return;
+        bone.setRotX(rotX);
+        bone.setRotY(rotY);
+        bone.setRotZ(rotZ);
     }
 }

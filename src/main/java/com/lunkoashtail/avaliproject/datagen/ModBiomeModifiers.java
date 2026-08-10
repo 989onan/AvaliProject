@@ -1,6 +1,7 @@
 package com.lunkoashtail.avaliproject.datagen;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
+import com.lunkoashtail.avaliproject.entity.ModEntities;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -8,10 +9,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.BiomeModifiers;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+
+import java.util.List;
 
 public class ModBiomeModifiers {
     public static void bootstrap(BootstrapContext<BiomeModifier> context) {
@@ -21,10 +25,6 @@ public class ModBiomeModifiers {
         context.register(ADD_LUME_ORE, new BiomeModifiers.AddFeaturesBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
                 HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.LUME_ORES_PLACED_KEY)),
-                GenerationStep.Decoration.UNDERGROUND_ORES));
-        context.register(ADD_SYNC_CRYSTAL_ORE, new BiomeModifiers.AddFeaturesBiomeModifier(
-                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
-                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.SYNC_CRYSTAL_ORES_PLACED_KEY)),
                 GenerationStep.Decoration.UNDERGROUND_ORES));
         context.register(ADD_TITANIUM_ORE, new BiomeModifiers.AddFeaturesBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
@@ -82,15 +82,32 @@ public class ModBiomeModifiers {
                 HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.GROOU_NODULE_PLACED_KEY)),
                 GenerationStep.Decoration.VEGETAL_DECORATION));
 
+        context.register(ADD_EXPIE_SPAWN, new BiomeModifiers.AddSpawnsBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                List.of(new MobSpawnSettings.SpawnerData(ModEntities.EXPIE.get(), 20, 1, 2))));
 
+        context.register(ADD_CONTAINER_CRATE, new BiomeModifiers.AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.CONTAINER_CRATE_PLACED_KEY)),
+                GenerationStep.Decoration.UNDERGROUND_DECORATION));
 
-
+        context.register(ADD_GEOTREE, new BiomeModifiers.AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.GEOTREE_PLACED_KEY)),
+                GenerationStep.Decoration.UNDERGROUND_DECORATION));
+        context.register(ADD_HYDREED, new BiomeModifiers.AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.HYDREED_PLACED_KEY)),
+                GenerationStep.Decoration.UNDERGROUND_DECORATION));
+        context.register(ADD_GLOWPLANT, new BiomeModifiers.AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.GLOWPLANT_PLACED_KEY)),
+                GenerationStep.Decoration.UNDERGROUND_DECORATION));
     }
     private static ResourceKey<BiomeModifier> registerKey(String name) {
         return ResourceKey.create(NeoForgeRegistries.Keys.BIOME_MODIFIERS, ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, name));
     }
     public static final ResourceKey<BiomeModifier> ADD_LUME_ORE = registerKey("add_lume_ore");
-    public static final ResourceKey<BiomeModifier> ADD_SYNC_CRYSTAL_ORE = registerKey("add_sync_crystal_ore");
     public static final ResourceKey<BiomeModifier> ADD_TITANIUM_ORE = registerKey("add_titanium_ore");
     public static final ResourceKey<BiomeModifier> ADD_THERMAL_CRYSTAL_ORE = registerKey("add_thermal_crystal_ore");
     public static final ResourceKey<BiomeModifier> ADD_DURASTEEL_ORE = registerKey("add_durasteel_ore");
@@ -105,4 +122,10 @@ public class ModBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_NAKATI_NODULE = registerKey("add_nakati_nodule");
     public static final ResourceKey<BiomeModifier> ADD_KIRI_NODULE = registerKey("add_kiri_nodule");
     public static final ResourceKey<BiomeModifier> ADD_GROOU_NODULE = registerKey("add_groou_nodule");
+
+    public static final ResourceKey<BiomeModifier> ADD_EXPIE_SPAWN = registerKey("add_expie_spawn");
+    public static final ResourceKey<BiomeModifier> ADD_CONTAINER_CRATE = registerKey("add_container_crate");
+    public static final ResourceKey<BiomeModifier> ADD_GEOTREE = registerKey("add_geotree");
+    public static final ResourceKey<BiomeModifier> ADD_HYDREED = registerKey("add_hydreed");
+    public static final ResourceKey<BiomeModifier> ADD_GLOWPLANT = registerKey("add_glowplant");
 }

@@ -54,5 +54,29 @@
         "stream": false
       }
     ]
+  },
+  "expie_hurt": {
+    "sounds": [
+      {
+        "name": "avaliproject:expie/hurt",
+        "stream": false
+      }
+    ]
+  },
+  "expie_call": {
+    "sounds": [
+      {
+        "name": "avaliproject:expie/call",
+        "stream": false
+      }
+    ]
+  },
+  "expie_interact": {
+    "sounds": [
+      {
+        "name": "avaliproject:expie/interact",
+        "stream": false
+      }
+    ]
   }
 }

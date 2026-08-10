@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "avaliproject:dressing"
+    },
+    {
+      "item": "avaliproject:antiseptic"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "avaliproject:sterilized_dressing"
+  }
+}

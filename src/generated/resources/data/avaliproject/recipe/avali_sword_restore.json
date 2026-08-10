@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "avaliproject:avali_sword"
+    },
+    {
+      "item": "avaliproject:aerogel_battery"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "avaliproject:avali_sword"
+  }
+}

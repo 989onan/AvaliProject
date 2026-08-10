@@ -1,5 +1,6 @@
 package com.lunkoashtail.avaliproject.screen.custom;
 
+import com.lunkoashtail.avaliproject.item.custom.DrugType;
 import com.lunkoashtail.avaliproject.limb.Limb;
 import com.lunkoashtail.avaliproject.network.SyringeEffectPayload;
 import com.lunkoashtail.avaliproject.sound.ModSounds;
@@ -8,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -26,16 +28,15 @@ import java.util.Random;
  *    Clicking off-target has no effect (and spawns a "ouch" blood particle).
  *
  *  Phase 2 — INSERTED:
- *    The needle tip is now fixed in the skin.
- *    The player must drag the mouse DOWNWARD to push the plunger.
- *    Each pixel of downward movement fills injection progress.
- *    The needle is automatically ejected if:
- *      – The cursor drifts more than WIGGLE_TOLERANCE px horizontally, or
- *      – A sharp upward flick (dy < −10 px in one frame) occurs, or
- *      – The left mouse button is released.
- *    Partial progress is RETAINED across ejections — re-insert and continue.
+ *    The needle tip is now fixed in the skin. Hold RIGHT mouse button and
+ *    move the cursor up/down to adjust how much of the loaded dose gets
+ *    pushed in — down increases it, up decreases it, clamped to [0, 100]%.
+ *    Releasing the right mouse button CONFIRMS the injection at whatever
+ *    progress is currently dialed in (a full 100% push injects everything
+ *    with zero leftover; stopping partway injects only that fraction and
+ *    keeps the rest loaded in the syringe).
  *
- *  Phase 3 — SUCCESS (at SUCCESS_THRESHOLD progress):
+ *  Phase 3 — SUCCESS:
  *    Drug effects are applied, an injection sound plays, and the screen
  *    auto-closes after a short delay.
  *
@@ -49,9 +50,6 @@ public class SyringeMinigameScreen extends Screen {
     // Nested types
     // =========================================================================
 
-    /** Which drug is being injected — drives fluid colour and applied effects. */
-    public enum DrugType { FENTANYL, HEROIN, SYRINGE }
-
     private enum Phase { AIMING, INSERTED, SUCCESS }
 
     // =========================================================================
@@ -62,19 +60,10 @@ public class SyringeMinigameScreen extends Screen {
     private static final int VEIN_RADIUS = 10;
 
     /**
-     * Maximum horizontal cursor drift (px from insertion X) before the needle
-     * is automatically ejected. Keeps the player from just wildly waving the mouse.
-     */
-    private static final int WIGGLE_TOLERANCE = 35;
-
-    /**
-     * Total downward mouse travel (px) needed to push the full dose.
-     * Larger = harder / requires more deliberate downward dragging.
+     * Total mouse travel (px) needed to swing injection progress from 0 to 100%
+     * while holding right-click. Larger = finer, more deliberate control.
      */
     private static final float DRAG_FOR_FULL = 90f;
-
-    /** Injection fraction at which SUCCESS is triggered. */
-    private static final float SUCCESS_THRESHOLD = 0.85f;
 
     // =========================================================================
     // Visual / layout constants
@@ -99,9 +88,11 @@ public class SyringeMinigameScreen extends Screen {
     // =========================================================================
 
     private final DrugType drugType;
+    private final float availableDosage;
     /** Which limb the injection is targeting — stored for display and future limb-specific logic. */
     @Nullable
     private final Limb targetLimb;
+    private final InteractionHand hand;
     private Phase phase = Phase.AIMING;
 
     // Screen layout — computed in init()
@@ -109,10 +100,8 @@ public class SyringeMinigameScreen extends Screen {
     private int veinX, veinY; // vein target position on screen
 
     // Snapshot taken at needle insertion
-    private int    insertX, insertY;   // on-screen position of the needle tip (= vein coords)
-    private double insertMouseX;       // raw cursor X when the player clicked — used for drift detection
+    private int insertX, insertY;
 
-    // Cumulative injection progress (0→1); survives eject/re-insert cycles
     private float injectionProgress = 0f;
 
     // Auto-close countdown after success (ticks)
@@ -135,20 +124,18 @@ public class SyringeMinigameScreen extends Screen {
     // Constructor
     // =========================================================================
 
-    /** Convenience constructor: no specific limb targeted. */
-    public SyringeMinigameScreen(DrugType drugType) {
-        this(drugType, null);
-    }
-
     /**
-     * Full constructor.
-     *
-     * @param targetLimb the limb selected on the wheel (null if opened without a limb context)
+     * @param drugType        which drug is loaded in the syringe
+     * @param availableDosage total dosage (mL) currently in the syringe
+     * @param targetLimb      the limb selected on the wheel (null if opened without a limb context)
+     * @param hand            which hand holds the syringe (needed to update it server-side)
      */
-    public SyringeMinigameScreen(DrugType drugType, @Nullable Limb targetLimb) {
+    public SyringeMinigameScreen(DrugType drugType, float availableDosage, @Nullable Limb targetLimb, InteractionHand hand) {
         super(Component.translatable("screen.avaliproject.syringe_minigame"));
-        this.drugType   = drugType;
-        this.targetLimb = targetLimb;
+        this.drugType        = drugType;
+        this.availableDosage = availableDosage;
+        this.targetLimb      = targetLimb;
+        this.hand            = hand;
     }
 
     // =========================================================================
@@ -335,7 +322,6 @@ public class SyringeMinigameScreen extends Screen {
         int fluidCol = switch (drugType) {
             case FENTANYL -> 0xCCFFCC44; // amber / golden
             case HEROIN   -> 0xCCDDBB88; // tan / off-white
-            case SYRINGE  -> 0xCCAACCFF; // clear blue (saline)
         };
 
         // Fluid occupies the lower part of the barrel; empties from the top as progress rises
@@ -391,15 +377,15 @@ public class SyringeMinigameScreen extends Screen {
         String drugName = switch (drugType) {
             case FENTANYL -> "Fentanyl";
             case HEROIN   -> "Heroin";
-            case SYRINGE  -> "Syringe";
         };
         String limbSuffix = (targetLimb != null) ? " → " + targetLimb.getDisplayName().getString() : "";
         gfx.drawString(font, "Injection: " + drugName + limbSuffix, hx, hy, 0xFFDDDDFF, false);
+        gfx.drawString(font, "Loaded: " + (int) availableDosage + " mL", hx, hy - 12, 0xFF88CCFF, false);
 
         // Phase instruction
         String phaseLabel = switch (phase) {
             case AIMING   -> "Step 1: Aim at the glowing vein";
-            case INSERTED -> "Step 2: Drag mouse down to inject";
+            case INSERTED -> "Step 2: Hold RIGHT-click, move mouse to adjust";
             case SUCCESS  -> "Injection complete!";
         };
         gfx.drawString(font, phaseLabel, hx, hy + 12, 0xAABBCC, false);
@@ -413,15 +399,12 @@ public class SyringeMinigameScreen extends Screen {
             gfx.fill(barX, barY, barX + barW, barY + barH, 0xFF1C1C2A);                  // track
 
             int fillW   = (int)(barW * Math.min(injectionProgress, 1f));
-            int barCol  = injectionProgress >= SUCCESS_THRESHOLD ? 0xFF44BB66 : 0xFFAA5555;
+            int barCol  = injectionProgress >= 1f ? 0xFF44BB66 : 0xFFAA5555;
             gfx.fill(barX, barY, barX + fillW, barY + barH, barCol);
             gfx.fill(barX, barY, barX + fillW, barY + 3, 0x33FFFFFF); // sheen
 
-            // Threshold marker (shows how far left to go)
-            int threshX = barX + (int)(barW * SUCCESS_THRESHOLD);
-            gfx.fill(threshX, barY - 2, threshX + 1, barY + barH + 2, 0xFFFFFF44);
-
-            gfx.drawString(font, (int)(injectionProgress * 100) + "% injected", barX, barY + barH + 4, 0x99BBEE, false);
+            int injectedMl = (int) (availableDosage * Math.min(injectionProgress, 1f));
+            gfx.drawString(font, injectedMl + " / " + (int) availableDosage + " mL", barX, barY + barH + 4, 0x99BBEE, false);
         }
 
         // Hand-shake warning
@@ -445,11 +428,11 @@ public class SyringeMinigameScreen extends Screen {
         if (phase != Phase.SUCCESS) {
             String hint = switch (phase) {
                 case AIMING   -> "Click on the vein to insert needle";
-                case INSERTED -> "Drag DOWN  |  Move sideways or pull up to remove";
+                case INSERTED -> "Hold RIGHT-click and move mouse to adjust  |  Release to confirm";
                 default       -> "";
             };
-            gfx.drawCenteredString(font, hint,                        width / 2, height - 30, 0xCCCCCC);
-            gfx.drawCenteredString(font, "[Right-click or Esc to cancel]", width / 2, height - 18, 0x666666);
+            gfx.drawCenteredString(font, hint, width / 2, height - 30, 0xCCCCCC);
+            gfx.drawCenteredString(font, "[Esc to cancel]", width / 2, height - 18, 0x666666);
         } else {
             gfx.drawCenteredString(font, "Injected successfully!", width / 2, armCY - ARM_H / 2 - 22, 0xFF55FF88);
         }
@@ -528,13 +511,15 @@ public class SyringeMinigameScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        if (button == 1) { onClose(); return true; } // right-click → cancel
-
         if (button == 0 && phase == Phase.AIMING) {
             // Apply shake to the effective click position before the hit-test.
             // This means unsteady players will click in the wrong place even if
             // they aimed correctly with the raw cursor.
-            attemptInsertion(mx + shakeX, my + shakeY, mx);
+            attemptInsertion(mx + shakeX, my + shakeY);
+            return true;
+        }
+
+        if (button == 1 && phase == Phase.INSERTED) {
             return true;
         }
         return super.mouseClicked(mx, my, button);
@@ -542,18 +527,16 @@ public class SyringeMinigameScreen extends Screen {
 
     /**
      * Checks whether the effective cursor is within VEIN_RADIUS of the vein target.
-     * If yes, transitions to INSERTED and records the reference X for drift detection.
+     * If yes, transitions to INSERTED.
      *
      * @param emx effective (shake-adjusted) cursor X
      * @param emy effective (shake-adjusted) cursor Y
-     * @param rawMx raw (un-shaken) cursor X, stored for drift reference
      */
-    private void attemptInsertion(double emx, double emy, double rawMx) {
+    private void attemptInsertion(double emx, double emy) {
         if (distToVein((int) emx, (int) emy) <= VEIN_RADIUS) {
-            phase         = Phase.INSERTED;
-            insertX       = veinX;
-            insertY       = veinY;
-            insertMouseX  = rawMx;
+            phase   = Phase.INSERTED;
+            insertX = veinX;
+            insertY = veinY;
             spawnBloodParticle(veinX,     veinY);
             spawnBloodParticle(veinX + 1, veinY + 2);
             playInsertSound();
@@ -564,64 +547,31 @@ public class SyringeMinigameScreen extends Screen {
     }
 
     /**
-     * Core injection physics — called each frame while LMB is held and the needle
-     * is inside the vein.
-     *
-     * Only downward mouse movement (dy > 0) accumulates injection progress.
-     * The player fails to inject by:
-     *   – Drifting horizontally beyond WIGGLE_TOLERANCE
-     *   – Pulling the mouse sharply upward (dy < −10 in one event)
-     *   – Releasing the mouse button (handled in mouseReleased)
-     *
-     * Progress is clamped to [0, 1] and persists across ejection/re-insertion cycles,
-     * so the player can take multiple attempts to fully inject the dose.
+     * Core injection control — holding RIGHT mouse button while the needle is
+     * inserted and moving the cursor adjusts injection progress: moving down
+     * increases it, moving up decreases it. Clamped to [0, 1].
      */
     @Override
     public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
-        if (button != 0 || phase != Phase.INSERTED) {
+        if (button != 1 || phase != Phase.INSERTED) {
             return super.mouseDragged(mx, my, button, dx, dy);
         }
 
-        // Horizontal drift guard: wiggling sideways mimics a real needle dislodging
-        if (Math.abs(mx - insertMouseX) > WIGGLE_TOLERANCE) {
-            ejectNeedle();
-            return true;
-        }
+        injectionProgress = Math.max(0f, Math.min(1f, injectionProgress + (float) (dy / DRAG_FOR_FULL)));
+        if (dy > 0 && rng.nextInt(7) == 0) spawnBloodParticle(insertX, insertY);
 
-        // Sharp upward flick guard: pulling up hard removes the needle
-        if (dy < -10.0) {
-            ejectNeedle();
-            return true;
-        }
-
-        // Accumulate only downward movement as injection progress
-        if (dy > 0) {
-            injectionProgress = Math.min(1f, injectionProgress + (float)(dy / DRAG_FOR_FULL));
-            if (rng.nextInt(7) == 0) spawnBloodParticle(insertX, insertY);
-        }
-
-        if (injectionProgress >= SUCCESS_THRESHOLD) {
-            triggerSuccess();
-        }
         return true;
     }
 
     @Override
     public boolean mouseReleased(double mx, double my, int button) {
-        if (button == 0 && phase == Phase.INSERTED) {
-            ejectNeedle(); // lifting the finger removes the needle; progress is kept
+        if (button == 1 && phase == Phase.INSERTED) {
+            if (injectionProgress > 0f) {
+                triggerSuccess();
+            }
             return true;
         }
         return super.mouseReleased(mx, my, button);
-    }
-
-    /**
-     * Returns to the AIMING phase without resetting injection progress.
-     * The player can re-insert the needle and continue from where they left off.
-     */
-    private void ejectNeedle() {
-        if (phase != Phase.INSERTED) return;
-        phase = Phase.AIMING;
     }
 
     // =========================================================================
@@ -645,10 +595,12 @@ public class SyringeMinigameScreen extends Screen {
         phase          = Phase.SUCCESS;
         closeCountdown = 80; // ~4 s at 20 tps, then screen closes
 
-        // Tell the server to apply the drug effects.
-        // Server-side application is required so the effects tick down properly
-        // and their HUD icons disappear when they expire.
-        PacketDistributor.sendToServer(new SyringeEffectPayload(drugType.ordinal()));
+        float injectedAmount = availableDosage * Math.min(injectionProgress, 1f);
+
+        PacketDistributor.sendToServer(new SyringeEffectPayload(
+                hand == InteractionHand.MAIN_HAND ? 0 : 1,
+                drugType.ordinal(),
+                injectedAmount));
 
         playInjectSound();
     }

@@ -1,6 +1,14 @@
-// 1.21.1	2026-06-30T22:42:13.9618506	Tags for minecraft:item mod id avaliproject
+// 1.21.1	2026-07-27T21:12:51.2713044	Tags for minecraft:item mod id avaliproject
+e16c4e5d65c0b3fe9cb8c7b72604102d18478e24 data/avaliproject/tags/item/avali.json
+1d2bdba1e57b09080d02c7e4c52cfff6817f3afa data/avaliproject/tags/item/expie.json
+9f2a9c03c38d6c282c1bf4c056155050831bb184 data/avaliproject/tags/item/expie_medical.json
+1ba928eeb380119f27be50b1bbc81bf38c1c1431 data/avaliproject/tags/item/expie_tools.json
+47638a2117a46e5a6eba4312c672f393b359c7b2 data/avaliproject/tags/item/expie_utility.json
+8004971fe586b50b00cec8f39564a71f7681536f data/avaliproject/tags/item/protogen.json
+c4375a00359a6ac5f9c8a8765d996b2136342fa2 data/avaliproject/tags/item/sergal.json
 56cbe4fa785dcf7db621b404d903c4a857345ef0 data/minecraft/tags/item/axes.json
 92e841ea977e7a6feb1f4f8aefef20f4e08cfcc3 data/minecraft/tags/item/enchantable/mace.json
 4abe5999270b479a42cc400a233b0031eda55bda data/minecraft/tags/item/hoes.json
 f236ee544d49cb93a7005f0d8bc74154d0e30b06 data/minecraft/tags/item/pickaxes.json
 0ba719c190522406c9b40aecf9aff0f0fe04f0a4 data/minecraft/tags/item/swords.json
+a63adbda67be77eb9006fb41eefd8c82aff76fc1 data/pamhc/tags/item/cheesemild.json

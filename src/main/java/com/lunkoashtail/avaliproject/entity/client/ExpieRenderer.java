@@ -13,6 +13,7 @@ public class ExpieRenderer extends GeoEntityRenderer<ExpieEntity> {
 
     public ExpieRenderer(EntityRendererProvider.Context context) {
         super(context, new ExpieModel());
+        this.addRenderLayer(new ExpiePlushLayer(this));
     }
 
     @Override
