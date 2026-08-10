@@ -10,8 +10,10 @@ import com.lunkoashtail.avaliproject.limb.ModAttachments;
 import com.lunkoashtail.avaliproject.network.AvaliTrustSyncPayload;
 import com.lunkoashtail.avaliproject.pack.AvaliTrustMemory;
 import com.lunkoashtail.avaliproject.screen.custom.AvaliInteractionScreen;
+import com.lunkoashtail.avaliproject.sound.ModSounds;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.Items;
@@ -296,17 +298,19 @@ public class AvaliEntity extends TamableAnimal implements GeoEntity, Merchant {
 
     protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHitIn) {
         super.dropCustomDeathLoot(serverLevel, source, recentlyHitIn);
-        this.spawnAtLocation(new ItemStack(Items.FEATHER));
+        ItemStack feathers = new ItemStack(Items.FEATHER);
+        feathers.setCount((int)(serverLevel.random.nextFloat()*5f)); //random 0-4 feathers
+        this.spawnAtLocation(feathers);
     }
 
     @Override
     public SoundEvent getAmbientSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.ambient"));
+        return ModSounds.AVALI_IDLE.get();
     }
 
     @Override
     public void playStepSound(BlockPos pos, BlockState blockIn) {
-        this.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.step")), 0.15f, 1);
+        this.playSound(SoundEvents.PARROT_STEP);
     }
 
     @Override
