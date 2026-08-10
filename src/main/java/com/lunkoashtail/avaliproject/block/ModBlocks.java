@@ -2,6 +2,7 @@ package com.lunkoashtail.avaliproject.block;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
 import com.lunkoashtail.avaliproject.block.custom.*;
+import com.lunkoashtail.avaliproject.block.fluid.ModFluids;
 import com.lunkoashtail.avaliproject.item.ModItems;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffects;
@@ -9,11 +10,16 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS =
@@ -230,6 +236,21 @@ public class ModBlocks {
     public static final DeferredBlock<Block> CONTAINER_CRATE = registerBlock("container_crate",
             () -> new ContainerCrateBlock(BlockBehaviour.Properties.of().strength(2.5f).sound(SoundType.WOOD)));
 
+    /*public static final DeferredBlock<Block> AMMONIA_BLOCK =
+            BLOCKS.register(
+                    ModFluids.AMMONIA.getId().getPath(),
+                    () -> new LiquidBlock(()-> (BaseFlowingFluid)ModFluids.AMMONIA.get(),
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.WATER)
+                                    .replaceable()
+                                    .noCollission()
+                                    .strength(100f)
+                                    .noLootTable()
+                                    .liquid()
+                                    .pushReaction(PushReaction.DESTROY)
+                                    .sound(SoundType.)
+                    )
+            );*/
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);
