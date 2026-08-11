@@ -11,6 +11,7 @@ import com.lunkoashtail.avaliproject.limb.ModAttachments;
 import com.lunkoashtail.avaliproject.network.AvaliSocializeInteractionPayload;
 import com.lunkoashtail.avaliproject.network.AvaliTrustSyncPayload;
 import com.lunkoashtail.avaliproject.pack.AvaliTrustMemory;
+import com.lunkoashtail.avaliproject.sound.ModSounds;
 import net.minecraft.Util;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
