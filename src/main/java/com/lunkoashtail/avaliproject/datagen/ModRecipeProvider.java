@@ -36,8 +36,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 ModBlocks.DURASTEEL_ORE.get(),ModBlocks.DURASTEEL_DEEPSLATE_ORE.get(), ModItems.RAW_DURASTEEL);
         List<ItemLike> AERO_CRYSTAL_SMELTABLES = List.of(
                 ModBlocks.AERO_CRYSTAL_ORE, ModBlocks.AERO_CRYSTAL_DEEPSLATE_ORE);
-        List<ItemLike> SYNC_CRYSTAL_SMELTABLES = List.of(
-                ModBlocks.SYNC_CRYSTAL_ORE, ModBlocks.SYNC_CRYSTAL_DEEPSLATE_ORE);
         List<ItemLike> THERMAL_CRYSTAL_SMELTABLES = List.of(
                 ModBlocks.THERMAL_CRYSTAL_ORE, ModBlocks.THERMAL_CRYSTAL_DEEPSLATE_ORE);
         List<ItemLike> AEGISALT_SMELTABLES = List.of(
@@ -1041,8 +1039,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         oreBlasting(recipeOutput, DURASTEEL_SMELTABLES, RecipeCategory.MISC, ModItems.DURASTEEL_INGOT.get(), 0.25f, 100, "Durasteel");
         oreSmelting(recipeOutput, AERO_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.AERO_CRYSTAL.get(), 0.25f, 200, "aero_crystal");
         oreBlasting(recipeOutput, AERO_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.AERO_CRYSTAL.get(), 0.25f, 100, "aero_crystal");
-        oreSmelting(recipeOutput, SYNC_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.SYNC_CRYSTAL.get(), 0.25f, 200, "sync_crystal");
-        oreBlasting(recipeOutput, SYNC_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.SYNC_CRYSTAL.get(), 0.25f, 100, "sync_crystal");
         oreSmelting(recipeOutput, THERMAL_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.THERMAL_CRYSTAL.get(), 0.25f, 200, "thermal_crystal");
         oreBlasting(recipeOutput, THERMAL_CRYSTAL_SMELTABLES, RecipeCategory.MISC, ModItems.THERMAL_CRYSTAL.get(), 0.25f, 100, "thermal_crystal");
         oreSmelting(recipeOutput, AEGISALT_SMELTABLES, RecipeCategory.MISC, ModItems.REFINED_AEGISALT.get(), 0.25f, 200, "refined_aegisalt");

@@ -32,8 +32,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
         blockWithItem(ModBlocks.LUME_BLOCK);
         blockWithItem(ModBlocks.LUME_ORE);
         blockWithItem(ModBlocks.LUME_DEEPSLATE_ORE);
-        blockWithItem(ModBlocks.SYNC_CRYSTAL_ORE);
-        blockWithItem(ModBlocks.SYNC_CRYSTAL_DEEPSLATE_ORE);
         blockWithItem(ModBlocks.AERO_CRYSTAL_ORE);
         blockWithItem(ModBlocks.AERO_CRYSTAL_DEEPSLATE_ORE);
         blockWithItem(ModBlocks.AEGISALT_ORE);

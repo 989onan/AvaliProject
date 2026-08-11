@@ -91,10 +91,6 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
                 block -> createOreDrop(ModBlocks.AERO_CRYSTAL_ORE.get(), ModItems.AERO_CRYSTAL.get()));
         add(ModBlocks.AERO_CRYSTAL_DEEPSLATE_ORE.get(),
                 block -> createMultipleOreDrops(ModBlocks.AERO_CRYSTAL_DEEPSLATE_ORE.get(), ModItems.AERO_CRYSTAL.get(), 2, 3));
-        add(ModBlocks.SYNC_CRYSTAL_ORE.get(),
-                block -> createOreDrop(ModBlocks.SYNC_CRYSTAL_ORE.get(), ModItems.SYNC_CRYSTAL.get()));
-        add(ModBlocks.SYNC_CRYSTAL_DEEPSLATE_ORE.get(),
-                block -> createMultipleOreDrops(ModBlocks.SYNC_CRYSTAL_DEEPSLATE_ORE.get(), ModItems.SYNC_CRYSTAL.get(), 1, 2));
 
         add(ModBlocks.ARCAITES_CRYSTAL_ORE.get(),
                 block -> createOreDrop(ModBlocks.ARCAITES_CRYSTAL_ORE.get(), ModItems.ARCAITES_CRYSTAL.get()));
