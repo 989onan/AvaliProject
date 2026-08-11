@@ -1,24 +1,23 @@
 package com.lunkoashtail.avaliproject.client;
 
+import com.lunkoashtail.avaliproject.component.SyringeContents;
+import com.lunkoashtail.avaliproject.limb.ModAttachments;
 import com.lunkoashtail.avaliproject.network.AvaliRecruitProposalPayload;
 import com.lunkoashtail.avaliproject.network.AvaliTrustSyncPayload;
 import com.lunkoashtail.avaliproject.network.DressingDepletedPayload;
 import com.lunkoashtail.avaliproject.network.PackDataSyncPayload;
 import com.lunkoashtail.avaliproject.screen.custom.AvaliInteractionScreen;
 import com.lunkoashtail.avaliproject.screen.custom.AvaliRecruitProposalScreen;
+import com.lunkoashtail.avaliproject.screen.custom.BloodDrawScreen;
 import com.lunkoashtail.avaliproject.screen.custom.DressingMinigameScreen;
+import com.lunkoashtail.avaliproject.screen.custom.LimbSelectionScreen;
 import com.lunkoashtail.avaliproject.screen.custom.PackScreen;
+import com.lunkoashtail.avaliproject.screen.custom.SyringeDrawScreen;
+import com.lunkoashtail.avaliproject.screen.custom.SyringeMinigameScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 
-/**
- * Client-only landing point for network payload handlers that touch Screen classes.
- * Payload record classes are loaded on both dists (for protocol registration), so any
- * direct reference to a Screen subclass inside their handle() body causes NeoForge's
- * dist validator to reject loading net.minecraft.client.gui.screens.Screen on a
- * dedicated server. Keeping those references confined to this client-only class means
- * this class is only ever loaded when its methods are actually invoked, which only
- * happens on the receiving client for playToClient payloads.
- */
 public final class ClientPayloadHandlers {
 
     private ClientPayloadHandlers() {}
@@ -43,5 +42,30 @@ public final class ClientPayloadHandlers {
 
     public static void openExpieInteractionScreen(int entityId) {
         Minecraft.getInstance().setScreen(new com.lunkoashtail.avaliproject.screen.custom.ExpieInteractionScreen(entityId));
+    }
+
+    public static void openAvaliInteractionScreen(int entityId, boolean tame, boolean ownedByPlayer) {
+        Minecraft.getInstance().setScreen(new AvaliInteractionScreen(entityId, tame, ownedByPlayer));
+    }
+
+    public static void openDressingLimbSelection(Player player, InteractionHand hand) {
+        Minecraft.getInstance().setScreen(new LimbSelectionScreen(selectedLimb -> {
+            int bleed = player.getData(ModAttachments.LIMB_DATA).getBleed(selectedLimb);
+            Minecraft.getInstance().setScreen(new DressingMinigameScreen(selectedLimb, bleed, hand));
+        }));
+    }
+
+    public static void openBloodDrawScreen() {
+        Minecraft.getInstance().setScreen(new BloodDrawScreen());
+    }
+
+    public static void openSyringeDrawScreen(InteractionHand hand) {
+        Minecraft.getInstance().setScreen(new SyringeDrawScreen(hand));
+    }
+
+    public static void openSyringeLimbSelection(SyringeContents contents, InteractionHand hand) {
+        Minecraft.getInstance().setScreen(new LimbSelectionScreen(selectedLimb ->
+                Minecraft.getInstance().setScreen(
+                        new SyringeMinigameScreen(contents.drugType(), contents.dosage(), selectedLimb, hand))));
     }
 }

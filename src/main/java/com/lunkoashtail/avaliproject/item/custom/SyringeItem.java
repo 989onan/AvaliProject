@@ -1,16 +1,12 @@
 package com.lunkoashtail.avaliproject.item.custom;
 
+import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import com.lunkoashtail.avaliproject.component.ModDataComponents;
 import com.lunkoashtail.avaliproject.component.SyringeContents;
 import com.lunkoashtail.avaliproject.item.ModItems;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
-import com.lunkoashtail.avaliproject.screen.custom.BloodDrawScreen;
-import com.lunkoashtail.avaliproject.screen.custom.LimbSelectionScreen;
-import com.lunkoashtail.avaliproject.screen.custom.SyringeDrawScreen;
-import com.lunkoashtail.avaliproject.screen.custom.SyringeMinigameScreen;
 import com.lunkoashtail.avaliproject.species.Species;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -41,7 +37,7 @@ public class SyringeItem extends Item {
         SyringeContents contents = stack.get(ModDataComponents.SYRINGE_CONTENTS);
 
         if (contents == null && player.getOffhandItem().is(ModItems.EMPTY_BLOOD_BAG.get())) {
-            Minecraft.getInstance().setScreen(new BloodDrawScreen());
+            ClientPayloadHandlers.openBloodDrawScreen();
             return InteractionResultHolder.sidedSuccess(stack, true);
         }
 
@@ -51,12 +47,9 @@ public class SyringeItem extends Item {
         }
 
         if (contents == null || player.isShiftKeyDown()) {
-            Minecraft.getInstance().setScreen(new SyringeDrawScreen(hand));
+            ClientPayloadHandlers.openSyringeDrawScreen(hand);
         } else {
-            Minecraft.getInstance().setScreen(new LimbSelectionScreen(selectedLimb ->
-                    Minecraft.getInstance().setScreen(
-                            new SyringeMinigameScreen(contents.drugType(), contents.dosage(), selectedLimb, hand))
-            ));
+            ClientPayloadHandlers.openSyringeLimbSelection(contents, hand);
         }
 
         return InteractionResultHolder.sidedSuccess(stack, true);
