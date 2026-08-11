@@ -1,8 +1,8 @@
 package com.lunkoashtail.avaliproject.network;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
+import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import com.lunkoashtail.avaliproject.pack.PackRosterEntry;
-import com.lunkoashtail.avaliproject.screen.custom.PackScreen;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -77,6 +77,6 @@ public record PackDataSyncPayload(String packName, String leaderName, boolean vi
     }
 
     public static void handle(PackDataSyncPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> PackScreen.onDataSync(payload));
+        context.enqueueWork(() -> ClientPayloadHandlers.handlePackDataSync(payload));
     }
 }

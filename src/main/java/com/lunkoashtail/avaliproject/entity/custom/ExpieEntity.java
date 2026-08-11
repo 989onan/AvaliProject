@@ -12,7 +12,7 @@ import com.lunkoashtail.avaliproject.entity.client.ExpieVariant;
 import com.lunkoashtail.avaliproject.item.ModItems;
 import com.lunkoashtail.avaliproject.block.ModBlocks;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
-import com.lunkoashtail.avaliproject.screen.custom.ExpieInteractionScreen;
+import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import com.lunkoashtail.avaliproject.sound.ModSounds;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -24,7 +24,6 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -352,7 +351,7 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
             }
         }
         if (this.level().isClientSide()) {
-            Minecraft.getInstance().setScreen(new ExpieInteractionScreen(this.getId()));
+            ClientPayloadHandlers.openExpieInteractionScreen(this.getId());
         } else if (player instanceof ServerPlayer serverPlayer) {
             this.setInteractingPlayer(serverPlayer.getUUID());
             this.touchInteraction();

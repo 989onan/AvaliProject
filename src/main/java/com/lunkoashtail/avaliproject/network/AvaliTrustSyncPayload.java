@@ -1,10 +1,10 @@
 package com.lunkoashtail.avaliproject.network;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
+import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import com.lunkoashtail.avaliproject.diplomacy.DiplomacyData;
 import com.lunkoashtail.avaliproject.entity.custom.AvaliEntity;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
-import com.lunkoashtail.avaliproject.screen.custom.AvaliInteractionScreen;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -42,6 +42,6 @@ public record AvaliTrustSyncPayload(int entityId, int trust, int recruitCost, bo
     }
 
     public static void handle(AvaliTrustSyncPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> AvaliInteractionScreen.onTrustSync(payload));
+        context.enqueueWork(() -> ClientPayloadHandlers.handleTrustSync(payload));
     }
 }
