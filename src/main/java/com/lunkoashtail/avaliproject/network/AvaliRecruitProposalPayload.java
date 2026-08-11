@@ -1,8 +1,8 @@
 package com.lunkoashtail.avaliproject.network;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
+import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -23,7 +23,6 @@ public record AvaliRecruitProposalPayload(int entityId) implements CustomPacketP
     }
 
     public static void handle(AvaliRecruitProposalPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> Minecraft.getInstance().setScreen(
-                new com.lunkoashtail.avaliproject.screen.custom.AvaliRecruitProposalScreen(payload.entityId())));
+        context.enqueueWork(() -> ClientPayloadHandlers.handleRecruitProposal(payload));
     }
 }

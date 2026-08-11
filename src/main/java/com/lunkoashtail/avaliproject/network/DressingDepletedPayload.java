@@ -1,9 +1,8 @@
 package com.lunkoashtail.avaliproject.network;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
-import com.lunkoashtail.avaliproject.screen.custom.DressingMinigameScreen;
+import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -24,10 +23,6 @@ public record DressingDepletedPayload() implements CustomPacketPayload {
     }
 
     public static void handle(DressingDepletedPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            if (Minecraft.getInstance().screen instanceof DressingMinigameScreen screen) {
-                screen.onDressingDepleted();
-            }
-        });
+        context.enqueueWork(() -> ClientPayloadHandlers.handleDressingDepleted(payload));
     }
 }
