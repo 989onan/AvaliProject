@@ -1,5 +1,6 @@
 package com.lunkoashtail.avaliproject.entity.custom;
 
+import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import com.lunkoashtail.avaliproject.diplomacy.DiplomacyData;
 import com.lunkoashtail.avaliproject.entity.ModEntities;
 import com.lunkoashtail.avaliproject.entity.ai.FaceInteractorGoal;
@@ -10,8 +11,6 @@ import com.lunkoashtail.avaliproject.limb.ModAttachments;
 import com.lunkoashtail.avaliproject.network.AvaliSocializeInteractionPayload;
 import com.lunkoashtail.avaliproject.network.AvaliTrustSyncPayload;
 import com.lunkoashtail.avaliproject.pack.AvaliTrustMemory;
-import com.lunkoashtail.avaliproject.screen.custom.AvaliInteractionScreen;
-import com.lunkoashtail.avaliproject.sound.ModSounds;
 import net.minecraft.Util;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -401,8 +400,8 @@ public class AvaliEntity extends TamableAnimal implements GeoEntity, Merchant {
             return super.mobInteract(sourceentity, hand);
         }
         if (this.level().isClientSide()) {
-            net.minecraft.client.Minecraft.getInstance().setScreen(new AvaliInteractionScreen(
-                    this.getId(), this.isTame(), this.isTame() && this.isOwnedBy(sourceentity)));
+            ClientPayloadHandlers.openAvaliInteractionScreen(
+                    this.getId(), this.isTame(), this.isTame() && this.isOwnedBy(sourceentity));
         } else if (sourceentity instanceof ServerPlayer serverPlayer) {
             this.setInteractingPlayer(serverPlayer.getUUID());
             this.touchInteraction();

@@ -1,11 +1,9 @@
 package com.lunkoashtail.avaliproject.item.custom;
 
+import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import com.lunkoashtail.avaliproject.limb.LimbData;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
-import com.lunkoashtail.avaliproject.screen.custom.DressingMinigameScreen;
-import com.lunkoashtail.avaliproject.screen.custom.LimbSelectionScreen;
 import com.lunkoashtail.avaliproject.species.Species;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -30,10 +28,7 @@ public class DressingItem extends Item {
                 player.sendSystemMessage(Component.literal("You're not an expie"));
                 return InteractionResultHolder.fail(player.getItemInHand(hand));
             }
-            Minecraft.getInstance().setScreen(new LimbSelectionScreen(selectedLimb -> {
-                int bleed = player.getData(ModAttachments.LIMB_DATA).getBleed(selectedLimb);
-                Minecraft.getInstance().setScreen(new DressingMinigameScreen(selectedLimb, bleed, hand));
-            }));
+            ClientPayloadHandlers.openDressingLimbSelection(player, hand);
         }
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
