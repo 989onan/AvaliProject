@@ -588,8 +588,6 @@ public class ModItems {
             () -> new ItemNameBlockItem(ModBlocks.HYDREED.get(), new Item.Properties()));
     public static final DeferredItem<Item> GLOWPLANT_FRUIT = ITEMS.register("glowplant_fruit",
             () -> new ItemNameBlockItem(ModBlocks.GLOWPLANT.get(), new Item.Properties()));
-    public static final DeferredItem<Item> VILOUS_CERAMIC_INGOT_BLOCK = ITEMS.register("vilous_ceramic_ingot_block",
-            () -> new ItemNameBlockItem(ModBlocks.VILOUS_CERAMIC_INGOT_BLOCK.get(), new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

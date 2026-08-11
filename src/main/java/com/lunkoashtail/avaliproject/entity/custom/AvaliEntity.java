@@ -7,11 +7,13 @@ import com.lunkoashtail.avaliproject.entity.ai.ProposeRecruitGoal;
 import com.lunkoashtail.avaliproject.entity.client.AvaliVariant;
 import com.lunkoashtail.avaliproject.item.ModItems;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
+import com.lunkoashtail.avaliproject.network.AvaliSocializeInteractionPayload;
 import com.lunkoashtail.avaliproject.network.AvaliTrustSyncPayload;
 import com.lunkoashtail.avaliproject.pack.AvaliTrustMemory;
 import com.lunkoashtail.avaliproject.screen.custom.AvaliInteractionScreen;
 import com.lunkoashtail.avaliproject.sound.ModSounds;
 import net.minecraft.Util;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
@@ -146,10 +148,20 @@ public class AvaliEntity extends TamableAnimal implements GeoEntity, Merchant {
         this.level().broadcastEntityEvent(this, (byte) 7);
     }
 
-    public void playHugOrSocializeFeedback(boolean hug) {
+    public void playHugOrSocializeFeedback(int event) {
         this.level().broadcastEntityEvent(this, (byte) 7);
-        if (hug) {
-            this.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.parrot.ambient")), 1.0f, 1.4f);
+
+        switch (event){
+            case AvaliSocializeInteractionPayload.ACTION_HUG, AvaliSocializeInteractionPayload.ACTION_FLIRT,
+                 AvaliSocializeInteractionPayload.ACTION_JOKE, AvaliSocializeInteractionPayload.ACTION_PLAY ->{
+                this.playSound(ModSounds.AVALI_HAPPY.get(), 1.0f, 1.0f);
+            }
+            case AvaliSocializeInteractionPayload.ACTION_BE_RUDE->{
+                    this.playSound(ModSounds.AVALI_SURPISE.get(), 1.0f, 1.0f);
+            }
+            default -> {
+                this.playSound(ModSounds.AVALI_TALK.get(), 1.0f, 1.0f);
+            }
         }
     }
 

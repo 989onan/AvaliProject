@@ -66,6 +66,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(ModBlocks.AVALI_NIGHTLY_FABRIC_4.get());
         dropSelf(ModBlocks.AVALI_NIGHTLY_FABRIC_5.get());
         dropSelf(ModBlocks.AVALI_NIGHTLY_FABRIC_6.get());
+        dropSelf(ModBlocks.VILOUS_CERAMIC_BLOCK.get());
 
         dropSelf(ModBlocks.NANOLOOM.get());
 

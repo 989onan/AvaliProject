@@ -45,7 +45,7 @@ public class AvalonBiomes {
 
 
 
-    public static void boostrap(BootstrapContext<Biome> context) {
+    public static void bootstrap(BootstrapContext<Biome> context) {
 
         //we are copying from existing biomes for now.
         //TODO: Avalon cities should spawn avalon buildings that are "villages" but bigger and cooler. - @989onan

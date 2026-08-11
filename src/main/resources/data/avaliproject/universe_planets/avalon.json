@@ -6,7 +6,7 @@
     "apply_gravity_correction_to_entities_in_dimension": true,
     "atmosphere_composition": {
       "21000": [
-        "high_density",
+        "low_density",
         "drowning"
       ]
     },

@@ -12,13 +12,13 @@
   "position": {
     "type": "fixed",
     "position": {
-      "x": 3.0E20,
-      "y": 3.0E20,
-      "z": 3.0E20
+      "x": 3.0E7,
+      "y": 3.0E7,
+      "z": 3.0E7
     }
   },
   "priority": 0,
-  "radius": 3.0E8,
+  "radius": 3E8,
   "rotation": {
     "type": "period",
     "period_seconds": 38400.0,

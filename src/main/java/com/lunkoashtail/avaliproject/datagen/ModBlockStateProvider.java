@@ -78,6 +78,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         blockWithItem(ModBlocks.AVALI_NIGHTLY_FABRIC_4);
         blockWithItem(ModBlocks.AVALI_NIGHTLY_FABRIC_5);
         blockWithItem(ModBlocks.AVALI_NIGHTLY_FABRIC_6);
+        blockWithItem(ModBlocks.VILOUS_CERAMIC_BLOCK);
 
         blockWithItem(ModBlocks.NANOLOOM);
 

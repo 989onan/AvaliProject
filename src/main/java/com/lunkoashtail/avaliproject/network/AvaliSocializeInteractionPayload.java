@@ -76,37 +76,28 @@ public record AvaliSocializeInteractionPayload(int entityId, int actionOrdinal) 
 
             int rawDelta;
             List<String> lines;
+            boolean bad_interaction = false;
             switch (payload.actionOrdinal()) {
                 case ACTION_BE_RUDE -> {
                     rawDelta = -8;
                     lines = AvaliSocialLines.BE_RUDE;
-                    if (player.level() instanceof ServerLevel serverLevel) {
-                        serverLevel.playSound(null, avali.blockPosition(), ModSounds.AVALI_SURPISE.get(), avali.getSoundSource());
-                    }
+                    bad_interaction = true;
                 }
                 case ACTION_FLIRT -> {
                     boolean welcome = current.trust() >= FLIRT_TRUST_THRESHOLD;
                     rawDelta = welcome ? 6 : -6;
-                    if (player.level() instanceof ServerLevel serverLevel) {
-                        serverLevel.playSound(null, avali.blockPosition(), welcome ?  ModSounds.AVALI_HAPPY.get() : ModSounds.AVALI_SURPISE.get(), avali.getSoundSource());
-                    }
                     lines = welcome ? AvaliSocialLines.FLIRT : AvaliSocialLines.FLIRT_TOO_SOON;
-
+                    bad_interaction = !welcome;
                 }
                 case ACTION_HUG -> {
                     rawDelta = 10;
                     lines = AvaliSocialLines.HUG;
-                    if (player.level() instanceof ServerLevel serverLevel) {
-                        serverLevel.playSound(null, avali.blockPosition(), ModSounds.AVALI_HAPPY.get(), avali.getSoundSource());
-                    }
                 }
                 case ACTION_TALK, ACTION_GOSSIP, ACTION_PLAY, ACTION_JOKE -> {
                     boolean landed = avali.getRandom().nextInt(100) < SLOW_RAISE_SUCCESS_CHANCE;
                     rawDelta = landed ? 2 : 0;
                     lines = landed ? linesFor(payload.actionOrdinal()) : AvaliSocialLines.FAILED;
-                    if (player.level() instanceof ServerLevel serverLevel && landed) {
-                        serverLevel.playSound(null, avali.blockPosition(), ModSounds.AVALI_TALK.get(), avali.getSoundSource());
-                    }
+
                 }
                 default -> {
                     rawDelta = 0;
@@ -119,9 +110,8 @@ public record AvaliSocializeInteractionPayload(int entityId, int actionOrdinal) 
             int scaledDelta = (int) Math.round(rawDelta * multiplier);
             avali.getTrustMemory().put(player.getUUID(), current.withTrustDelta(scaledDelta, now));
 
-            boolean hug = payload.actionOrdinal() == ACTION_HUG;
-            avali.playHugOrSocializeFeedback(hug);
-            if (player.level() instanceof ServerLevel serverLevel && hug) {
+            avali.playHugOrSocializeFeedback(bad_interaction ? ACTION_BE_RUDE : payload.actionOrdinal());
+            if (player.level() instanceof ServerLevel serverLevel && payload.actionOrdinal() == ACTION_HUG) {
                 serverLevel.sendParticles(ParticleTypes.HEART, avali.getX(), avali.getY() + avali.getBbHeight() + 0.2, avali.getZ(),
                         6, 0.3, 0.2, 0.3, 0.02);
             }

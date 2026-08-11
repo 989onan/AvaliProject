@@ -206,7 +206,7 @@ public class ModBlocks {
     public static final DeferredBlock<Block> NANOLOOM = registerBlock("nanoloom",
             () -> new NanoloomBlock(BlockBehaviour.Properties.of().strength(3f).requiresCorrectToolForDrops()));
 
-    public static final DeferredBlock<Block> VILOUS_CERAMIC_INGOT_BLOCK = registerBlock("vilous_ceramic_ingot_block",
+    public static final DeferredBlock<Block> VILOUS_CERAMIC_BLOCK = registerBlock("vilous_ceramic_block",
             () -> new Block(BlockBehaviour.Properties.of()
                     .strength(4f).requiresCorrectToolForDrops().sound(SoundType.NETHER_BRICKS)));
 

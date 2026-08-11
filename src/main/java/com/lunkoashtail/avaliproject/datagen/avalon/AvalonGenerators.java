@@ -28,13 +28,6 @@ public class AvalonGenerators {
         BiomeDefaultFeatures.addDefaultOres(pBuilder);
         BiomeDefaultFeatures.addDefaultSoftDisks(pBuilder);
         BiomeDefaultFeatures.addSurfaceFreezing(pBuilder);
-        pBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, ModPlacedFeatures.AEGISALT_ORES_PLACED_KEY);
-        pBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, ModPlacedFeatures.AERO_CRYSTAL_ORES_PLACED_KEY);
-        pBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, ModPlacedFeatures.LUME_ORES_PLACED_KEY);
-        pBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ModPlacedFeatures.PIRU_NODULE_PLACED_KEY);
-        pBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ModPlacedFeatures.NAKATI_NODULE_PLACED_KEY);
-        pBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ModPlacedFeatures.KIRI_NODULE_PLACED_KEY);
-        pBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ModPlacedFeatures.GROOU_NODULE_PLACED_KEY);
 
     }
 
