@@ -69,6 +69,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -97,12 +98,12 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
     public long getLastInteractionTick() { return lastInteractionTick; }
     public void touchInteraction() { this.lastInteractionTick = this.level().getGameTime(); }
 
-    @Nullable
-    private UUID clingyTarget;
+    private static final EntityDataAccessor<Optional<UUID>> CLINGY_TARGET =
+            SynchedEntityData.defineId(ExpieEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     @Nullable
-    public UUID getClingyTarget() { return clingyTarget; }
-    public void setClingyTarget(@Nullable UUID playerId) { this.clingyTarget = playerId; }
+    public UUID getClingyTarget() { return this.entityData.get(CLINGY_TARGET).orElse(null); }
+    public void setClingyTarget(@Nullable UUID playerId) { this.entityData.set(CLINGY_TARGET, Optional.ofNullable(playerId)); }
 
     private long lastHugTick;
 
@@ -179,8 +180,9 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
             mood.add(HOLD_PLUSH_MOOD_GAIN);
         }
 
-        boolean bondedNearby = this.clingyTarget != null
-                && this.level().getPlayerByUUID(this.clingyTarget) instanceof Player bonded
+        UUID clingyTarget = this.getClingyTarget();
+        boolean bondedNearby = clingyTarget != null
+                && this.level().getPlayerByUUID(clingyTarget) instanceof Player bonded
                 && this.distanceToSqr(bonded) <= PROXIMITY_RANGE * PROXIMITY_RANGE;
         mood.add(bondedNearby ? PROXIMITY_MOOD_GAIN : -ISOLATION_MOOD_LOSS);
 
@@ -202,7 +204,8 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
     }
 
     private void dieOfDespair() {
-        Player notify = this.clingyTarget != null ? this.level().getPlayerByUUID(this.clingyTarget) : null;
+        UUID clingyTarget = this.getClingyTarget();
+        Player notify = clingyTarget != null ? this.level().getPlayerByUUID(clingyTarget) : null;
         if (notify == null) {
             notify = this.level().getNearestPlayer(this, 32.0);
         }
@@ -260,6 +263,7 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
         builder.define(ANIMATION, "undefined");
         builder.define(SLEEPING_NEAR_PLAYER, false);
         builder.define(HELD_PLUSH, ItemStack.EMPTY);
+        builder.define(CLINGY_TARGET, Optional.empty());
     }
 
     private int getTypeVariant() { return this.entityData.get(VARIANT); }
@@ -280,7 +284,8 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("Variant", this.getTypeVariant());
-        if (this.clingyTarget != null) compound.putUUID("ClingyTarget", this.clingyTarget);
+        UUID clingyTarget = this.getClingyTarget();
+        if (clingyTarget != null) compound.putUUID("ClingyTarget", clingyTarget);
         compound.putLong("LastHugTick", this.lastHugTick);
         compound.put("HeldPlush", this.getHeldPlush().saveOptional(this.registryAccess()));
     }
@@ -289,7 +294,7 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("Variant")) this.entityData.set(VARIANT, compound.getInt("Variant"));
-        if (compound.hasUUID("ClingyTarget")) this.clingyTarget = compound.getUUID("ClingyTarget");
+        if (compound.hasUUID("ClingyTarget")) this.setClingyTarget(compound.getUUID("ClingyTarget"));
         if (compound.contains("LastHugTick")) this.lastHugTick = compound.getLong("LastHugTick");
         if (compound.contains("HeldPlush")) {
             this.setHeldPlush(ItemStack.parseOptional(this.registryAccess(), compound.getCompound("HeldPlush")));
@@ -345,7 +350,7 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
             }
             return InteractionResult.SUCCESS;
         }
-        if (player.isShiftKeyDown() && stack.isEmpty() && player.getUUID().equals(this.clingyTarget)) {
+        if (player.isShiftKeyDown() && stack.isEmpty() && player.getUUID().equals(this.getClingyTarget())) {
             if (!this.level().isClientSide() && this.toggleComfortCling(player)) {
                 return InteractionResult.SUCCESS;
             }
