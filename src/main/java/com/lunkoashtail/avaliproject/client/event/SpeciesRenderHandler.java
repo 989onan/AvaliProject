@@ -65,7 +65,7 @@ public class SpeciesRenderHandler {
     }
 
     private static void syncState(Player player, LivingEntity dummy) {
-        // moveTo sets xRotO = xRot and yRotO = yRot, preventing jitter from 0→value interpolation
+        
         dummy.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         dummy.yHeadRot = player.yHeadRot;
         dummy.yHeadRotO = player.yHeadRotO;
@@ -78,7 +78,7 @@ public class SpeciesRenderHandler {
         dummy.setSprinting(player.isSprinting());
         dummy.setDeltaMovement(player.getDeltaMovement());
         dummy.setSwimming(player.isSwimming());
-        // Copy walk speed so event.isMoving() / getLimbSwingAmount() work correctly
+        
         dummy.walkAnimation.update(player.walkAnimation.speed(), 1.0f);
     }
 

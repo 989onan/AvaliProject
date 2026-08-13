@@ -488,7 +488,7 @@ public class ExpieEntity extends Monster implements GeoEntity, Merchant {
         return this.level().isClientSide();
     }
 
-    // ── Animation controllers ───────────────────────────────────────────────
+    
 
     private PlayState movementPredicate(AnimationState event) {
         if (!this.animationprocedure.equals("empty")) {

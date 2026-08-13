@@ -185,7 +185,7 @@ public class ProtogenEntity extends Monster implements GeoEntity {
     }
 
 
-    /* VARIANT */
+     
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

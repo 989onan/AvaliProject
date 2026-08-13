@@ -145,7 +145,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     private ConfiguredModel[] states(BlockState state, CropBlock block, String modelName, String textureName) {
         ConfiguredModel[] models = new ConfiguredModel[1];
 
-        // Dynamically get the age property for various crop types
+        
         IntegerProperty ageProperty;
         if (block instanceof GroouCropBlock) {
             ageProperty = ((GroouCropBlock) block).getAgeProperty();
@@ -159,10 +159,10 @@ public class ModBlockStateProvider extends BlockStateProvider {
             throw new IllegalArgumentException("Unsupported crop block: " + block.getClass().getName());
         }
 
-        // Get the age value from the block state
+        
         int age = state.getValue(ageProperty);
 
-        // Define the model for this age
+        
         models[0] = new ConfiguredModel(models().crop(
                 modelName + age,
                 ResourceLocation.fromNamespaceAndPath(AvaliProject.MOD_ID, "block/" + textureName + age)

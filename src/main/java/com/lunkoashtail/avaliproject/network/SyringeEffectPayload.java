@@ -5,6 +5,8 @@ import com.lunkoashtail.avaliproject.component.ModDataComponents;
 import com.lunkoashtail.avaliproject.component.SyringeContents;
 import com.lunkoashtail.avaliproject.item.custom.DrugType;
 import com.lunkoashtail.avaliproject.item.custom.SyringeItem;
+import com.lunkoashtail.avaliproject.limb.ModAttachments;
+import com.lunkoashtail.avaliproject.species.Species;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -14,24 +16,27 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/**
- * Sent from the client when the syringe injection minigame succeeds.
- *
- * The server applies the drug effects (server-side, so they tick down and
- * their HUD icons disappear on time) AND deducts the injected amount from
- * the syringe's remaining dosage — any leftover stays loaded for next time.
- *
- * handOrdinal: 0 = MAIN_HAND, 1 = OFF_HAND — which hand holds the syringe.
- * drugTypeOrdinal: DrugType.values() ordinal.
- * injectedAmount: mL the client's minigame reports as injected. The server
- *   clamps this to what's actually left in the syringe before trusting it.
- */
-public record SyringeEffectPayload(int handOrdinal, int drugTypeOrdinal, float injectedAmount)
+
+
+
+
+
+
+
+
+
+
+
+
+public record SyringeEffectPayload(int handOrdinal, int drugTypeOrdinal, float injectedAmount, int targetEntityId)
         implements CustomPacketPayload {
+
+    private static final double MAX_TREAT_DISTANCE_SQ = 64;
 
     public static final CustomPacketPayload.Type<SyringeEffectPayload> TYPE =
             new CustomPacketPayload.Type<>(
@@ -42,6 +47,7 @@ public record SyringeEffectPayload(int handOrdinal, int drugTypeOrdinal, float i
                     ByteBufCodecs.INT, SyringeEffectPayload::handOrdinal,
                     ByteBufCodecs.INT, SyringeEffectPayload::drugTypeOrdinal,
                     ByteBufCodecs.FLOAT, SyringeEffectPayload::injectedAmount,
+                    ByteBufCodecs.INT, SyringeEffectPayload::targetEntityId,
                     SyringeEffectPayload::new);
 
     @Override
@@ -51,10 +57,17 @@ public record SyringeEffectPayload(int handOrdinal, int drugTypeOrdinal, float i
 
     public static void handle(SyringeEffectPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (!(context.player() instanceof ServerPlayer player)) return;
+            if (!(context.player() instanceof ServerPlayer wielder)) return;
+
+            Entity targetEntity = wielder.level().getEntity(payload.targetEntityId());
+            if (!(targetEntity instanceof ServerPlayer targetPlayer)) return;
+            boolean self = targetPlayer == wielder;
+            if (!self && targetPlayer.distanceToSqr(wielder) > MAX_TREAT_DISTANCE_SQ) return;
+            if (!targetPlayer.isAlive()) return;
+            if (targetPlayer.getData(ModAttachments.SPECIES) != Species.EXPIE) return;
 
             InteractionHand hand = payload.handOrdinal() == 0 ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-            ItemStack syringeStack = player.getItemInHand(hand);
+            ItemStack syringeStack = wielder.getItemInHand(hand);
             if (!(syringeStack.getItem() instanceof SyringeItem)) return;
 
             SyringeContents contents = syringeStack.get(ModDataComponents.SYRINGE_CONTENTS);
@@ -67,7 +80,7 @@ public record SyringeEffectPayload(int handOrdinal, int drugTypeOrdinal, float i
             float amount = Math.max(0f, Math.min(payload.injectedAmount(), contents.dosage()));
             if (amount <= 0f) return;
 
-            applyEffects(player, contents.drugType(), amount);
+            applyEffects(targetPlayer, contents.drugType(), amount);
 
             float leftover = contents.dosage() - amount;
             if (leftover <= 0.5f) {

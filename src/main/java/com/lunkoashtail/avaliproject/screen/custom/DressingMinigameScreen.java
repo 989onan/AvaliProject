@@ -1,6 +1,7 @@
 package com.lunkoashtail.avaliproject.screen.custom;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
+import com.lunkoashtail.avaliproject.client.TargetDataCache;
 import com.lunkoashtail.avaliproject.item.ModItems;
 import com.lunkoashtail.avaliproject.limb.BleedingTier;
 import com.lunkoashtail.avaliproject.limb.Limb;
@@ -82,6 +83,7 @@ public class DressingMinigameScreen extends Screen {
 
     private final Limb limb;
     private final InteractionHand hand;
+    private final int targetEntityId;
 
     private boolean lmbHeld = false;
     private double lastAngle = Double.NaN;
@@ -112,10 +114,11 @@ public class DressingMinigameScreen extends Screen {
     private final float[][] particles = new float[MAX_PARTICLES][4];
     private int particleCount = 0;
 
-    public DressingMinigameScreen(Limb limb, int initialBleed, InteractionHand hand) {
+    public DressingMinigameScreen(Limb limb, int initialBleed, InteractionHand hand, int targetEntityId) {
         super(Component.translatable("screen.avaliproject.dressing_minigame"));
         this.limb = limb;
         this.hand = hand;
+        this.targetEntityId = targetEntityId;
         this.healedNotified = initialBleed <= 0;
     }
 
@@ -334,7 +337,10 @@ public class DressingMinigameScreen extends Screen {
 
     private int currentBleed() {
         Player p = minecraft.player;
-        return p != null ? p.getData(ModAttachments.LIMB_DATA).getBleed(limb) : 0;
+        if (p == null) return 0;
+        return (p.getId() == targetEntityId)
+                ? p.getData(ModAttachments.LIMB_DATA).getBleed(limb)
+                : TargetDataCache.getBleed(targetEntityId, limb);
     }
 
 
@@ -458,7 +464,7 @@ public class DressingMinigameScreen extends Screen {
             bleedAccumulator -= bleedWhole;
             durabilityAccumulator -= durabilityWhole;
             PacketDistributor.sendToServer(new ReduceBleedPayload(
-                    limb.ordinal(), bleedWhole, durabilityWhole, hand == InteractionHand.MAIN_HAND));
+                    limb.ordinal(), bleedWhole, durabilityWhole, hand == InteractionHand.MAIN_HAND, targetEntityId));
 
             pointsSinceSound += durabilityWhole;
             if (pointsSinceSound >= POINTS_PER_SOUND) {

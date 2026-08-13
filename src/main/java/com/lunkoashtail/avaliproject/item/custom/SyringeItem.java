@@ -4,17 +4,23 @@ import com.lunkoashtail.avaliproject.client.ClientPayloadHandlers;
 import com.lunkoashtail.avaliproject.component.ModDataComponents;
 import com.lunkoashtail.avaliproject.component.SyringeContents;
 import com.lunkoashtail.avaliproject.item.ModItems;
+import com.lunkoashtail.avaliproject.limb.LimbData;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
+import com.lunkoashtail.avaliproject.network.TargetLimbDataSyncPayload;
 import com.lunkoashtail.avaliproject.species.Species;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -53,6 +59,26 @@ public class SyringeItem extends Item {
         }
 
         return InteractionResultHolder.sidedSuccess(stack, true);
+    }
+
+    @Override
+    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
+        if (!(target instanceof Player targetPlayer) || targetPlayer == player) return InteractionResult.PASS;
+
+        SyringeContents contents = stack.get(ModDataComponents.SYRINGE_CONTENTS);
+        if (contents == null) return InteractionResult.PASS;
+
+        if (!player.level().isClientSide()) {
+            if (targetPlayer.getData(ModAttachments.SPECIES) != Species.EXPIE) {
+                player.sendSystemMessage(Component.literal("They're not an expie"));
+                return InteractionResult.FAIL;
+            }
+            LimbData data = targetPlayer.getData(ModAttachments.LIMB_DATA);
+            PacketDistributor.sendToPlayer((ServerPlayer) player, TargetLimbDataSyncPayload.from(targetPlayer.getId(), data));
+        } else {
+            ClientPayloadHandlers.openSyringeLimbSelection(contents, hand, targetPlayer.getId());
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override

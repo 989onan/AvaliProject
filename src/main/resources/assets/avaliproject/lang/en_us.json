@@ -380,7 +380,17 @@
 
   "key.avaliproject.open_limb_wheel": "Open Limb Wheel",
   "key.avaliproject.open_pack_gui": "Open Pack GUI",
+  "key.avaliproject.open_carry_gui": "Open Carry Menu",
   "key.categories.avaliproject": "The Galaxy Comes Alive",
+
+  "screen.avaliproject.carry_selection": "Who to Carry?",
+  "screen.avaliproject.carry_selection.empty": "No one nearby to carry",
+  "screen.avaliproject.carry_consent": "Carry Request",
+  "screen.avaliproject.carry_consent.accept": "Accept",
+  "screen.avaliproject.carry_consent.decline": "Decline",
+  "message.avaliproject.carry.request_sent": "Carry request sent...",
+  "message.avaliproject.carry.declined": "They declined to be carried.",
+  "message.avaliproject.carry.no_longer_valid": "Can no longer be carried.",
 
   "message.avaliproject.aerogel_tool.no_battery": "No Aerogel Battery installed",
   "message.avaliproject.aerogel_tool.battery_installed": "Aerogel Battery installed",

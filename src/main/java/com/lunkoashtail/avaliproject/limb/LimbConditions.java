@@ -63,6 +63,11 @@ public class LimbConditions {
         dislocated[limb.ordinal()] = value;
     }
 
+    public void clear() {
+        Arrays.fill(shrapnelValues, 0);
+        Arrays.fill(dislocated, false);
+    }
+
 
     public static final Codec<LimbConditions> CODEC = RecordCodecBuilder.create(instance ->
         instance.group(

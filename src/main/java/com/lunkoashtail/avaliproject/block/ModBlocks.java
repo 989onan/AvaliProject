@@ -208,7 +208,7 @@ public class ModBlocks {
 
 
 
-// Crops
+
     public static final DeferredBlock<Block> NAKATI_CROP_BLOCK = BLOCKS.register("nakati_crop_block",
             () -> new NakatiCropBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT)));
     public static final DeferredBlock<Block> GROOU_CROP_BLOCK = BLOCKS.register("groou_crop_block",

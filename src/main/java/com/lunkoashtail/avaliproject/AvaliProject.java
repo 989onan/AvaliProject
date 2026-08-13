@@ -5,6 +5,12 @@ import com.lunkoashtail.avaliproject.component.ModDataComponents;
 import com.lunkoashtail.avaliproject.diplomacy.DiplomacyData;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
 import com.lunkoashtail.avaliproject.network.AvaliOpenEquipPayload;
+import com.lunkoashtail.avaliproject.network.CarryCandidatesSyncPayload;
+import com.lunkoashtail.avaliproject.network.CarryConsentAcceptPayload;
+import com.lunkoashtail.avaliproject.network.CarryConsentDeclinePayload;
+import com.lunkoashtail.avaliproject.network.CarryConsentRequestPayload;
+import com.lunkoashtail.avaliproject.network.CarryOpenPayload;
+import com.lunkoashtail.avaliproject.network.CarryRequestPayload;
 import com.lunkoashtail.avaliproject.network.AvaliRecruitPayload;
 import com.lunkoashtail.avaliproject.network.AvaliRecruitProposalAcceptPayload;
 import com.lunkoashtail.avaliproject.network.AvaliRecruitProposalDeclinePayload;
@@ -32,6 +38,7 @@ import com.lunkoashtail.avaliproject.network.RemoveShrapnelPayload;
 import com.lunkoashtail.avaliproject.network.ResetDislocationPayload;
 import com.lunkoashtail.avaliproject.network.SpeciesSyncPayload;
 import com.lunkoashtail.avaliproject.network.SyringeEffectPayload;
+import com.lunkoashtail.avaliproject.network.TargetLimbDataSyncPayload;
 import com.lunkoashtail.avaliproject.network.SyringeLoadPayload;
 import com.lunkoashtail.avaliproject.network.DrawBloodPayload;
 import com.lunkoashtail.avaliproject.network.ExpieHugPayload;
@@ -87,7 +94,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-// The value here should match an entry in the META-INF/neoforge.mods.toml file
+
 @Mod(AvaliProject.MOD_ID)
 public class AvaliProject {
     public static final String MOD_ID = "avaliproject";
@@ -143,7 +150,7 @@ public class AvaliProject {
                 ExpieOpenTradePayload.STREAM_CODEC,
                 ExpieOpenTradePayload::handle);
 
-        // Limb system packets
+        
         registrar.playToClient(
                 LimbDataSyncPayload.TYPE,
                 LimbDataSyncPayload.STREAM_CODEC,
@@ -156,6 +163,10 @@ public class AvaliProject {
                 DressingDepletedPayload.TYPE,
                 DressingDepletedPayload.STREAM_CODEC,
                 DressingDepletedPayload::handle);
+        registrar.playToClient(
+                TargetLimbDataSyncPayload.TYPE,
+                TargetLimbDataSyncPayload.STREAM_CODEC,
+                TargetLimbDataSyncPayload::handle);
 
         registrar.playToClient(
                 LimbConditionsSyncPayload.TYPE,
@@ -179,7 +190,7 @@ public class AvaliProject {
                 PainSyncPayload.STREAM_CODEC,
                 PainSyncPayload::handle);
 
-        // Species system packets
+        
         registrar.playToClient(
                 SpeciesSyncPayload.TYPE,
                 SpeciesSyncPayload.STREAM_CODEC,
@@ -251,6 +262,31 @@ public class AvaliProject {
                 AvaliOpenAugmentPayload.TYPE,
                 AvaliOpenAugmentPayload.STREAM_CODEC,
                 AvaliOpenAugmentPayload::handle);
+
+        registrar.playToServer(
+                CarryOpenPayload.TYPE,
+                CarryOpenPayload.STREAM_CODEC,
+                CarryOpenPayload::handle);
+        registrar.playToClient(
+                CarryCandidatesSyncPayload.TYPE,
+                CarryCandidatesSyncPayload.STREAM_CODEC,
+                CarryCandidatesSyncPayload::handle);
+        registrar.playToServer(
+                CarryRequestPayload.TYPE,
+                CarryRequestPayload.STREAM_CODEC,
+                CarryRequestPayload::handle);
+        registrar.playToClient(
+                CarryConsentRequestPayload.TYPE,
+                CarryConsentRequestPayload.STREAM_CODEC,
+                CarryConsentRequestPayload::handle);
+        registrar.playToServer(
+                CarryConsentAcceptPayload.TYPE,
+                CarryConsentAcceptPayload.STREAM_CODEC,
+                CarryConsentAcceptPayload::handle);
+        registrar.playToServer(
+                CarryConsentDeclinePayload.TYPE,
+                CarryConsentDeclinePayload.STREAM_CODEC,
+                CarryConsentDeclinePayload::handle);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -457,7 +493,7 @@ public class AvaliProject {
             event.accept(ModItems.SERGAL_SWORD);
             event.accept(ModItems.SERGAL_GREATSWORD);
             event.accept(ModItems.SERGAL_LANCE);
-//            event.accept(ModItems.SERGAL_SLINGSHOT);
+
             event.accept(ModItems.SERGAL_MACE);
             event.accept(ModItems.AVALI_SPEAR);
         }

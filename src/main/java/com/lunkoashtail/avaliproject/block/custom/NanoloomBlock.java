@@ -30,7 +30,7 @@ public class NanoloomBlock extends BaseEntityBlock {
     protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
-    /* BLOCK ENTITY */
+     
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {

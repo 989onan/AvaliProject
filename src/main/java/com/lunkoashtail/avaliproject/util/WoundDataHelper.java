@@ -3,14 +3,14 @@ package com.lunkoashtail.avaliproject.util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 
-/**
- * Per-limb bleed tracking stored in player persistent NBT.
- * Data survives death (via persistent data) but is purely client-local until
- * a proper server sync packet is added. For a full implementation, send a
- * custom packet to the server when bleed changes.
- *
- * Limb keys used: "left_arm", "right_arm", "left_leg", "right_leg", "torso", "head"
- */
+
+
+
+
+
+
+
+
 public class WoundDataHelper {
 
     private static final String ROOT_TAG = "avaliproject_wounds";
@@ -34,7 +34,7 @@ public class WoundDataHelper {
         setBleed(player, limb, getBleed(player, limb) - amount);
     }
 
-    /** Convenience for testing: give the left arm a starting bleed value. */
+     
     public static void debugSetLeftArmBleed(Player player, int value) {
         setBleed(player, "left_arm", value);
     }

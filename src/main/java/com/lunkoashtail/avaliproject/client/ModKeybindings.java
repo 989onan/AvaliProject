@@ -8,16 +8,16 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
-/**
- * Declares and registers mod keybindings.
- *
- * OPEN_LIMB_WHEEL defaults to H (re-assignable in Options → Controls).
- * Key consumption (opening the screen) happens in ClientEventHandler.
- */
+
+
+
+
+
+
 @EventBusSubscriber(modid = AvaliProject.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ModKeybindings {
 
-    /** Opens the standalone limb-status / selection wheel. */
+     
     public static final KeyMapping OPEN_LIMB_WHEEL = new KeyMapping(
             "key.avaliproject.open_limb_wheel",
             InputConstants.Type.KEYSYM,
@@ -32,9 +32,17 @@ public class ModKeybindings {
             "key.categories.avaliproject"
     );
 
+    public static final KeyMapping OPEN_CARRY_GUI = new KeyMapping(
+            "key.avaliproject.open_carry_gui",
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_J,
+            "key.categories.avaliproject"
+    );
+
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(OPEN_LIMB_WHEEL);
         event.register(OPEN_PACK_GUI);
+        event.register(OPEN_CARRY_GUI);
     }
 }

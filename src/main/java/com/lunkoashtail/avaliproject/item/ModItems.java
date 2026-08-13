@@ -349,17 +349,17 @@ public class ModItems {
     public static final DeferredItem<Item> VILOUS_CERAMIC_INGOT = ITEMS.register("vilous_ceramic_ingot",
             () -> new Item(new Item.Properties()));
 
-// Tools
 
-//    public static final DeferredItem<SwordItem> AVALI_SWORD = ITEMS.register("avali_sword",
-//            () -> new SwordItem(ModToolTiers.AEROGEL, new Item.Properties()
-//                    .attributes(SwordItem.createAttributes(ModToolTiers.AEROGEL, 5, -2.4f))){
-//                @Override
-//                public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-//                    tooltipComponents.add(Component.translatable("tooltip.avaliproject.avali_sword.tooltip"));
-//                    super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-//                }
-//            });
+
+
+
+
+
+
+
+
+
+
 
     public static final DeferredItem<Item> AVALI_SWORD = ITEMS.register("avali_sword", AvaliswordItem::new);
 
@@ -491,14 +491,14 @@ public class ModItems {
     public static final DeferredItem<SwordItem> SERGAL_MACE = ITEMS.register("sergal_mace",
             () -> new SwordItem(ModToolTiers.CERAMIC, new Item.Properties()
                     .attributes(AxeItem.createAttributes(ModToolTiers.CERAMIC, 9.0F, -3.2f))));
-//    public static final DeferredItem<Item> SERGAL_SLINGSHOT = ITEMS.register("sergal_slingshot",
-//            () -> new BowItem(new Item.Properties().durability(996)){
-//                @Override
-//                public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-//                    tooltipComponents.add(Component.translatable("tooltip.avaliproject.sergal_slingshot.tooltip"));
-//                    super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-//                }
-//            });
+
+
+
+
+
+
+
+
 
     public static final DeferredItem<SwordItem> SERGAL_SWORD = ITEMS.register("sergal_sword",
             () -> new SwordItem(ModToolTiers.CERAMIC, new Item.Properties()
@@ -511,11 +511,11 @@ public class ModItems {
             properties -> new Item(properties.jukeboxPlayable(ModSounds.CYBERNETIC_HEART_KEY).stacksTo(1)));
 
 
- //   public static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(AvaliProject.MOD_ID);
- //   public static final DeferredItem<Item> AVALI_SWORD = REGISTRY.register("avali_sword", AvaliswordItem::new);
+ 
+ 
 
 
-    // Plushies
+    
     public static final DeferredItem<Item> AKITU_PLUSHIE = ITEMS.register("akitu_plushie", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> AMS_PLUSHIE = ITEMS.register("ams_plushie", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> BOT_PLUSHIE = ITEMS.register("bot_plushie", () -> new Item(new Item.Properties()));
@@ -535,7 +535,7 @@ public class ModItems {
     public static final DeferredItem<Item> WEH_PLUSHIE = ITEMS.register("weh_plushie", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> WICK_PLUSHIE = ITEMS.register("wick_plushie", () -> new Item(new Item.Properties()));
 
-    // Medical & survival items
+    
     public static final DeferredItem<Item> ALCOHOL = ITEMS.register("alcohol", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> ANTI_DEPRESSANTS = ITEMS.register("anti_depressants", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> ANTIBIOTICS = ITEMS.register("antibiotics", () -> new Item(new Item.Properties()));

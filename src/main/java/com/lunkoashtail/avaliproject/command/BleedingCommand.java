@@ -17,28 +17,28 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Arrays;
 
-/**
- * /avalibleed — operator command for inspecting and modifying per-limb bleed values.
- *
- * Sub-commands:
- *   add    <player> <limb> <tier>    Set a limb's bleed to the chosen tier's midpoint.
- *   remove <player> <limb>           Clear bleeding on one limb (set to 0).
- *   set    <player> <limb> <0–100>   Set an exact raw bleed value.
- *   clear  <player>                  Clear all limbs at once.
- *   status <player>                  Print every limb's current tier and value.
- *
- * Requires operator permission level 2.
- *
- * Limb keys:   head | left_arm | right_arm | back | left_leg | right_leg
- * Tier names:  minor_bleeding | bleeding | heavy_bleeding | catastrophic_bleeding
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public class BleedingCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> build() {
         return Commands.literal("avalibleed")
                 .requires(src -> src.hasPermission(2))
 
-                // ── add <player> <limb> <tier> ────────────────────────────────────────
+                
                 .then(Commands.literal("add")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .then(Commands.argument("limb", StringArgumentType.word())
@@ -54,7 +54,7 @@ public class BleedingCommand {
                                                             StringArgumentType.getString(ctx, "tier"));
                                                     if (tier == null) return 0;
 
-                                                    // Use the tier midpoint so the limb lands squarely inside that tier
+                                                    
                                                     int value = (tier.minBleed + tier.maxBleed) / 2;
                                                     applyAndSync(player, limb, value);
 
@@ -69,7 +69,7 @@ public class BleedingCommand {
                         )
                 )
 
-                // ── remove <player> <limb> ────────────────────────────────────────────
+                
                 .then(Commands.literal("remove")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .then(Commands.argument("limb", StringArgumentType.word())
@@ -91,7 +91,7 @@ public class BleedingCommand {
                         )
                 )
 
-                // ── set <player> <limb> <value 0-100> ────────────────────────────────
+                
                 .then(Commands.literal("set")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .then(Commands.argument("limb", StringArgumentType.word())
@@ -121,7 +121,7 @@ public class BleedingCommand {
                         )
                 )
 
-                // ── clear <player> ────────────────────────────────────────────────────
+                
                 .then(Commands.literal("clear")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(ctx -> {
@@ -137,7 +137,7 @@ public class BleedingCommand {
                         )
                 )
 
-                // ── status <player> ───────────────────────────────────────────────────
+                
                 .then(Commands.literal("status")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(ctx -> {
@@ -163,9 +163,9 @@ public class BleedingCommand {
                 );
     }
 
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
+    
+    
+    
 
     private static void applyAndSync(ServerPlayer player, Limb limb, int value) {
         LimbData data = player.getData(ModAttachments.LIMB_DATA);
