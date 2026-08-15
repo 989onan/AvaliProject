@@ -12,9 +12,9 @@
   "position": {
     "type": "fixed",
     "position": {
-      "x": 3.0E7,
-      "y": 3.0E7,
-      "z": 3.0E7
+      "x": 0,
+      "y": 0,
+      "z": 5.8406087e10
     }
   },
   "priority": 0,
