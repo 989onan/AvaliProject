@@ -22,6 +22,8 @@ public class PainData {
 
     public void add(float amount) { set(this.pain + amount); }
 
+    public void clear() { set(0f); }
+
     private static float clamp(float value) {
         return Math.max(0f, Math.min(MAX_PAIN, value));
     }

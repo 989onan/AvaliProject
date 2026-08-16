@@ -176,7 +176,7 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.SERGAL_SWORD);
                         output.accept(ModItems.SERGAL_GREATSWORD);
                         output.accept(ModItems.SERGAL_MACE);
-//                        output.accept(ModItems.SERGAL_SLINGSHOT);
+
                         output.accept(ModItems.MERP_MUSIC_DISC);
                         output.accept(ModItems.SERGAL_SPAWN_EGG);
                         output.accept(ModItems.TALXLEECH_SPAWN_EGG);

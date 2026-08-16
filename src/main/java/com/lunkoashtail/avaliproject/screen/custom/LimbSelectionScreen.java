@@ -1,6 +1,7 @@
 package com.lunkoashtail.avaliproject.screen.custom;
 
 import com.lunkoashtail.avaliproject.AvaliProject;
+import com.lunkoashtail.avaliproject.client.TargetDataCache;
 import com.lunkoashtail.avaliproject.limb.BleedingTier;
 import com.lunkoashtail.avaliproject.limb.Limb;
 import com.lunkoashtail.avaliproject.limb.LimbConditions;
@@ -12,66 +13,67 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-/**
- * Wheel-style limb selection screen.
- *
- * ── Layout ─────────────────────────────────────────────────────────────────
- *   Six limb buttons are placed at 60° intervals around WHEEL_RADIUS, starting
- *   at the top (12 o'clock) and going clockwise:
- *
- *     HEAD → RIGHT_ARM → RIGHT_LEG → BACK → LEFT_LEG → LEFT_ARM
- *
- *   The local player entity is rendered in the centre so the wheel reads as a
- *   body diagram.
- *
- * ── Effect icons ────────────────────────────────────────────────────────────
- *   Each button shows a 16×16 bleed-tier icon in its top-right corner when the
- *   limb has any bleeding.  Icons are loaded from:
- *
- *     assets/avaliproject/textures/gui/effect/
- *       minor_bleeding_effect.png          (bleed  1–25)
- *       bleeding_effect.png                (bleed 26–50)
- *       heavy_bleeding_effect.png          (bleed 51–75)
- *       catastrophic_bleeding_effect.png   (bleed 76–100)
- *
- *   Place 16×16 PNG files at those paths — the game renders pink/white squares
- *   if a file is missing, so add the PNGs before shipping.
- *
- * ── Shrapnel indicator + inspect-mode shortcut ──────────────────────────────
- *   A limb with any embedded shrapnel shows a small badge (top-left corner) using
- *   expie_shrapnel.png, and its combined status line calls it out alongside any
- *   bleeding tier (both can be true at once - shrapnel is NOT exclusive with
- *   bleeding/other conditions, and using an item like a syringe or dressing on a
- *   shrapneled limb still works completely normally; nothing here blocks that).
- *   The only special behavior is in INSPECT mode (onLimbSelected == null, opened by
- *   the H keybinding with no item in hand): clicking a shrapneled limb there opens
- *   ShrapnelMinigameScreen directly, since no item currently triggers it - this is
- *   just a convenient stand-in entry point, not a restriction.
- *
- * ── Two operating modes ────────────────────────────────────────────────────
- *   Item mode   (onLimbSelected ≠ null): clicking a limb always fires the callback
- *               (which opens that item's own minigame) without calling onClose(),
- *               regardless of whether the limb also has shrapnel.
- *   Inspect mode (onLimbSelected == null): opened by the H keybinding; clicking a
- *               limb opens ShrapnelMinigameScreen if it has shrapnel, otherwise
- *               just closes the wheel.
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public class LimbSelectionScreen extends Screen {
 
-    // -------------------------------------------------------------------------
-    // Geometry
-    // -------------------------------------------------------------------------
+    
+    
+    
 
-    /** Radius (px) of the circle on which button centres sit. */
+     
     private static final int WHEEL_RADIUS = 90;
-    /** Half-size of a button square; clickable area = 2*BTN_R × 2*BTN_R. */
+     
     private static final int BTN_R        = 22;
-    /** Size of the bleed-tier icon rendered inside each button. */
+     
     private static final int ICON_SIZE    = 16;
 
     private static final ResourceLocation SHRAPNEL_ICON =
@@ -79,9 +81,9 @@ public class LimbSelectionScreen extends Screen {
     private static final int SHRAPNEL_ICON_TEX_W = 27, SHRAPNEL_ICON_TEX_H = 138;
     private static final int SHRAPNEL_BADGE_W = 8, SHRAPNEL_BADGE_H = 14;
 
-    // -------------------------------------------------------------------------
-    // Colours
-    // -------------------------------------------------------------------------
+    
+    
+    
     private static final int COL_OVERLAY      = 0xBB060612;
     private static final int COL_BTN_IDLE     = 0xFF1A1A2E;
     private static final int COL_BTN_HOVER    = 0xFF22334C;
@@ -94,45 +96,76 @@ public class LimbSelectionScreen extends Screen {
     private static final int COL_HEALTHY      = 0xFF44BB66;
     private static final int COL_BORDER_SHRAPNEL = 0xFFFFAA33;
 
-    // -------------------------------------------------------------------------
-    // Wheel order — clockwise from 12 o'clock
-    // -------------------------------------------------------------------------
+    
+    
+    
     private static final Limb[] WHEEL_ORDER = {
-            Limb.HEAD,      // 270° (top)
-            Limb.RIGHT_ARM, // 330° (upper-right)
-            Limb.RIGHT_LEG, //  30° (lower-right)
-            Limb.BACK,      //  90° (bottom)
-            Limb.LEFT_LEG,  // 150° (lower-left)
-            Limb.LEFT_ARM   // 210° (upper-left)
+            Limb.HEAD,      
+            Limb.RIGHT_ARM, 
+            Limb.RIGHT_LEG, 
+            Limb.BACK,      
+            Limb.LEFT_LEG,  
+            Limb.LEFT_ARM   
     };
 
-    // -------------------------------------------------------------------------
-    // State
-    // -------------------------------------------------------------------------
+    
+    
+    
 
     @Nullable private final Consumer<Limb> onLimbSelected;
     @Nullable private Limb hoveredLimb = null;
 
-    /** Precomputed button centres (filled in init()). */
+    private final int targetEntityId;
+
+     
     private final int[] btnX = new int[6];
     private final int[] btnY = new int[6];
     private int centerX, centerY;
 
-    // -------------------------------------------------------------------------
-    // Constructor
-    // -------------------------------------------------------------------------
+    
+    
+    
 
-    /**
-     * @param onLimbSelected callback fired with the chosen Limb, or null for inspect mode
-     */
+    
+
+
     public LimbSelectionScreen(@Nullable Consumer<Limb> onLimbSelected) {
-        super(Component.translatable("screen.avaliproject.limb_selection"));
-        this.onLimbSelected = onLimbSelected;
+        this(onLimbSelected, localPlayerId());
     }
 
-    // -------------------------------------------------------------------------
-    // Init
-    // -------------------------------------------------------------------------
+    public LimbSelectionScreen(@Nullable Consumer<Limb> onLimbSelected, int targetEntityId) {
+        super(Component.translatable("screen.avaliproject.limb_selection"));
+        this.onLimbSelected = onLimbSelected;
+        this.targetEntityId = targetEntityId;
+    }
+
+    private static int localPlayerId() {
+        Player player = Minecraft.getInstance().player;
+        return player != null ? player.getId() : -1;
+    }
+
+    private boolean isSelf() {
+        Player local = Minecraft.getInstance().player;
+        return local != null && local.getId() == targetEntityId;
+    }
+
+    private LimbData resolveLimbData() {
+        Player local = Minecraft.getInstance().player;
+        if (isSelf()) return local != null ? local.getData(ModAttachments.LIMB_DATA) : new LimbData();
+        LimbData data = new LimbData();
+        for (Limb limb : Limb.values()) data.setBleed(limb, TargetDataCache.getBleed(targetEntityId, limb));
+        return data;
+    }
+
+    private LimbConditions resolveLimbConditions() {
+        Player local = Minecraft.getInstance().player;
+        if (isSelf() && local != null) return local.getData(ModAttachments.LIMB_CONDITIONS);
+        return new LimbConditions();
+    }
+
+    
+    
+    
 
     @Override
     protected void init() {
@@ -141,19 +174,19 @@ public class LimbSelectionScreen extends Screen {
         centerY = height / 2;
 
         for (int i = 0; i < WHEEL_ORDER.length; i++) {
-            double angleRad = Math.toRadians(-90.0 + i * 60.0); // start top, step CW
+            double angleRad = Math.toRadians(-90.0 + i * 60.0); 
             btnX[i] = centerX + (int) (Math.cos(angleRad) * WHEEL_RADIUS);
             btnY[i] = centerY + (int) (Math.sin(angleRad) * WHEEL_RADIUS);
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Rendering
-    // -------------------------------------------------------------------------
+    
+    
+    
 
     @Override
     public void renderBackground(GuiGraphics gfx, int mx, int my, float partial) {
-        // Suppress MC's blur post-effect — we draw our own overlay in render().
+        
     }
 
     @Override
@@ -171,7 +204,7 @@ public class LimbSelectionScreen extends Screen {
         super.render(gfx, mx, my, partial);
     }
 
-    /** Faint spokes/rim connecting the six button positions. */
+     
     private void drawWheelSpokes(GuiGraphics gfx) {
         for (int i = 0; i < 6; i++) {
             drawLine(gfx, btnX[i], btnY[i], btnX[(i + 1) % 6], btnY[(i + 1) % 6], 0x33334466);
@@ -179,26 +212,31 @@ public class LimbSelectionScreen extends Screen {
         }
     }
 
-    /**
-     * Renders the local player entity centred in the wheel.
-     * Scale 22 keeps it small enough to leave room for the buttons.
-     */
+    
+
+
+
     private void drawPlayerModel(GuiGraphics gfx, int mx, int my) {
-        Player player = Minecraft.getInstance().player;
-        if (player == null) return;
+        Player local = Minecraft.getInstance().player;
+        if (local == null) return;
+
+        Player renderTarget = local;
+        if (!isSelf() && Minecraft.getInstance().level != null) {
+            Entity entity = Minecraft.getInstance().level.getEntity(targetEntityId);
+            if (entity instanceof Player targetPlayer) renderTarget = targetPlayer;
+        }
 
         InventoryScreen.renderEntityInInventoryFollowsMouse(
                 gfx,
                 centerX - 28, centerY - 46,
                 centerX + 28, centerY + 46,
-                22, 0.0f, (float) mx, (float) my, player
+                22, 0.0f, (float) mx, (float) my, renderTarget
         );
     }
 
     private void drawLimbButtons(GuiGraphics gfx) {
-        Player player = Minecraft.getInstance().player;
-        LimbData data = (player != null) ? player.getData(ModAttachments.LIMB_DATA) : new LimbData();
-        LimbConditions conditions = (player != null) ? player.getData(ModAttachments.LIMB_CONDITIONS) : new LimbConditions();
+        LimbData data = resolveLimbData();
+        LimbConditions conditions = resolveLimbConditions();
 
         for (int i = 0; i < WHEEL_ORDER.length; i++) {
             Limb limb  = WHEEL_ORDER[i];
@@ -208,21 +246,21 @@ public class LimbSelectionScreen extends Screen {
         }
     }
 
-    /**
-     * Draws a single limb button centred at (cx, cy).
-     *
-     * Structure (top → bottom inside the 44×44 square):
-     *   ┌──────────────────────┐
-     *   │[!]  [tier icon][name]│  ← shrapnel badge top-left, tier icon top-right, name centred
-     *   │       name line 2    │
-     *   │  ████████░░░░░░░░░   │  ← bleed bar at bottom
-     *   └──────────────────────┘
-     *
-     * The tier icon is only drawn when bleed > 0; the shrapnel badge only when shrapnel > 0.
-     */
+    
+
+
+
+
+
+
+
+
+
+
+
     private void drawButton(GuiGraphics gfx, int cx, int cy, Limb limb, int bleed, boolean hasShrapnel, boolean hovered) {
         int x = cx - BTN_R, y = cy - BTN_R;
-        int w = BTN_R * 2,  h = BTN_R * 2;   // 44 × 44
+        int w = BTN_R * 2,  h = BTN_R * 2;   
 
         gfx.fill(x, y, x + w, y + h, hovered ? COL_BTN_HOVER : COL_BTN_IDLE);
         int bc = hasShrapnel ? COL_BORDER_SHRAPNEL : (hovered ? COL_BORDER_HOVER : COL_BORDER_IDLE);
@@ -231,12 +269,12 @@ public class LimbSelectionScreen extends Screen {
         gfx.fill(x,         y,         x + 1, y + h,     bc);
         gfx.fill(x + w - 1, y,         x + w, y + h,     bc);
 
-        // ── Bleeding tier icon (top-right corner) ──────────────────────────
-        // Rendered BEFORE the text so the text can overlap if the button is tiny.
+        
+        
         BleedingTier tier = BleedingTier.fromBleedValue(bleed);
         if (tier != null) {
-            int iconX = x + w - ICON_SIZE - 2; // 2 px from right edge
-            int iconY = y + 2;                  // 2 px from top edge
+            int iconX = x + w - ICON_SIZE - 2; 
+            int iconY = y + 2;                  
             drawTierIcon(gfx, tier, iconX, iconY);
         }
 
@@ -245,10 +283,10 @@ public class LimbSelectionScreen extends Screen {
                     0f, 0f, SHRAPNEL_ICON_TEX_W, SHRAPNEL_ICON_TEX_H, SHRAPNEL_ICON_TEX_W, SHRAPNEL_ICON_TEX_H);
         }
 
-        // ── Limb name (centred; split on first space for two-word names) ────
+        
         int tc = hovered ? COL_TEXT_HOVER : COL_TEXT_IDLE;
         String[] parts = limb.getDisplayName().getString().split(" ", 2);
-        // If there's a tier icon occupying the top-right, shift text left slightly
+        
         int textCX = (tier != null) ? cx - 4 : cx;
         int textY  = (parts.length == 2) ? cy - 8 : cy - 4;
         for (String part : parts) {
@@ -256,10 +294,10 @@ public class LimbSelectionScreen extends Screen {
             textY += font.lineHeight + 1;
         }
 
-        // ── Bleed bar (bottom of button) ──────────────────────────────────
+        
         int barW = w - 8, barH = 4;
         int barX = x + 4, barY = y + h - barH - 4;
-        gfx.fill(barX, barY, barX + barW, barY + barH, 0xFF111111); // track
+        gfx.fill(barX, barY, barX + barW, barY + barH, 0xFF111111); 
         if (bleed > 0 && tier != null) {
             int fillW = Math.max(2, (int) ((float) bleed / LimbData.MAX_BLEED * barW));
             gfx.fill(barX, barY, barX + fillW, barY + barH, tier.getColor());
@@ -267,7 +305,7 @@ public class LimbSelectionScreen extends Screen {
     }
 
     private void drawTierIcon(GuiGraphics gfx, BleedingTier tier, int iconX, int iconY) {
-        // 7-arg blit: assumes 256×256 texture, reads uOffset/vOffset in pixel coords.
+        
         gfx.blit(tier.icon, iconX, iconY, 0, 0, ICON_SIZE, ICON_SIZE);
     }
 
@@ -279,16 +317,15 @@ public class LimbSelectionScreen extends Screen {
         gfx.drawCenteredString(font, "[Esc / Right-click to close]", width / 2, height - 14, COL_HINT);
     }
 
-    /**
-     * Tooltip bar shown at the bottom of the screen while hovering a limb button.
-     * Shows the limb name, bleeding tier name (or "Healthy"), and bleed percentage.
-     */
+    
+
+
+
     private void drawTooltip(GuiGraphics gfx) {
         if (hoveredLimb == null) return;
 
-        Player player = Minecraft.getInstance().player;
-        LimbData data = (player != null) ? player.getData(ModAttachments.LIMB_DATA) : new LimbData();
-        LimbConditions conditions = (player != null) ? player.getData(ModAttachments.LIMB_CONDITIONS) : new LimbConditions();
+        LimbData data = resolveLimbData();
+        LimbConditions conditions = resolveLimbConditions();
         int bleed = data.getBleed(hoveredLimb);
         boolean hasShrapnel = conditions.getShrapnel(hoveredLimb) > 0;
 
@@ -314,9 +351,9 @@ public class LimbSelectionScreen extends Screen {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Input
-    // -------------------------------------------------------------------------
+    
+    
+    
 
     private void updateHoveredLimb(int mx, int my) {
         hoveredLimb = null;
@@ -330,14 +367,13 @@ public class LimbSelectionScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        if (button == 1) { onClose(); return true; } // right-click → cancel
+        if (button == 1) { onClose(); return true; } 
 
         if (button == 0 && hoveredLimb != null) {
             if (onLimbSelected != null) {
                 onLimbSelected.accept(hoveredLimb);
             } else {
-                Player player = Minecraft.getInstance().player;
-                LimbConditions conditions = (player != null) ? player.getData(ModAttachments.LIMB_CONDITIONS) : new LimbConditions();
+                LimbConditions conditions = resolveLimbConditions();
                 int shrapnel = conditions.getShrapnel(hoveredLimb);
                 if (shrapnel > 0) {
                     Minecraft.getInstance().setScreen(new ShrapnelMinigameScreen(hoveredLimb, shrapnel));
@@ -352,18 +388,18 @@ public class LimbSelectionScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) { onClose(); return true; } // Escape
+        if (keyCode == 256) { onClose(); return true; } 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean isPauseScreen() { return false; }
 
-    // -------------------------------------------------------------------------
-    // Rendering utility
-    // -------------------------------------------------------------------------
+    
+    
+    
 
-    /** Bresenham-style 1 px line using gfx.fill(). */
+     
     private static void drawLine(GuiGraphics gfx, int x1, int y1, int x2, int y2, int color) {
         int dx = x2 - x1, dy = y2 - y1;
         int steps = Math.max(Math.abs(dx), Math.abs(dy));

@@ -41,7 +41,7 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        //Items
+        
         basicItem(ModItems.AERO_CRYSTAL.get());
         basicItem(ModItems.THERMAL_CRYSTAL.get());
         basicItem(ModItems.SYNC_CRYSTAL.get());
@@ -104,7 +104,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.DRESSING.get());
         basicItem(ModItems.RIPPED_DRESSING.get());
 
-        // Plushies
+        
         basicItem(ModItems.AKITU_PLUSHIE.get());
         basicItem(ModItems.AMS_PLUSHIE.get());
         basicItem(ModItems.BOT_PLUSHIE.get());
@@ -124,7 +124,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.WEH_PLUSHIE.get());
         basicItem(ModItems.WICK_PLUSHIE.get());
 
-        // Medical & survival items
+        
         basicItem(ModItems.ALCOHOL.get());
         basicItem(ModItems.ANTI_DEPRESSANTS.get());
         basicItem(ModItems.ANTIBIOTICS.get());
@@ -175,27 +175,27 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.NUMBERRY.get());
         basicItem(ModItems.GLOWPLANT_FRUIT.get());
 
-        //Icons
+        
         basicItem(ModItems.GALAXY_ICON.get());
         basicItem(ModItems.AVALI_ICON.get());
         basicItem(ModItems.PROTOGEN_ICON.get());
         basicItem(ModItems.SERGAL_ICON.get());
 
-        //Tools
-//        basicItem(ModItems.AVALI_AXE.get());
+        
+
         basicItem(ModItems.AVALI_PICKAXE.get());
         basicItem(ModItems.AVALI_HOE.get());
-//        basicItem(ModItems.AVALI_SWORD.get());
+
         basicItem(ModItems.PROTOGEN_SWORD.get());
         basicItem(ModItems.PROTOGEN_AXE.get());
-//        basicItem(ModItems.AVALI_SPEAR.get());
+
         basicItem(ModItems.SERGAL_GREATSWORD.get());
         basicItem(ModItems.SERGAL_LANCE.get());
         basicItem(ModItems.SERGAL_SWORD.get());
-//        basicItem(ModItems.SERGAL_SLINGSHOT.get());
+
         basicItem(ModItems.SERGAL_MACE.get());
 
-        //Foods
+        
         basicItem(ModItems.AVALI_BBQ.get());
         basicItem(ModItems.AVALON_TACO.get());
         basicItem(ModItems.AVALI_MUFFIN.get());
@@ -248,7 +248,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     private void trimmedArmorItem(DeferredItem<ArmorItem> itemDeferredItem) {
-        final String MOD_ID = AvaliProject.MOD_ID; // Change this to your mod id
+        final String MOD_ID = AvaliProject.MOD_ID; 
 
         if(itemDeferredItem.get() instanceof ArmorItem armorItem) {
             trimMaterials.forEach((trimMaterial, value) -> {
@@ -266,20 +266,20 @@ public class ModItemModelProvider extends ItemModelProvider {
                 String trimPath = "trims/items/" + armorType + "_trim_" + trimMaterial.location().getPath();
                 String currentTrimName = armorItemPath + "_" + trimMaterial.location().getPath() + "_trim";
                 ResourceLocation armorItemResLoc = ResourceLocation.parse(armorItemPath);
-                ResourceLocation trimResLoc = ResourceLocation.parse(trimPath); // minecraft namespace
+                ResourceLocation trimResLoc = ResourceLocation.parse(trimPath); 
                 ResourceLocation trimNameResLoc = ResourceLocation.parse(currentTrimName);
 
-                // This is used for making the ExistingFileHelper acknowledge that this texture exist, so this will
-                // avoid an IllegalArgumentException
+                
+                
                 existingFileHelper.trackGenerated(trimResLoc, PackType.CLIENT_RESOURCES, ".png", "textures");
 
-                // Trimmed armorItem files
+                
                 getBuilder(currentTrimName)
                         .parent(new ModelFile.UncheckedModelFile("item/generated"))
                         .texture("layer0", armorItemResLoc.getNamespace() + ":item/" + armorItemResLoc.getPath())
                         .texture("layer1", trimResLoc);
 
-                // Non-trimmed armorItem file (normal variant)
+                
                 this.withExistingParent(itemDeferredItem.getId().getPath(),
                                 mcLoc("item/generated"))
                         .override()

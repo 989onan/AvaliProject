@@ -4,11 +4,15 @@ import com.lunkoashtail.avaliproject.component.SyringeContents;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
 import com.lunkoashtail.avaliproject.network.AvaliRecruitProposalPayload;
 import com.lunkoashtail.avaliproject.network.AvaliTrustSyncPayload;
+import com.lunkoashtail.avaliproject.network.CarryCandidatesSyncPayload;
+import com.lunkoashtail.avaliproject.network.CarryConsentRequestPayload;
 import com.lunkoashtail.avaliproject.network.DressingDepletedPayload;
 import com.lunkoashtail.avaliproject.network.PackDataSyncPayload;
 import com.lunkoashtail.avaliproject.screen.custom.AvaliInteractionScreen;
 import com.lunkoashtail.avaliproject.screen.custom.AvaliRecruitProposalScreen;
 import com.lunkoashtail.avaliproject.screen.custom.BloodDrawScreen;
+import com.lunkoashtail.avaliproject.screen.custom.CarryConsentScreen;
+import com.lunkoashtail.avaliproject.screen.custom.CarrySelectionScreen;
 import com.lunkoashtail.avaliproject.screen.custom.DressingMinigameScreen;
 import com.lunkoashtail.avaliproject.screen.custom.LimbSelectionScreen;
 import com.lunkoashtail.avaliproject.screen.custom.PackScreen;
@@ -39,6 +43,14 @@ public final class ClientPayloadHandlers {
         PackScreen.onDataSync(payload);
     }
 
+    public static void handleCarryCandidatesSync(CarryCandidatesSyncPayload payload) {
+        Minecraft.getInstance().setScreen(new CarrySelectionScreen(payload.candidates()));
+    }
+
+    public static void handleCarryConsentRequest(CarryConsentRequestPayload payload) {
+        Minecraft.getInstance().setScreen(new CarryConsentScreen(payload.requesterEntityId()));
+    }
+
     public static void handleRecruitProposal(AvaliRecruitProposalPayload payload) {
         Minecraft.getInstance().setScreen(new AvaliRecruitProposalScreen(payload.entityId()));
     }
@@ -52,10 +64,16 @@ public final class ClientPayloadHandlers {
     }
 
     public static void openDressingLimbSelection(Player player, InteractionHand hand) {
+        openDressingLimbSelection(player, hand, player.getId());
+    }
+
+    public static void openDressingLimbSelection(Player player, InteractionHand hand, int targetEntityId) {
         Minecraft.getInstance().setScreen(new LimbSelectionScreen(selectedLimb -> {
-            int bleed = player.getData(ModAttachments.LIMB_DATA).getBleed(selectedLimb);
-            Minecraft.getInstance().setScreen(new DressingMinigameScreen(selectedLimb, bleed, hand));
-        }));
+            int bleed = (targetEntityId == player.getId())
+                    ? player.getData(ModAttachments.LIMB_DATA).getBleed(selectedLimb)
+                    : TargetDataCache.getBleed(targetEntityId, selectedLimb);
+            Minecraft.getInstance().setScreen(new DressingMinigameScreen(selectedLimb, bleed, hand, targetEntityId));
+        }, targetEntityId));
     }
 
     public static void openBloodDrawScreen() {
@@ -67,8 +85,14 @@ public final class ClientPayloadHandlers {
     }
 
     public static void openSyringeLimbSelection(SyringeContents contents, InteractionHand hand) {
+        Player player = Minecraft.getInstance().player;
+        openSyringeLimbSelection(contents, hand, player != null ? player.getId() : -1);
+    }
+
+    public static void openSyringeLimbSelection(SyringeContents contents, InteractionHand hand, int targetEntityId) {
         Minecraft.getInstance().setScreen(new LimbSelectionScreen(selectedLimb ->
                 Minecraft.getInstance().setScreen(
-                        new SyringeMinigameScreen(contents.drugType(), contents.dosage(), selectedLimb, hand))));
+                        new SyringeMinigameScreen(contents.drugType(), contents.dosage(), selectedLimb, hand, targetEntityId)),
+                targetEntityId));
     }
 }

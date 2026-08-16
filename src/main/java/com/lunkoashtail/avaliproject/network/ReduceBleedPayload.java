@@ -5,38 +5,42 @@ import com.lunkoashtail.avaliproject.item.ModItems;
 import com.lunkoashtail.avaliproject.limb.Limb;
 import com.lunkoashtail.avaliproject.limb.LimbData;
 import com.lunkoashtail.avaliproject.limb.ModAttachments;
+import com.lunkoashtail.avaliproject.species.Species;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/**
- * Client → Server: request to reduce bleed on a specific limb.
- *
- * Sent progressively by DressingMinigameScreen as the player circles the wound. Healing and
- * durability spend are deliberately decoupled — one whole dressing (2 * LimbData.MAX_BLEED
- * durability) is calibrated to last a fixed number of clockwise revolutions, while bleed heals
- * at its own (faster) rate per revolution — so bleedAmount and durabilityAmount are not
- * necessarily equal on a given packet.
- *
- * The whole minigame session is bound to the exact stack in {@code mainHand ? main hand : off
- * hand} at the moment the screen was opened — like a pickaxe breaking, a depleted dressing is
- * NOT swapped for another one in the inventory, even if the player is carrying more. The server
- * only ever spends durabilityAmount out of that one stack; if it can't fully pay (durability hit
- * 0, or the stack is gone), bleedAmount is NOT granted for that packet (no healing without
- * material) and a DressingDepletedPayload is sent back so the screen can auto-close.
- *
- * limbOrdinal:      Limb.values()[limbOrdinal] — the target limb.
- * bleedAmount:       how many bleed points this increment is requesting to heal.
- * durabilityAmount:  how many durability points this increment costs.
- * mainHand:          true to spend from the main hand's stack, false for the off hand's.
- */
-public record ReduceBleedPayload(int limbOrdinal, int bleedAmount, int durabilityAmount, boolean mainHand) implements CustomPacketPayload {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public record ReduceBleedPayload(int limbOrdinal, int bleedAmount, int durabilityAmount, boolean mainHand, int targetEntityId) implements CustomPacketPayload {
+
+    private static final double MAX_TREAT_DISTANCE_SQ = 64;
 
     public static final CustomPacketPayload.Type<ReduceBleedPayload> TYPE =
             new CustomPacketPayload.Type<>(
@@ -48,6 +52,7 @@ public record ReduceBleedPayload(int limbOrdinal, int bleedAmount, int durabilit
                     ByteBufCodecs.INT, ReduceBleedPayload::bleedAmount,
                     ByteBufCodecs.INT, ReduceBleedPayload::durabilityAmount,
                     ByteBufCodecs.BOOL, ReduceBleedPayload::mainHand,
+                    ByteBufCodecs.INT, ReduceBleedPayload::targetEntityId,
                     ReduceBleedPayload::new
             );
 
@@ -76,24 +81,34 @@ public record ReduceBleedPayload(int limbOrdinal, int bleedAmount, int durabilit
 
     public static void handle(ReduceBleedPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
+            if (!(context.player() instanceof ServerPlayer wielder)) return;
 
             Limb[] limbs = Limb.values();
             if (payload.limbOrdinal() < 0 || payload.limbOrdinal() >= limbs.length) return;
             Limb limb = limbs[payload.limbOrdinal()];
 
-            ItemStack stack = payload.mainHand() ? serverPlayer.getMainHandItem() : serverPlayer.getOffhandItem();
+            Entity targetEntity = wielder.level().getEntity(payload.targetEntityId());
+            if (!(targetEntity instanceof ServerPlayer targetPlayer)) return;
+            boolean self = targetPlayer == wielder;
+            if (!self && targetPlayer.distanceToSqr(wielder) > MAX_TREAT_DISTANCE_SQ) return;
+            if (!targetPlayer.isAlive()) return;
+            if (targetPlayer.getData(ModAttachments.SPECIES) != Species.EXPIE) return;
+
+            ItemStack stack = payload.mainHand() ? wielder.getMainHandItem() : wielder.getOffhandItem();
             int durabilitySpent = spendDurability(stack, payload.durabilityAmount());
             boolean fullyPaid = durabilitySpent >= payload.durabilityAmount();
 
             if (fullyPaid && payload.bleedAmount() > 0) {
-                LimbData data = serverPlayer.getData(ModAttachments.LIMB_DATA);
+                LimbData data = targetPlayer.getData(ModAttachments.LIMB_DATA);
                 data.reduceBleed(limb, payload.bleedAmount());
-                PacketDistributor.sendToPlayer(serverPlayer, LimbDataSyncPayload.from(data));
+                PacketDistributor.sendToPlayer(targetPlayer, LimbDataSyncPayload.from(data));
+                if (!self) {
+                    PacketDistributor.sendToPlayer(wielder, TargetLimbDataSyncPayload.from(targetPlayer.getId(), data));
+                }
             }
 
             if (!fullyPaid) {
-                PacketDistributor.sendToPlayer(serverPlayer, new DressingDepletedPayload());
+                PacketDistributor.sendToPlayer(wielder, new DressingDepletedPayload());
             }
         });
     }

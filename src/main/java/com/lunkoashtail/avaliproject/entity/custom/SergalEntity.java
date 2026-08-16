@@ -201,7 +201,7 @@ public class SergalEntity extends Monster implements GeoEntity {
         return this.cache;
     }
 
-    /* VARIANT */
+     
 
     private int getTypeVariant() {
         return this.entityData.get(VARIANT);

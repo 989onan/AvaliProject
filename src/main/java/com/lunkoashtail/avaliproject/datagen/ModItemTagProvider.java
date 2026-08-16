@@ -40,12 +40,12 @@ public class ModItemTagProvider extends ItemTagsProvider {
                 .add(ModItems.AVALI_AXE.get());
         tag(ItemTags.HOES)
                 .add(ModItems.AVALI_HOE.get());
-//        tag(ItemTags.BOW_ENCHANTABLE)
-//                .add(ModItems.SERGAL_SLINGSHOT.get());
+
+
         tag(ItemTags.MACE_ENCHANTABLE)
                 .add(ModItems.SERGAL_MACE.get());
-//        tag(ItemTags.ARROWS)
-//                .add(ModItems.VILOUS_CLAY.get());
+
+
 
         tag(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("pamhc", "cheesemild")))
                 .add(ModItems.SERGAL_CHEESE.get());

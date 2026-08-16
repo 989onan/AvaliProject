@@ -16,158 +16,160 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Random;
 
-/**
- * SyringeMinigameScreen — an interactive injection minigame.
- *
- * HOW IT WORKS:
- *
- *  Phase 1 — AIMING:
- *    The player moves their mouse over a procedurally drawn forearm.
- *    A pulsing vein is visible inside the arm; a cross-hair appears near it.
- *    Left-clicking within VEIN_RADIUS pixels of the vein inserts the needle.
- *    Clicking off-target has no effect (and spawns a "ouch" blood particle).
- *
- *  Phase 2 — INSERTED:
- *    The needle tip is now fixed in the skin. Hold RIGHT mouse button and
- *    move the cursor up/down to adjust how much of the loaded dose gets
- *    pushed in — down increases it, up decreases it, clamped to [0, 100]%.
- *    Releasing the right mouse button CONFIRMS the injection at whatever
- *    progress is currently dialed in (a full 100% push injects everything
- *    with zero leftover; stopping partway injects only that fraction and
- *    keeps the rest loaded in the syringe).
- *
- *  Phase 3 — SUCCESS:
- *    Drug effects are applied, an injection sound plays, and the screen
- *    auto-closes after a short delay.
- *
- * TEXTURE PATHS (optional — game works with primitives if absent):
- *    assets/avaliproject/textures/gui/syringe/arm.png
- *    assets/avaliproject/textures/gui/syringe/syringe.png
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public class SyringeMinigameScreen extends Screen {
 
-    // =========================================================================
-    // Nested types
-    // =========================================================================
+    
+    
+    
 
     private enum Phase { AIMING, INSERTED, SUCCESS }
 
-    // =========================================================================
-    // Tuning constants
-    // =========================================================================
+    
+    
+    
 
-    /** Pixel radius around the vein centre within which a click counts as a hit. */
+     
     private static final int VEIN_RADIUS = 10;
 
-    /**
-     * Total mouse travel (px) needed to swing injection progress from 0 to 100%
-     * while holding right-click. Larger = finer, more deliberate control.
-     */
+    
+
+
+
     private static final float DRAG_FOR_FULL = 90f;
 
-    // =========================================================================
-    // Visual / layout constants
-    // =========================================================================
+    
+    
+    
 
-    // Arm
+    
     private static final int ARM_W = 54;
     private static final int ARM_H = 132;
 
-    // Syringe sprite sizes
+    
     private static final int SYR_W      = 12;
     private static final int SYR_H      = 38;
     private static final int NEEDLE_LEN = 14;
     private static final int PLUNGER_H  = 6;
 
-    // Colours
+    
     private static final int COL_PANEL  = 0xBB080812;
     private static final int COL_BORDER = 0xFF334466;
 
-    // =========================================================================
-    // State
-    // =========================================================================
+    
+    
+    
 
     private final DrugType drugType;
     private final float availableDosage;
-    /** Which limb the injection is targeting — stored for display and future limb-specific logic. */
+     
     @Nullable
     private final Limb targetLimb;
     private final InteractionHand hand;
+    private final int targetEntityId;
     private Phase phase = Phase.AIMING;
 
-    // Screen layout — computed in init()
+    
     private int armCX, armCY;
-    private int veinX, veinY; // vein target position on screen
+    private int veinX, veinY; 
 
-    // Snapshot taken at needle insertion
+    
     private int insertX, insertY;
 
     private float injectionProgress = 0f;
 
-    // Auto-close countdown after success (ticks)
+    
     private int closeCountdown = 0;
 
-    // Vein-pulse animation
+    
     private float   veinPulse    = 0f;
     private boolean veinPulseUp  = true;
 
-    // Hand-shake driven by status effects (px of random jitter per frame)
+    
     private final Random rng = new Random();
     private float shakeX, shakeY;
 
-    // Blood / fluid particles  [x, y, vx, vy, life(0–1)]
+    
     private static final int MAX_PARTICLES = 28;
     private final float[][] particles = new float[MAX_PARTICLES][5];
     private int particleCount = 0;
 
-    // =========================================================================
-    // Constructor
-    // =========================================================================
+    
+    
+    
 
-    /**
-     * @param drugType        which drug is loaded in the syringe
-     * @param availableDosage total dosage (mL) currently in the syringe
-     * @param targetLimb      the limb selected on the wheel (null if opened without a limb context)
-     * @param hand            which hand holds the syringe (needed to update it server-side)
-     */
-    public SyringeMinigameScreen(DrugType drugType, float availableDosage, @Nullable Limb targetLimb, InteractionHand hand) {
+    
+
+
+
+
+
+    public SyringeMinigameScreen(DrugType drugType, float availableDosage, @Nullable Limb targetLimb, InteractionHand hand, int targetEntityId) {
         super(Component.translatable("screen.avaliproject.syringe_minigame"));
         this.drugType        = drugType;
         this.availableDosage = availableDosage;
         this.targetLimb      = targetLimb;
         this.hand            = hand;
+        this.targetEntityId  = targetEntityId;
     }
 
-    // =========================================================================
-    // Init
-    // =========================================================================
+    
+    
+    
 
     @Override
     protected void init() {
         super.init();
         armCX = width  / 2;
         armCY = height / 2 + 5;
-        // Vein target sits slightly to the left of arm centre, a quarter of the way up
+        
         veinX = armCX - 7;
         veinY = armCY - 18;
     }
 
-    // =========================================================================
-    // Rendering
-    // =========================================================================
+    
+    
+    
 
     @Override
     public void renderBackground(GuiGraphics gfx, int mx, int my, float partial) {
-        // Intentionally empty — prevents MC's blur post-effect.
-        // The dark overlay is applied in render() instead.
+        
+        
     }
 
     @Override
     public void render(GuiGraphics gfx, int mx, int my, float partial) {
         gfx.fill(0, 0, width, height, 0xCC000000);
 
-        // Shift the logical cursor by the shake offset so unsteady players
-        // physically feel their hand trembling against the vein target.
+        
+        
         int smx = mx + (int) shakeX;
         int smy = my + (int) shakeY;
 
@@ -181,7 +183,7 @@ public class SyringeMinigameScreen extends Screen {
         super.render(gfx, mx, my, partial);
     }
 
-    // ---- Left-side stats panel ----
+    
 
     private void drawStatsPanel(GuiGraphics gfx) {
         int pw = 148, ph = 124;
@@ -193,37 +195,37 @@ public class SyringeMinigameScreen extends Screen {
         gfx.fill(px + pw - 1, py,          px + pw,     py + ph,     COL_BORDER);
     }
 
-    // ---- Forearm silhouette (black fur, matches BandageMinigameScreen) ----
+    
 
     private void drawArm(GuiGraphics gfx) {
         int x = armCX - ARM_W / 2;
         int y = armCY - ARM_H / 2;
 
-        final int BASE   = 0xFF0E0E0E; // main body fill
-        final int MID    = 0xFF181818; // slightly lighter mid-tone
-        final int HILIGHT = 0xFF262626; // subtle edge highlight (light catching fur tips)
-        final int DEEP   = 0xFF050505; // deepest shadow on the inner curve
-        final int FUR1   = 0xFF1C1C1C; // shorter strand
-        final int FUR2   = 0xFF282828; // longer strand tip
+        final int BASE   = 0xFF0E0E0E; 
+        final int MID    = 0xFF181818; 
+        final int HILIGHT = 0xFF262626; 
+        final int DEEP   = 0xFF050505; 
+        final int FUR1   = 0xFF1C1C1C; 
+        final int FUR2   = 0xFF282828; 
 
-        // Rounded cylinder body
+        
         gfx.fill(x + 2,  y + 5,             x + ARM_W - 2,  y + ARM_H - 5,  BASE);
         gfx.fill(x,      y + 12,            x + ARM_W,       y + ARM_H - 12, BASE);
-        // Top cap
+        
         gfx.fill(x + 5,  y + 2,             x + ARM_W - 5,  y + 5,          BASE);
         gfx.fill(x + 9,  y,                 x + ARM_W - 9,  y + 2,          BASE);
-        // Bottom cap
+        
         gfx.fill(x + 5,  y + ARM_H - 5,    x + ARM_W - 5,  y + ARM_H - 2,  BASE);
         gfx.fill(x + 9,  y + ARM_H - 2,    x + ARM_W - 9,  y + ARM_H,      BASE);
 
-        // Roundness shading: dark groove down the centre
+        
         gfx.fill(x + ARM_W / 2 - 4, y + 4,  x + ARM_W / 2 + 4, y + ARM_H - 4, DEEP);
-        // Slight mid-tone on the lit (right) side
+        
         gfx.fill(x + ARM_W - 10,    y + 8,  x + ARM_W - 3,      y + ARM_H - 8, MID);
-        // Thin highlight streak on the far right edge
+        
         gfx.fill(x + ARM_W - 4,     y + 10, x + ARM_W - 2,      y + ARM_H - 10, HILIGHT);
 
-        // Fur strands on the left edge
+        
         for (int fy = y + 6; fy < y + ARM_H - 6; fy += 3) {
             boolean longStrand = ((fy - y) % 9 == 0);
             int len = longStrand ? 4 : 2;
@@ -232,7 +234,7 @@ public class SyringeMinigameScreen extends Screen {
             if (longStrand) gfx.fill(x - len - 1, fy, x - len, fy + 1, DEEP);
         }
 
-        // Fur strands on the right edge (offset so left/right don't align)
+        
         for (int fy = y + 6; fy < y + ARM_H - 6; fy += 3) {
             boolean longStrand = ((fy - y) % 9 == 3);
             int len = longStrand ? 4 : 2;
@@ -241,14 +243,14 @@ public class SyringeMinigameScreen extends Screen {
             if (longStrand) gfx.fill(x + ARM_W + len, fy, x + ARM_W + len + 1, fy + 1, DEEP);
         }
 
-        // Fur tufts at the top cap
+        
         for (int fx = x + 9; fx < x + ARM_W - 9; fx += 4) {
             boolean tall = ((fx - x) % 8 == 1);
             int tuftH = tall ? 3 : 2;
             gfx.fill(fx, y - tuftH, fx + 2, y, tall ? FUR2 : FUR1);
         }
 
-        // Fur tufts at the bottom cap
+        
         for (int fx = x + 9; fx < x + ARM_W - 9; fx += 4) {
             boolean tall = ((fx - x) % 8 == 1);
             int tuftH = tall ? 3 : 2;
@@ -256,23 +258,23 @@ public class SyringeMinigameScreen extends Screen {
         }
     }
 
-    // ---- Vein and injection target ----
+    
 
     private void drawVein(GuiGraphics gfx, int smx, int smy) {
         boolean near = (phase == Phase.AIMING) && distToVein(smx, smy) <= VEIN_RADIUS * 2.5;
 
-        // Subtle blue vein line running along the inside of the arm
+        
         int lineAlpha = near ? (int)(0x65 + veinPulse * 0x55) : 0x48;
         gfx.fill(veinX - 1, armCY - ARM_H / 2 + 14, veinX + 2, armCY + ARM_H / 2 - 14,
                 (lineAlpha << 24) | 0x5566EE);
 
-        // Target bulge — brighter when the cursor is nearby
+        
         int bulgeAlpha = near ? (int)(0x88 + veinPulse * 0x66) : 0x58;
         gfx.fill(veinX - 4, veinY - 5, veinX + 5, veinY + 5, (bulgeAlpha << 24) | 0x7799FF);
         gfx.fill(veinX - 2, veinY - 3, veinX + 3, veinY + 3,
                 (Math.min(0xFF, bulgeAlpha + 0x44) << 24) | 0x99AAFF);
 
-        // Cross-hair guide dots (hint at the sweet spot while AIMING)
+        
         if (phase == Phase.AIMING) {
             int chAlpha = near ? 0xCC : 0x44;
             int chCol   = (chAlpha << 24) | 0xFFEE88;
@@ -282,49 +284,49 @@ public class SyringeMinigameScreen extends Screen {
             gfx.fill(veinX,     veinY + 6, veinX + 1, veinY + 9, chCol);
         }
 
-        // Small red entry mark at the puncture site while needle is inside
+        
         if (phase == Phase.INSERTED || phase == Phase.SUCCESS) {
             gfx.fill(insertX - 2, insertY - 1, insertX + 3, insertY + 2, 0xCCFF3333);
         }
     }
 
-    // ---- Syringe cursor ----
+    
 
-    /**
-     * Draws the syringe with the needle tip at the logical cursor.
-     *
-     * While AIMING  : tip follows the (shake-adjusted) cursor exactly.
-     * While INSERTED: tip is fixed at the vein; the barrel hangs above it.
-     *
-     * The plunger moves progressively downward into the barrel as
-     * {@code injectionProgress} increases, and the fluid level depletes to match.
-     */
+    
+
+
+
+
+
+
+
+
     private void drawSyringe(GuiGraphics gfx, int mx, int my) {
         int tipX = (phase == Phase.AIMING) ? mx     : insertX;
         int tipY = (phase == Phase.AIMING) ? my     : insertY;
 
-        // ---- Needle shaft ----
+        
         int needleTopY = tipY - NEEDLE_LEN;
         gfx.fill(tipX,     needleTopY,     tipX + 1, tipY,             0xFFDDDDDD);
-        gfx.fill(tipX - 1, needleTopY,     tipX + 2, needleTopY + 3,   0xFFAAAAAA); // bevel
+        gfx.fill(tipX - 1, needleTopY,     tipX + 2, needleTopY + 3,   0xFFAAAAAA); 
 
-        // ---- Barrel (glass tube) ----
+        
         int barX = tipX - SYR_W / 2;
         int barY = needleTopY - SYR_H;
 
-        gfx.fill(barX,              barY,             barX + SYR_W,     barY + SYR_H,     0x44BBBBBB); // glass fill
-        gfx.fill(barX,              barY,             barX + SYR_W,     barY + 1,          0xFFDDDDDD); // top edge
-        gfx.fill(barX,              barY + SYR_H - 1, barX + SYR_W,     barY + SYR_H,     0xFFDDDDDD); // bottom edge
-        gfx.fill(barX,              barY,             barX + 1,          barY + SYR_H,     0xFFDDDDDD); // left edge
-        gfx.fill(barX + SYR_W - 1,  barY,             barX + SYR_W,     barY + SYR_H,     0xFFDDDDDD); // right edge
+        gfx.fill(barX,              barY,             barX + SYR_W,     barY + SYR_H,     0x44BBBBBB); 
+        gfx.fill(barX,              barY,             barX + SYR_W,     barY + 1,          0xFFDDDDDD); 
+        gfx.fill(barX,              barY + SYR_H - 1, barX + SYR_W,     barY + SYR_H,     0xFFDDDDDD); 
+        gfx.fill(barX,              barY,             barX + 1,          barY + SYR_H,     0xFFDDDDDD); 
+        gfx.fill(barX + SYR_W - 1,  barY,             barX + SYR_W,     barY + SYR_H,     0xFFDDDDDD); 
 
-        // Fluid colour by drug type
+        
         int fluidCol = switch (drugType) {
-            case FENTANYL -> 0xCCFFCC44; // amber / golden
-            case HEROIN   -> 0xCCDDBB88; // tan / off-white
+            case FENTANYL -> 0xCCFFCC44; 
+            case HEROIN   -> 0xCCDDBB88; 
         };
 
-        // Fluid occupies the lower part of the barrel; empties from the top as progress rises
+        
         int innerH   = SYR_H - 4;
         int fluidPx  = (int)(innerH * (1f - injectionProgress));
         if (fluidPx > 0) {
@@ -332,31 +334,31 @@ public class SyringeMinigameScreen extends Screen {
             gfx.fill(barX + 2, fluidTop, barX + SYR_W - 2, barY + SYR_H - 2, fluidCol);
         }
 
-        // Graduation tick marks on the right side of the barrel
+        
         for (int i = 1; i <= 3; i++) {
             int markY = barY + i * SYR_H / 4;
             gfx.fill(barX + SYR_W - 4, markY, barX + SYR_W - 1, markY + 1, 0x88FFFFFF);
         }
-        // Glassy highlight streak down the left interior
+        
         gfx.fill(barX + 2, barY + 2, barX + 4, barY + SYR_H - 2, 0x33FFFFFF);
 
-        // ---- Plunger ----
-        // Starts flush with the barrel top; moves down as the dose is pushed in.
+        
+        
         int maxTravel    = SYR_H - PLUNGER_H - 4;
         int plungerOffset = (phase == Phase.AIMING) ? 0 : (int)(maxTravel * injectionProgress);
         int pY           = barY + plungerOffset;
 
-        gfx.fill(barX - 3,     pY,             barX + SYR_W + 3, pY + PLUNGER_H,  0xFFAAAAAA); // finger wings
-        gfx.fill(barX + 1,     pY + 1,         barX + SYR_W - 1, pY + PLUNGER_H,  0xFF777777); // rubber head
-        gfx.fill(barX + 2,     pY + 2,         barX + SYR_W - 2, pY + 3,          0xFF555555); // grip indent
+        gfx.fill(barX - 3,     pY,             barX + SYR_W + 3, pY + PLUNGER_H,  0xFFAAAAAA); 
+        gfx.fill(barX + 1,     pY + 1,         barX + SYR_W - 1, pY + PLUNGER_H,  0xFF777777); 
+        gfx.fill(barX + 2,     pY + 2,         barX + SYR_W - 2, pY + 3,          0xFF555555); 
 
-        // Rod visible above the barrel when the plunger is at the top
+        
         if (plungerOffset == 0) {
             gfx.fill(tipX - 1, barY - 11, tipX + 2, barY, 0xFF999999);
         }
     }
 
-    // ---- Particles ----
+    
 
     private void drawParticles(GuiGraphics gfx) {
         for (int i = 0; i < particleCount; i++) {
@@ -367,13 +369,13 @@ public class SyringeMinigameScreen extends Screen {
         }
     }
 
-    // ---- HUD ----
+    
 
     private void drawHUD(GuiGraphics gfx, int mx, int my) {
         int hx = 14;
         int hy = height / 2 - 56;
 
-        // Drug label
+        
         String drugName = switch (drugType) {
             case FENTANYL -> "Fentanyl";
             case HEROIN   -> "Heroin";
@@ -382,7 +384,7 @@ public class SyringeMinigameScreen extends Screen {
         gfx.drawString(font, "Injection: " + drugName + limbSuffix, hx, hy, 0xFFDDDDFF, false);
         gfx.drawString(font, "Loaded: " + (int) availableDosage + " mL", hx, hy - 12, 0xFF88CCFF, false);
 
-        // Phase instruction
+        
         String phaseLabel = switch (phase) {
             case AIMING   -> "Step 1: Aim at the glowing vein";
             case INSERTED -> "Step 2: Hold RIGHT-click, move mouse to adjust";
@@ -390,31 +392,31 @@ public class SyringeMinigameScreen extends Screen {
         };
         gfx.drawString(font, phaseLabel, hx, hy + 12, 0xAABBCC, false);
 
-        // Injection progress bar (shown once insertion has been attempted at least once)
+        
         if (injectionProgress > 0f || phase != Phase.AIMING) {
             int barW = 130, barH = 9;
             int barX = hx, barY = hy + 30;
 
-            gfx.fill(barX - 1, barY - 1, barX + barW + 1, barY + barH + 1, 0xFF111111); // border
-            gfx.fill(barX, barY, barX + barW, barY + barH, 0xFF1C1C2A);                  // track
+            gfx.fill(barX - 1, barY - 1, barX + barW + 1, barY + barH + 1, 0xFF111111); 
+            gfx.fill(barX, barY, barX + barW, barY + barH, 0xFF1C1C2A);                  
 
             int fillW   = (int)(barW * Math.min(injectionProgress, 1f));
             int barCol  = injectionProgress >= 1f ? 0xFF44BB66 : 0xFFAA5555;
             gfx.fill(barX, barY, barX + fillW, barY + barH, barCol);
-            gfx.fill(barX, barY, barX + fillW, barY + 3, 0x33FFFFFF); // sheen
+            gfx.fill(barX, barY, barX + fillW, barY + 3, 0x33FFFFFF); 
 
             int injectedMl = (int) (availableDosage * Math.min(injectionProgress, 1f));
             gfx.drawString(font, injectedMl + " / " + (int) availableDosage + " mL", barX, barY + barH + 4, 0x99BBEE, false);
         }
 
-        // Hand-shake warning
+        
         float shakeMag = getShakeMagnitude();
         if (shakeMag > 2f) {
             String warn = shakeMag > 5f ? "Hands shaking badly!" : "Hands unsteady";
             gfx.drawString(font, warn, hx, hy + 68, 0xFFFFAA22, false);
         }
 
-        // Aim-proximity readout while hunting the vein
+        
         if (phase == Phase.AIMING) {
             double dist = distToVein(mx, my);
             if (dist < VEIN_RADIUS * 4) {
@@ -424,7 +426,7 @@ public class SyringeMinigameScreen extends Screen {
             }
         }
 
-        // Bottom hint line
+        
         if (phase != Phase.SUCCESS) {
             String hint = switch (phase) {
                 case AIMING   -> "Click on the vein to insert needle";
@@ -438,9 +440,9 @@ public class SyringeMinigameScreen extends Screen {
         }
     }
 
-    // =========================================================================
-    // Tick / update
-    // =========================================================================
+    
+    
+    
 
     @Override
     public void tick() {
@@ -463,10 +465,10 @@ public class SyringeMinigameScreen extends Screen {
         shakeY = mag > 0f ? (rng.nextFloat() - 0.5f) * mag : 0f;
     }
 
-    /**
-     * Returns the pixel magnitude of cursor jitter caused by the player's current
-     * status effects. Applied each frame to the logical cursor before any hit-tests.
-     */
+    
+
+
+
     private float getShakeMagnitude() {
         Player p = minecraft.player;
         if (p == null) return 0f;
@@ -501,20 +503,20 @@ public class SyringeMinigameScreen extends Screen {
         p[0] = x + rng.nextInt(5) - 2;
         p[1] = y + rng.nextInt(5) - 2;
         p[2] = (rng.nextFloat() - 0.5f) * 2.5f;
-        p[3] = rng.nextFloat() * 1.8f; // bias downward
+        p[3] = rng.nextFloat() * 1.8f; 
         p[4] = 0.5f + rng.nextFloat() * 0.5f;
     }
 
-    // =========================================================================
-    // Mouse input
-    // =========================================================================
+    
+    
+    
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (button == 0 && phase == Phase.AIMING) {
-            // Apply shake to the effective click position before the hit-test.
-            // This means unsteady players will click in the wrong place even if
-            // they aimed correctly with the raw cursor.
+            
+            
+            
             attemptInsertion(mx + shakeX, my + shakeY);
             return true;
         }
@@ -525,13 +527,13 @@ public class SyringeMinigameScreen extends Screen {
         return super.mouseClicked(mx, my, button);
     }
 
-    /**
-     * Checks whether the effective cursor is within VEIN_RADIUS of the vein target.
-     * If yes, transitions to INSERTED.
-     *
-     * @param emx effective (shake-adjusted) cursor X
-     * @param emy effective (shake-adjusted) cursor Y
-     */
+    
+
+
+
+
+
+
     private void attemptInsertion(double emx, double emy) {
         if (distToVein((int) emx, (int) emy) <= VEIN_RADIUS) {
             phase   = Phase.INSERTED;
@@ -541,16 +543,16 @@ public class SyringeMinigameScreen extends Screen {
             spawnBloodParticle(veinX + 1, veinY + 2);
             playInsertSound();
         } else {
-            // Missed: cosmetic "ouch" particle where they poked
+            
             spawnBloodParticle((int) emx, (int) emy);
         }
     }
 
-    /**
-     * Core injection control — holding RIGHT mouse button while the needle is
-     * inserted and moving the cursor adjusts injection progress: moving down
-     * increases it, moving up decreases it. Clamped to [0, 1].
-     */
+    
+
+
+
+
     @Override
     public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
         if (button != 1 || phase != Phase.INSERTED) {
@@ -574,33 +576,34 @@ public class SyringeMinigameScreen extends Screen {
         return super.mouseReleased(mx, my, button);
     }
 
-    // =========================================================================
-    // Keyboard
-    // =========================================================================
+    
+    
+    
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) { onClose(); return true; } // Escape
+        if (keyCode == 256) { onClose(); return true; } 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean isPauseScreen() { return false; }
 
-    // =========================================================================
-    // Success / effects
-    // =========================================================================
+    
+    
+    
 
     private void triggerSuccess() {
         phase          = Phase.SUCCESS;
-        closeCountdown = 80; // ~4 s at 20 tps, then screen closes
+        closeCountdown = 80; 
 
         float injectedAmount = availableDosage * Math.min(injectionProgress, 1f);
 
         PacketDistributor.sendToServer(new SyringeEffectPayload(
                 hand == InteractionHand.MAIN_HAND ? 0 : 1,
                 drugType.ordinal(),
-                injectedAmount));
+                injectedAmount,
+                targetEntityId));
 
         playInjectSound();
     }
@@ -621,9 +624,9 @@ public class SyringeMinigameScreen extends Screen {
                 0.9f, 1.0f, false);
     }
 
-    // =========================================================================
-    // Utility
-    // =========================================================================
+    
+    
+    
 
     private double distToVein(int mx, int my) {
         double dx = mx - veinX, dy = my - veinY;

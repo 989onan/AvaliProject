@@ -12,23 +12,23 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
-/**
- * Renders active bleeding tier icons on the HUD (top-right corner).
- *
- * One row per bleeding limb, stacked downward:
- *
- *   "Left Arm (42%)"  [icon]
- *   "Head (80%)"      [icon]
- *
- * Only limbs with bleed > 0 are shown.
- * Hidden when F1 (hideGui) is active.
- */
+
+
+
+
+
+
+
+
+
+
+
 @EventBusSubscriber(modid = AvaliProject.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)
 public class BleedingHudOverlay {
 
     private static final int ICON_SIZE = 16;
     private static final int ROW_H    = ICON_SIZE + 2;
-    private static final int MARGIN   = 4; // gap from screen edge and between rows
+    private static final int MARGIN   = 4; 
 
     @SubscribeEvent
     public static void onRenderGui(RenderGuiEvent.Post event) {
@@ -48,10 +48,10 @@ public class BleedingHudOverlay {
             BleedingTier tier = BleedingTier.fromBleedValue(bleed);
             if (tier == null) continue;
 
-            // Effect icon on the far right
+            
             gfx.blit(tier.icon, iconX, y, 0, 0, ICON_SIZE, ICON_SIZE);
 
-            // "Limb Name (bleed%)" label, right-aligned against the icon
+            
             String label = limb.getDisplayName().getString() + " (" + bleed + "%)";
             int labelX = iconX - mc.font.width(label) - 3;
             int labelY = y + (ICON_SIZE - mc.font.lineHeight) / 2;
